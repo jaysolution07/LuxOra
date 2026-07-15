@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LuxOra</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='46%25' r='62%25'%3E%3Cstop offset='0%25' stop-color='%23fffaf0'/%3E%3Cstop offset='55%25' stop-color='%23f5eac9'/%3E%3Cstop offset='100%25' stop-color='%23e6d5a3'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)' stroke='%23c9a24b' stroke-width='4'/%3E%3Cg stroke='%23c9a24b' stroke-width='2.4' stroke-linecap='round' opacity='.7'%3E%3Cline x1='50' y1='4' x2='50' y2='14'/%3E%3Cline x1='50' y1='86' x2='50' y2='96'/%3E%3Cline x1='4' y1='50' x2='14' y2='50'/%3E%3Cline x1='86' y1='50' x2='96' y2='50'/%3E%3Cline x1='17' y1='17' x2='24' y2='24'/%3E%3Cline x1='76' y1='76' x2='83' y2='83'/%3E%3Cline x1='17' y1='83' x2='24' y2='76'/%3E%3Cline x1='76' y1='24' x2='83' y2='17'/%3E%3C/g%3E%3Cg transform='translate(50 55) scale(1.05)' fill='%231b1a24'%3E%3Cpath d='M-3 9-13 24-6 15 0 22 4 14 9 23 3 9Z'/%3E%3Cellipse cx='0' cy='-3' rx='6.6' ry='13'/%3E%3Ccircle cx='2.2' cy='-16' r='5'/%3E%3Cpath d='M6-16 12.5-14 6-11.6Z'/%3E%3Cpath d='M-4-7C-19-11-32-24-36-37-28-30-17-22-6-18-13-16-19-10-21-3-15-6-9-8-4-7Z'/%3E%3Cpath d='M4-7C19-11 32-24 36-37 28-30 17-22 6-18 13-16 19-10 21-3 15-6 9-8 4-7Z'/%3E%3Ccircle cx='3.6' cy='-16.6' r='1' fill='%23f5eac9'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -411,6 +412,31 @@
       gap: 9px;
     }
 
+    .person-summary {
+      display: grid;
+      gap: 12px;
+    }
+
+    .person-kpis {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .person-kpi {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background: #fbf9f5;
+    }
+
+    .person-kpi strong {
+      display: block;
+      margin-top: 5px;
+      font-family: var(--font-display);
+      font-size: 22px;
+    }
+
     .mini-bar-row {
       display: grid;
       grid-template-columns: minmax(96px, 1fr) minmax(0, 2fr) auto;
@@ -579,6 +605,7 @@
       main { padding: 28px; }
       .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .filter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .person-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
@@ -768,10 +795,25 @@
                   <label for="filter_client">Client</label>
                   <select id="filter_client"></select>
                 </div>
+                <div class="admin-filter">
+                  <label for="filter_owner">Apporteur</label>
+                  <select id="filter_owner"></select>
+                </div>
                 <div>
                   <button id="clearFiltersBtn" class="btn btn-secondary full" type="button">Reinitialiser</button>
                 </div>
               </div>
+            </div>
+
+            <div class="panel admin-filter">
+              <div class="toolbar" style="margin-bottom:8px">
+                <div>
+                  <h3>Stats personne</h3>
+                  <p class="muted" id="personStatsHelp"></p>
+                </div>
+                <button id="openSelectedPersonBtn" class="btn btn-primary" type="button">Voir la fiche</button>
+              </div>
+              <div id="personStatsPanel" class="person-summary"></div>
             </div>
 
             <div class="panel">
@@ -850,6 +892,7 @@
             </div>
             <div class="actions">
               <button id="cancelEditUserBtn" class="btn btn-secondary">Annuler</button>
+              <button id="deleteUserBtn" class="btn btn-secondary">Supprimer l'apporteur</button>
               <button id="updateUserBtn" class="btn btn-primary">Enregistrer</button>
             </div>
           </div>
@@ -963,6 +1006,42 @@
             </div>
           </div>
 
+          <div id="clientEditPanel" class="panel" style="display:none;margin-top:14px">
+            <h3>Modifier le client</h3>
+            <input id="edit_client_id" type="hidden">
+            <div class="form-grid">
+              <div>
+                <label for="edit_client_name">Nom de l'entreprise</label>
+                <input id="edit_client_name">
+              </div>
+              <div>
+                <label for="edit_client_phone">Telephone</label>
+                <input id="edit_client_phone">
+              </div>
+              <div>
+                <label for="edit_client_site">Site internet</label>
+                <input id="edit_client_site">
+              </div>
+              <div>
+                <label for="edit_client_address">Adresse</label>
+                <input id="edit_client_address">
+              </div>
+              <div>
+                <label for="edit_client_owner">Attribuer a</label>
+                <select id="edit_client_owner"></select>
+              </div>
+              <div>
+                <label for="edit_client_notes">Notes</label>
+                <input id="edit_client_notes">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="cancelEditClientBtn" class="btn btn-secondary">Annuler</button>
+              <button id="deleteClientBtn" class="btn btn-secondary">Supprimer le client</button>
+              <button id="updateClientBtn" class="btn btn-primary">Enregistrer</button>
+            </div>
+          </div>
+
           <div class="panel" style="margin-top:14px">
             <div class="table-wrap">
               <table>
@@ -973,9 +1052,28 @@
                     <th>Referent</th>
                     <th>Contact</th>
                     <th>Notes</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="clientsRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px">
+            <h3>Historique portefeuille</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Client</th>
+                    <th>Action</th>
+                    <th>De</th>
+                    <th>Vers</th>
+                  </tr>
+                </thead>
+                <tbody id="portfolioHistoryRows"></tbody>
               </table>
             </div>
           </div>
@@ -1206,6 +1304,7 @@
       appointments: StoredSession?.appointments || [],
       revenue: StoredSession?.revenue || [],
       objectives: StoredSession?.objectives || [],
+      portfolioHistory: StoredSession?.portfolioHistory || [],
       loading: {
         users: false,
         clients: false,
@@ -1264,8 +1363,20 @@
         State.user = data.user;
         State.company = data.company;
         State.businessEndpoint = data.company?.business_endpoint || '';
+        State.users = data.users || [State.user];
+        State.stats = data.stats || null;
         persistSession();
-        await bootstrapApp();
+        $('loginScreen').style.display = 'none';
+        $('bootScreen').style.display = 'none';
+        $('app').style.display = 'block';
+        renderAll();
+        State.loading.clients = true;
+        State.loading.appointments = true;
+        State.loading.revenue = true;
+        renderAll();
+        await loadBusinessBootstrap().catch(err => showToast(err.message));
+        renderAll();
+        persistSession();
       } catch (err) {
         $('loginError').textContent = err.message;
         $('loginError').style.display = 'block';
@@ -1275,20 +1386,53 @@
     }
 
     async function bootstrapApp() {
-      const data = await masterApi.request('me');
+      State.loading.users = State.user?.role === 'admin';
+      State.loading.clients = true;
+      State.loading.appointments = true;
+      State.loading.revenue = true;
+      if (State.user) renderAll();
+
+      const data = await masterApi.request('bootstrap');
       State.user = data.user;
       State.company = data.company;
       State.businessEndpoint = data.company?.business_endpoint || '';
       State.stats = data.stats;
-      await loadUsers();
-      await loadClients();
-      await loadAppointments();
-      await loadRevenueData();
+      State.users = data.users || [State.user];
+      State.loading.users = false;
+      await loadBusinessBootstrap();
       renderAll();
       $('loginScreen').style.display = 'none';
       $('bootScreen').style.display = 'none';
       $('app').style.display = 'block';
       persistSession();
+    }
+
+    async function loadBusinessBootstrap() {
+      if (!State.businessEndpoint) {
+        State.clients = [];
+        State.appointments = [];
+        State.revenue = [];
+        State.objectives = [];
+        State.portfolioHistory = [];
+        State.loading.clients = false;
+        State.loading.appointments = false;
+        State.loading.revenue = false;
+        return;
+      }
+      try {
+        const data = await businessApi.request('bootstrap');
+        State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
+        State.clients = data.clients || [];
+        State.appointments = data.appointments || [];
+        State.revenue = data.revenue || [];
+        State.objectives = data.objectives || [];
+        State.portfolioHistory = data.portfolioHistory || [];
+        persistSession();
+      } finally {
+        State.loading.clients = false;
+        State.loading.appointments = false;
+        State.loading.revenue = false;
+      }
     }
 
     async function loadUsers() {
@@ -1367,6 +1511,9 @@
       document.querySelectorAll('.admin-user-col').forEach(el => {
         el.style.display = isAdmin ? 'table-cell' : 'none';
       });
+      document.querySelectorAll('.admin-filter').forEach(el => {
+        el.style.display = isAdmin ? 'block' : 'none';
+      });
       if (!isAdmin && document.getElementById('users').classList.contains('active')) setView('dashboard');
       $('companyName').textContent = State.company?.entreprise || '';
       $('dashboardTitle').textContent = State.company?.entreprise || 'Tableau de bord';
@@ -1387,14 +1534,22 @@
       renderStats();
       renderUsers();
       renderClients();
+      renderPortfolioHistory();
       renderAppointmentClientOptions();
       renderAppointments();
       renderRevenueOptions();
       renderRevenue();
       renderDashboardAnalytics();
+      renderPersonStats();
     }
 
     function renderStats() {
+      if (State.loading.clients || State.loading.appointments || State.loading.revenue) {
+        ['statClients', 'statAppointments', 'statPendingReports', 'statRevenue', 'statContracts'].forEach(id => {
+          $(id).innerHTML = '<div class="skeleton" style="height:30px"></div>';
+        });
+        return;
+      }
       const filteredRevenue = filterRevenue(State.revenue);
       $('statUsers').textContent = State.stats?.users || State.users.length || 0;
       $('statAdmins').textContent = State.stats?.admins || State.users.filter(user => user.role === 'admin').length || 0;
@@ -1418,25 +1573,33 @@
           <td>${escapeHtml(user.entreprise)}</td>
           <td><span class="badge ${user.role === 'admin' ? 'warn' : 'ok'}">${roleLabel(user.role)}</span></td>
           <td class="admin-user-col">${escapeHtml(user.MDP || '')}</td>
-          <td class="admin-user-col"><button class="btn btn-secondary" data-edit-user="${escapeAttr(user.ID)}">Modifier</button></td>
+          <td class="admin-user-col">
+            <div class="inline-actions">
+              <button class="btn btn-secondary" data-edit-user="${escapeAttr(user.ID)}">Modifier</button>
+              <button class="btn btn-secondary" data-person-stats="${escapeAttr(user.ID)}">Stats</button>
+              ${user.role === 'apporteur' ? `<button class="btn btn-secondary" data-delete-user="${escapeAttr(user.ID)}">Supprimer</button>` : ''}
+            </div>
+          </td>
         </tr>
       `).join('') || `<tr><td colspan="6" class="muted">Aucun utilisateur.</td></tr>`;
     }
 
     function renderClients() {
       if (State.loading.clients) {
-        $('clientsRows').innerHTML = skeletonRows(5, 4);
+        $('clientsRows').innerHTML = skeletonRows(6, 4);
         return;
       }
       $('clientsRows').innerHTML = State.clients.map(client => {
         const referents = client.referents || [];
         const referentList = referents.map(ref => escapeHtml([ref.prenom, ref.nom].filter(Boolean).join(' ') || 'Référent')).join('<br>');
         const contact = referents.map(ref => escapeHtml([ref.email, ref.telephone].filter(Boolean).join(' - '))).filter(Boolean).join('<br>');
+        const owner = State.users.find(user => user.ID === client.owner_id);
         return `
           <tr class="${client._pending ? 'row-pending' : ''}">
             <td>
               <strong>${escapeHtml(client.nom_entreprise)}</strong>
               <div class="muted">${escapeHtml(client.adresse || '')}</div>
+              <div class="muted">${escapeHtml(owner ? `Portefeuille: ${owner.Nom}` : '')}</div>
               <div style="margin-top:8px"><button class="btn btn-secondary" data-add-referent="${escapeAttr(client.client_id)}">Ajouter un référent</button></div>
             </td>
             <td>${escapeHtml(client.telephone || '')}</td>
@@ -1445,9 +1608,15 @@
             </td>
             <td>${contact || ''}</td>
             <td>${escapeHtml(client.notes || '')}</td>
+            <td>
+              <div class="inline-actions">
+                <button class="btn btn-secondary" data-edit-client="${escapeAttr(client.client_id)}">Modifier</button>
+                <button class="btn btn-secondary" data-delete-client="${escapeAttr(client.client_id)}">Supprimer</button>
+              </div>
+            </td>
           </tr>
         `;
-      }).join('') || `<tr><td colspan="5" class="muted">Aucun client pour le moment.</td></tr>`;
+      }).join('') || `<tr><td colspan="6" class="muted">Aucun client pour le moment.</td></tr>`;
     }
 
     function renderAppointmentClientOptions() {
@@ -1506,12 +1675,42 @@
       const apporteurs = getAssignableUsers();
       const currentRevenueOwner = $('revenue_owner').value;
       const currentObjectiveOwner = $('objective_owner').value;
+      const currentFilterOwner = $('filter_owner').value;
+      const currentEditOwner = $('edit_client_owner').value;
       const ownerOptions = apporteurs.map(user => `<option value="${escapeAttr(user.ID)}">${escapeHtml(user.Nom || user.ID)}</option>`).join('');
       $('revenue_owner').innerHTML = ownerOptions;
       $('objective_owner').innerHTML = ownerOptions;
+      $('filter_owner').innerHTML = `<option value="">Moi / global</option>${ownerOptions}`;
+      $('edit_client_owner').innerHTML = ownerOptions;
       if (currentRevenueOwner) $('revenue_owner').value = currentRevenueOwner;
       if (currentObjectiveOwner) $('objective_owner').value = currentObjectiveOwner;
+      else if (State.user?.ID) $('objective_owner').value = State.user.ID;
+      if (currentFilterOwner) $('filter_owner').value = currentFilterOwner;
+      if (currentEditOwner) $('edit_client_owner').value = currentEditOwner;
       fillObjectiveForm();
+    }
+
+    function renderPortfolioHistory() {
+      if (!$('portfolioHistoryRows')) return;
+      if (State.loading.clients || State.loading.revenue) {
+        $('portfolioHistoryRows').innerHTML = skeletonRows(5, 3);
+        return;
+      }
+      const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
+      const ownerId = $('filter_owner')?.value || '';
+      const rows = (State.portfolioHistory || [])
+        .filter(item => !ownerId || item.from_owner_id === ownerId || item.to_owner_id === ownerId)
+        .slice()
+        .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+      $('portfolioHistoryRows').innerHTML = rows.map(item => `
+        <tr class="${item._pending ? 'row-pending' : ''}">
+          <td>${escapeHtml(formatDateTime(item.created_at))}</td>
+          <td>${escapeHtml(item.client_nom || 'Client')}</td>
+          <td><span class="badge pending">${escapeHtml(item._pending ? 'synchronisation' : item.action || '')}</span></td>
+          <td>${escapeHtml(userMap.get(item.from_owner_id) || item.from_owner_id || '')}</td>
+          <td>${escapeHtml(userMap.get(item.to_owner_id) || item.to_owner_id || '')}</td>
+        </tr>
+      `).join('') || `<tr><td colspan="5" class="muted">Aucun historique.</td></tr>`;
     }
 
     function renderRevenue() {
@@ -1529,7 +1728,7 @@
       $('revenueRows').innerHTML = rows.map(item => `
         <tr class="${item._pending ? 'row-pending' : ''}">
           <td>${escapeHtml(formatDate(item.date))}</td>
-          <td>${escapeHtml(clientMap.get(item.client_id) || 'Client')}</td>
+          <td>${escapeHtml(clientMap.get(item.client_id) || item.client_nom || 'Client')}</td>
           <td>${escapeHtml(userMap.get(item.owner_id) || item.owner_id || '')}</td>
           <td><strong>${escapeHtml(formatMoney(item.montant))}</strong></td>
           <td>${escapeHtml(item.nombre_contrats || 0)}</td>
@@ -1539,8 +1738,13 @@
     }
 
     function renderDashboardAnalytics() {
+      if (State.loading.revenue) {
+        $('objectiveProgress').innerHTML = '<div class="skeleton" style="height:62px"></div><div class="skeleton" style="height:62px"></div>';
+        $('revenueBars').innerHTML = '<div class="skeleton" style="height:120px"></div>';
+        return;
+      }
       const rows = filterRevenue(State.revenue);
-      const ownerId = State.user.role === 'admin' ? $('objective_owner').value || State.user.ID : State.user.ID;
+      const ownerId = State.user.role === 'admin' ? $('filter_owner').value || State.user.ID : State.user.ID;
       const objective = getObjectiveFor(ownerId);
       const ca = sumField(rows.filter(item => State.user.role === 'admin' ? item.owner_id === ownerId : true), 'montant');
       const contracts = sumField(rows.filter(item => State.user.role === 'admin' ? item.owner_id === ownerId : true), 'nombre_contrats');
@@ -1572,6 +1776,81 @@
         </div>
       `).join('') || '<p class="muted">Aucune donnee sur la periode.</p>';
       return `<div><h3 style="margin-top:0">${escapeHtml(title)}</h3>${rows}</div>`;
+    }
+
+    function openPersonStats(ownerId) {
+      const id = ownerId || $('filter_owner').value || State.user.ID;
+      if ($('filter_owner')) $('filter_owner').value = id;
+      setView('dashboard');
+      renderStats();
+      renderRevenue();
+      renderDashboardAnalytics();
+      renderPortfolioHistory();
+      renderPersonStats();
+      $('personStatsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderPersonStats() {
+      if (!$('personStatsPanel') || State.user.role !== 'admin') return;
+      if (State.loading.clients || State.loading.revenue || State.loading.appointments) {
+        $('personStatsHelp').textContent = 'Chargement des donnees.';
+        $('personStatsPanel').innerHTML = '<div class="skeleton" style="height:120px"></div>';
+        return;
+      }
+      const ownerId = $('filter_owner').value || State.user.ID;
+      const person = State.users.find(user => user.ID === ownerId) || State.user;
+      const clients = State.clients.filter(client => client.owner_id === ownerId);
+      const revenueRows = State.revenue
+        .filter(item => item.owner_id === ownerId)
+        .filter(item => {
+          const start = $('filter_start')?.value || '';
+          const end = $('filter_end')?.value || '';
+          const clientId = $('filter_client')?.value || '';
+          if (start && item.date < start) return false;
+          if (end && item.date > end) return false;
+          if (clientId && item.client_id !== clientId) return false;
+          return true;
+        })
+        .slice()
+        .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      const appointments = State.appointments.filter(item => item.owner_id === ownerId);
+      const objective = getObjectiveFor(ownerId);
+      const totalCa = sumField(revenueRows, 'montant');
+      const totalContracts = sumField(revenueRows, 'nombre_contrats');
+      const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
+      $('personStatsHelp').textContent = `${person.Nom || person.ID} - ${roleLabel(person.role)}`;
+      $('personStatsPanel').innerHTML = `
+        <div class="person-kpis">
+          <div class="person-kpi"><span class="muted">Clients</span><strong>${clients.length}</strong></div>
+          <div class="person-kpi"><span class="muted">CA realise</span><strong>${escapeHtml(formatMoney(totalCa))}</strong></div>
+          <div class="person-kpi"><span class="muted">Contrats</span><strong>${totalContracts}</strong></div>
+          <div class="person-kpi"><span class="muted">Rendez-vous</span><strong>${appointments.length}</strong></div>
+        </div>
+        <div class="progress-block">
+          ${progressLine("Objectif CA", totalCa, Number(objective?.objectif_ca || 0), formatMoney)}
+          ${progressLine("Objectif contrats", totalContracts, Number(objective?.objectif_contrats || 0), value => String(value))}
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Client</th><th>Montant</th><th>Contrats</th><th>Commentaire</th></tr></thead>
+            <tbody>
+              ${revenueRows.map(item => `
+                <tr>
+                  <td>${escapeHtml(formatDate(item.date))}</td>
+                  <td>${escapeHtml(clientMap.get(item.client_id) || item.client_nom || 'Client')}</td>
+                  <td><strong>${escapeHtml(formatMoney(item.montant))}</strong></td>
+                  <td>${escapeHtml(item.nombre_contrats || 0)}</td>
+                  <td>${escapeHtml(item.commentaires || '')}</td>
+                </tr>
+              `).join('') || '<tr><td colspan="5" class="muted">Aucun chiffre enregistre pour cette selection.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3>Clients du portefeuille</h3>
+          <p class="muted">${clients.map(client => escapeHtml(client.nom_entreprise)).join(' - ') || 'Aucun client attribue.'}</p>
+        </div>
+      `;
     }
 
     async function createUser() {
@@ -1668,6 +1947,50 @@
         showToast(err.message);
       } finally {
         setButtonLoading('updateUserBtn', false);
+      }
+    }
+
+    async function deleteUser(userId) {
+      const user = State.users.find(item => item.ID === userId);
+      if (!user || user.role !== 'apporteur') return;
+      const previousUsers = State.users.slice();
+      const previousClients = State.clients.map(client => ({ ...client, referents: [...(client.referents || [])] }));
+      const previousHistory = State.portfolioHistory.slice();
+      const reassignedClients = State.clients.filter(client => client.owner_id === userId);
+      reassignedClients.forEach(client => {
+        State.portfolioHistory.unshift({
+          history_id: tempId('hist'),
+          client_id: client.client_id,
+          client_nom: client.nom_entreprise,
+          from_owner_id: userId,
+          to_owner_id: State.user.ID,
+          action: 'transfert',
+          created_at: new Date().toISOString(),
+        });
+        client.owner_id = State.user.ID;
+        client._pending = true;
+      });
+      State.users = State.users.filter(item => item.ID !== userId);
+      renderAll();
+      persistSession();
+      try {
+        for (const client of reassignedClients) {
+          await businessApi.request('transferClient', {
+            client_id: client.client_id,
+            owner_id: State.user.ID,
+            commentaires: `Reprise automatique avant suppression de ${user.Nom || userId}`,
+          });
+          client._pending = false;
+        }
+        await masterApi.request('deleteUser', { id: userId });
+        silentRefresh();
+        showToast('Apporteur supprime');
+      } catch (err) {
+        State.users = previousUsers;
+        State.clients = previousClients;
+        State.portfolioHistory = previousHistory;
+        renderAll();
+        showToast(err.message);
       }
     }
 
@@ -1778,6 +2101,122 @@
         showToast(err.message);
       } finally {
         setButtonLoading('createClientBtn', false);
+      }
+    }
+
+    function openEditClient(clientId) {
+      const client = State.clients.find(item => item.client_id === clientId);
+      if (!client) return;
+      renderRevenueOptions();
+      $('edit_client_id').value = client.client_id;
+      $('edit_client_name').value = client.nom_entreprise || '';
+      $('edit_client_phone').value = client.telephone || '';
+      $('edit_client_site').value = client.site_internet || '';
+      $('edit_client_address').value = client.adresse || '';
+      $('edit_client_notes').value = client.notes || '';
+      $('edit_client_owner').value = client.owner_id || State.user?.ID || '';
+      $('edit_client_owner').disabled = State.user.role !== 'admin';
+      $('clientEditPanel').style.display = 'block';
+      $('clientEditPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeEditClient() {
+      $('clientEditPanel').style.display = 'none';
+      ['edit_client_id', 'edit_client_name', 'edit_client_phone', 'edit_client_site', 'edit_client_address', 'edit_client_notes'].forEach(id => $(id).value = '');
+    }
+
+    async function updateClient() {
+      const clientId = $('edit_client_id').value;
+      const current = State.clients.find(item => item.client_id === clientId);
+      if (!current) return;
+      const previous = { ...current, referents: [...(current.referents || [])] };
+      const previousHistory = State.portfolioHistory.slice();
+      const nextOwner = $('edit_client_owner').value || current.owner_id;
+      Object.assign(current, {
+        nom_entreprise: $('edit_client_name').value,
+        telephone: $('edit_client_phone').value,
+        site_internet: $('edit_client_site').value,
+        adresse: $('edit_client_address').value,
+        notes: $('edit_client_notes').value,
+        owner_id: State.user.role === 'admin' ? nextOwner : current.owner_id,
+        _pending: true,
+      });
+      let optimisticHistory = null;
+      if (State.user.role === 'admin' && previous.owner_id !== nextOwner) {
+        optimisticHistory = {
+          history_id: tempId('hist'),
+          client_id: clientId,
+          client_nom: current.nom_entreprise,
+          from_owner_id: previous.owner_id,
+          to_owner_id: nextOwner,
+          action: 'transfert',
+          created_at: new Date().toISOString(),
+          _pending: true,
+        };
+        State.portfolioHistory.unshift(optimisticHistory);
+      }
+      renderAll();
+      persistSession();
+      setButtonLoading('updateClientBtn', true);
+      try {
+        let saved = await businessApi.request('updateClient', {
+          client_id: clientId,
+          nom_entreprise: current.nom_entreprise,
+          telephone: current.telephone,
+          site_internet: current.site_internet,
+          adresse: current.adresse,
+          notes: current.notes,
+        });
+        if (State.user.role === 'admin' && previous.owner_id !== nextOwner) {
+          saved = await businessApi.request('transferClient', {
+            client_id: clientId,
+            owner_id: nextOwner,
+            commentaires: 'Transfert depuis fiche client',
+          });
+          if (optimisticHistory) optimisticHistory._pending = false;
+        }
+        Object.assign(current, saved, { _pending: false });
+        closeEditClient();
+        renderAll();
+        silentRefresh();
+        showToast('Client modifie');
+      } catch (err) {
+        Object.assign(current, previous, { _pending: false });
+        State.portfolioHistory = previousHistory;
+        renderAll();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('updateClientBtn', false);
+      }
+    }
+
+    async function deleteClient(clientId) {
+      const removed = State.clients.find(item => item.client_id === clientId);
+      if (!removed) return;
+      const previousClients = State.clients.slice();
+      const previousHistory = State.portfolioHistory.slice();
+      State.clients = State.clients.filter(item => item.client_id !== clientId);
+      State.portfolioHistory.unshift({
+        history_id: tempId('hist'),
+        client_id: clientId,
+        client_nom: removed.nom_entreprise,
+        from_owner_id: removed.owner_id,
+        to_owner_id: '',
+        action: 'suppression',
+        created_at: new Date().toISOString(),
+      });
+      renderAll();
+      persistSession();
+      try {
+        await businessApi.request('deleteClient', { client_id: clientId });
+        closeEditClient();
+        silentRefresh();
+        showToast('Client supprime');
+      } catch (err) {
+        State.clients = previousClients;
+        State.portfolioHistory = previousHistory;
+        renderAll();
+        showToast(err.message);
       }
     }
 
@@ -1940,17 +2379,19 @@
     async function refresh() {
       setButtonLoading('refreshBtn', true);
       try {
-      const me = await masterApi.request('me');
-      State.user = me.user;
-      State.company = me.company;
-      State.businessEndpoint = me.company?.business_endpoint || '';
-      State.stats = me.stats;
-      await loadUsers();
-      await loadClients();
-      await loadAppointments();
-      await loadRevenueData();
-      renderAll();
-      persistSession();
+        State.loading.clients = true;
+        State.loading.appointments = true;
+        State.loading.revenue = true;
+        renderAll();
+        const data = await masterApi.request('bootstrap');
+        State.user = data.user;
+        State.company = data.company;
+        State.businessEndpoint = data.company?.business_endpoint || '';
+        State.stats = data.stats;
+        State.users = data.users || [State.user];
+        await loadBusinessBootstrap();
+        renderAll();
+        persistSession();
       } finally {
         setButtonLoading('refreshBtn', false);
       }
@@ -1958,18 +2399,13 @@
 
     function silentRefresh(options = {}) {
       (async () => {
-        const me = await masterApi.request('me');
-        State.user = me.user;
-        State.company = me.company;
-        State.businessEndpoint = me.company?.business_endpoint || '';
-        State.stats = me.stats;
-        State.users = State.user.role === 'admin' ? await masterApi.request('listUsers') : [State.user];
-        if (State.businessEndpoint) {
-          State.clients = await businessApi.request('listClients');
-          State.appointments = await businessApi.request('listAppointments');
-          State.revenue = await businessApi.request('listRevenue');
-          State.objectives = await businessApi.request('listObjectives');
-        }
+        const data = await masterApi.request('bootstrap');
+        State.user = data.user;
+        State.company = data.company;
+        State.businessEndpoint = data.company?.business_endpoint || '';
+        State.stats = data.stats;
+        State.users = data.users || [State.user];
+        await loadBusinessBootstrap();
         renderAll();
         persistSession();
       })().catch(() => {
@@ -2051,6 +2487,7 @@
     }
 
     function buildRevenueFromForm() {
+      const client = State.clients.find(item => item.client_id === $('revenue_client').value);
       return {
         revenue_id: tempId('ca'),
         client_id: $('revenue_client').value,
@@ -2059,6 +2496,7 @@
         montant: Number($('revenue_amount').value || 0),
         nombre_contrats: Number($('revenue_contracts').value || 0),
         commentaires: $('revenue_comments').value,
+        client_nom: client?.nom_entreprise || '',
         _pending: true,
       };
     }
@@ -2081,14 +2519,22 @@
       $('objective_end').value = objective?.date_fin || '';
     }
 
+    function syncRevenueOwnerFromClient() {
+      if (State.user?.role !== 'admin') return;
+      const client = State.clients.find(item => item.client_id === $('revenue_client').value);
+      if (client?.owner_id) $('revenue_owner').value = client.owner_id;
+    }
+
     function filterRevenue(rows) {
       const start = $('filter_start')?.value || '';
       const end = $('filter_end')?.value || '';
       const clientId = $('filter_client')?.value || '';
+      const ownerId = $('filter_owner')?.value || '';
       return rows.filter(item => {
         if (start && item.date < start) return false;
         if (end && item.date > end) return false;
         if (clientId && item.client_id !== clientId) return false;
+        if (ownerId && item.owner_id !== ownerId) return false;
         return true;
       });
     }
@@ -2097,7 +2543,7 @@
       const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
       const grouped = new Map();
       rows.forEach(item => {
-        const label = clientMap.get(item.client_id) || 'Client';
+        const label = clientMap.get(item.client_id) || item.client_nom || 'Client';
         grouped.set(label, (grouped.get(label) || 0) + Number(item.montant || 0));
       });
       return Array.from(grouped, ([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total);
@@ -2168,6 +2614,13 @@
       return date.toLocaleDateString('fr-FR');
     }
 
+    function formatDateTime(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value;
+      return date.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+    }
+
     function readStoredSession() {
       try {
         const raw = localStorage.getItem('crm.session');
@@ -2196,6 +2649,7 @@
         appointments: State.appointments,
         revenue: State.revenue,
         objectives: State.objectives,
+        portfolioHistory: State.portfolioHistory,
         savedAt: Date.now(),
       }));
     }
@@ -2241,28 +2695,36 @@
     $('refreshBtn').addEventListener('click', () => refresh().then(() => showToast('Donnees actualisees')).catch(err => showToast(err.message)));
     $('createUserBtn').addEventListener('click', createUser);
     $('updateUserBtn').addEventListener('click', updateUser);
+    $('deleteUserBtn').addEventListener('click', () => deleteUser($('edit_old_id').value));
     $('cancelEditUserBtn').addEventListener('click', closeEditUser);
     $('createClientBtn').addEventListener('click', createClient);
+    $('updateClientBtn').addEventListener('click', updateClient);
+    $('deleteClientBtn').addEventListener('click', () => deleteClient($('edit_client_id').value));
+    $('cancelEditClientBtn').addEventListener('click', closeEditClient);
     $('createReferentBtn').addEventListener('click', createReferent);
     $('cancelReferentBtn').addEventListener('click', closeReferentForm);
     $('createAppointmentBtn').addEventListener('click', createAppointment);
     $('saveReportBtn').addEventListener('click', saveReport);
     $('createRevenueBtn').addEventListener('click', createRevenue);
     $('saveObjectiveBtn').addEventListener('click', saveObjective);
+    $('openSelectedPersonBtn').addEventListener('click', () => openPersonStats($('filter_owner').value || State.user.ID));
     $('rdv_client').addEventListener('change', renderReferentOptions);
+    $('revenue_client').addEventListener('change', syncRevenueOwnerFromClient);
     $('objective_owner').addEventListener('change', () => {
       fillObjectiveForm();
       renderDashboardAnalytics();
     });
-    ['filter_start', 'filter_end', 'filter_client'].forEach(id => {
+    ['filter_start', 'filter_end', 'filter_client', 'filter_owner'].forEach(id => {
       $(id).addEventListener('change', () => {
         renderStats();
         renderRevenue();
         renderDashboardAnalytics();
+        renderPortfolioHistory();
+        renderPersonStats();
       });
     });
     $('clearFiltersBtn').addEventListener('click', () => {
-      ['filter_start', 'filter_end', 'filter_client'].forEach(id => $(id).value = '');
+      ['filter_start', 'filter_end', 'filter_client', 'filter_owner'].forEach(id => $(id).value = '');
       renderAll();
     });
     document.addEventListener('click', event => {
@@ -2272,8 +2734,16 @@
       if (deleteBtn) deleteAppointment(deleteBtn.dataset.deleteRdv);
       const editUserBtn = event.target.closest('[data-edit-user]');
       if (editUserBtn) openEditUser(editUserBtn.dataset.editUser);
+      const personStatsBtn = event.target.closest('[data-person-stats]');
+      if (personStatsBtn) openPersonStats(personStatsBtn.dataset.personStats);
+      const deleteUserBtn = event.target.closest('[data-delete-user]');
+      if (deleteUserBtn) deleteUser(deleteUserBtn.dataset.deleteUser);
       const addReferentBtn = event.target.closest('[data-add-referent]');
       if (addReferentBtn) openReferentForm(addReferentBtn.dataset.addReferent);
+      const editClientBtn = event.target.closest('[data-edit-client]');
+      if (editClientBtn) openEditClient(editClientBtn.dataset.editClient);
+      const deleteClientBtn = event.target.closest('[data-delete-client]');
+      if (deleteClientBtn) deleteClient(deleteClientBtn.dataset.deleteClient);
     });
     document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
 
