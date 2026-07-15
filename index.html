@@ -1,0 +1,2283 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LuxOra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #faf8f4;
+      --panel: #ffffff;
+      --text: #1b1a24;
+      --muted: #837f8f;
+      --line: #ece7dd;
+      --brand: #9b7b2e;
+      --brand-dark: #7c611f;
+      --brand-light: #f3e7c8;
+      --gold: #c9a24b;
+      --ink: #16151d;
+      --accent: #8b6fb0;
+      --danger: #b42318;
+      --ok: #027a48;
+      --radius-lg: 20px;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 20px 50px rgba(27, 26, 36, .07);
+      --shadow-sm: 0 6px 18px rgba(27, 26, 36, .06);
+      --font-display: "Fraunces", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(1100px 520px at 12% -8%, #fbf3df 0%, rgba(251,243,223,0) 60%),
+        radial-gradient(900px 480px at 100% 0%, #f1ecf9 0%, rgba(241,236,249,0) 55%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, input, select { font: inherit; }
+
+    .login {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .boot {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--bg);
+    }
+
+    .boot-card {
+      width: min(100%, 360px);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .boot-line {
+      height: 10px;
+      border-radius: 999px;
+      margin-top: 16px;
+      background: linear-gradient(90deg, #f3efe4, #fbf9f4, #f3efe4);
+      background-size: 240% 100%;
+      animation: shimmer 1.1s ease-in-out infinite;
+    }
+
+    .brand-panel {
+      display: none;
+      padding: 56px;
+      color: #fff;
+      position: relative;
+      background:
+        radial-gradient(1200px 700px at -10% 0%, rgba(255,255,255,.10), rgba(255,255,255,0) 55%),
+        linear-gradient(160deg, #1b1a24 0%, #2a2536 55%, #46392b 100%);
+      overflow: hidden;
+    }
+
+    .brand-panel::after {
+      content: '';
+      position: absolute;
+      inset: -20% -20% auto auto;
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(201,162,75,.25) 0%, rgba(201,162,75,0) 70%);
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      width: 84px;
+      height: 84px;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 6px 18px rgba(201, 162, 75, .35));
+    }
+    .hero-logo svg { width: 100%; height: 100%; display: block; }
+
+    .brand-panel h1 {
+      margin: 14px 0 0;
+      max-width: 760px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(36px, 5.4vw, 62px);
+      line-height: 1.04;
+      letter-spacing: -.01em;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .o-dove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: .92em;
+      height: .92em;
+      margin: 0 .02em;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 42%, #fffaf0 0%, #f5eac9 55%, #e6d5a3 100%);
+      box-shadow: 0 0 0 2px rgba(201,162,75,.55), 0 0 22px 6px rgba(233, 201, 130, .55);
+      position: relative;
+      vertical-align: middle;
+    }
+
+    .o-dove svg { width: 68%; height: 68%; }
+
+    .brand-panel p {
+      max-width: 480px;
+      margin-top: 18px;
+      font-size: 17px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, .78);
+      position: relative;
+    }
+
+    .login-panel {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card, .panel, .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card {
+      width: min(100%, 420px);
+      padding: 32px;
+    }
+
+    .eyebrow {
+      color: var(--brand);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: .14em;
+    }
+
+    h2, h3 { margin: 8px 0; letter-spacing: 0; font-family: var(--font-display); font-weight: 600; }
+    .muted { color: var(--muted); line-height: 1.55; }
+
+    label {
+      display: block;
+      margin: 18px 0 7px;
+      color: #4a4658;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #fdfcfa;
+      color: var(--text);
+      padding: 9px 13px;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--gold);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(201, 162, 75, .14);
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      min-height: 42px;
+      padding: 9px 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      background: #fff;
+      color: var(--text);
+      transition: transform .12s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+    }
+
+    .btn:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #cba758, var(--brand));
+      border-color: var(--brand-dark);
+      color: #fff;
+    }
+    .btn-primary:hover { background: linear-gradient(135deg, #d6b567, var(--brand-dark)); }
+    .btn-secondary { border-color: var(--line); }
+    .btn:disabled { opacity: .55; cursor: wait; transform: none; }
+    .btn.loading {
+      color: transparent;
+      position: relative;
+      pointer-events: none;
+    }
+    .btn.loading::after {
+      content: '';
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,.55);
+      border-top-color: #fff;
+      border-radius: 999px;
+      position: absolute;
+      animation: spin .7s linear infinite;
+    }
+    .btn-secondary.loading::after {
+      border-color: rgba(15, 118, 110, .22);
+      border-top-color: var(--brand);
+    }
+    .full { width: 100%; margin-top: 22px; }
+
+    .alert {
+      display: none;
+      margin-top: 14px;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      color: var(--danger);
+      background: #fff1f0;
+      border: 1px solid #fecdca;
+      font-size: 13px;
+    }
+
+    .app { display: none; min-height: 100vh; }
+
+    .topbar {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 22px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 21px;
+      color: var(--ink);
+      min-width: 0;
+      letter-spacing: -.01em;
+    }
+
+    .logo-mark {
+      width: 30px;
+      height: 30px;
+      display: inline-grid;
+      place-items: center;
+      flex: none;
+      margin: 0 1px;
+      transform: translateY(1px);
+    }
+
+    .logo-mark svg { width: 100%; height: 100%; display: block; }
+
+    .topbar-spacer { flex: 1; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      display: none;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      padding: 16px;
+      min-height: calc(100vh - 64px);
+    }
+
+    .nav-btn {
+      width: 100%;
+      justify-content: flex-start;
+      margin-bottom: 6px;
+      border-color: transparent;
+      background: transparent;
+      color: #4a4658;
+    }
+
+    .nav-btn:hover { background: #f6f2e8; transform: none; box-shadow: none; }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, #f6ecd2, #f1e6f7);
+      color: var(--brand-dark);
+      border-color: var(--brand-light);
+    }
+
+    main {
+      padding: 18px;
+      max-width: 1120px;
+      width: 100%;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .dashboard-stack {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .progress-block {
+      display: grid;
+      gap: 12px;
+    }
+
+    .progress-line {
+      display: grid;
+      gap: 7px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #f1ede4;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--brand), var(--accent));
+      transition: width .22s ease;
+    }
+
+    .mini-bars {
+      display: grid;
+      gap: 9px;
+    }
+
+    .mini-bar-row {
+      display: grid;
+      grid-template-columns: minmax(96px, 1fr) minmax(0, 2fr) auto;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .mini-bar-track {
+      min-width: 90px;
+      height: 9px;
+      border-radius: 999px;
+      background: #f1ede4;
+      overflow: hidden;
+    }
+
+    .mini-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #cba758, #8b6fb0);
+      border-radius: inherit;
+    }
+
+    .stat, .panel {
+      padding: 20px;
+      box-shadow: none;
+    }
+
+    .stat {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto auto;
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, rgba(201,162,75,.14), rgba(201,162,75,0) 70%);
+    }
+
+    .stat .value {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 600;
+      margin-top: 8px;
+      color: var(--ink);
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      background: #fbf9f5;
+    }
+
+    tbody tr:hover { background: #fbf9f5; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #f1ede4;
+    }
+
+    .badge.ok { color: var(--ok); background: #ecfdf3; }
+    .badge.warn { color: var(--accent); background: #fffaeb; }
+    .badge.pending { color: #175cd3; background: #eff8ff; }
+    .badge.danger { color: var(--danger); background: #fff1f0; }
+
+    .row-pending {
+      opacity: .68;
+    }
+
+    .skeleton {
+      min-height: 14px;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #eef2f6, #f8fafc, #eef2f6);
+      background-size: 240% 100%;
+      animation: shimmer 1.1s ease-in-out infinite;
+    }
+
+    .skeleton-row td {
+      padding: 14px 12px;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mobile-nav {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      position: sticky;
+      top: 64px;
+      z-index: 9;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      padding: 11px 16px;
+      box-shadow: var(--shadow);
+      display: none;
+      z-index: 50;
+      font-size: 14px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes shimmer { to { background-position: -240% 0; } }
+
+    @media (min-width: 780px) {
+      .login { grid-template-columns: 1.15fr .85fr; }
+      .brand-panel { display: flex; flex-direction: column; justify-content: flex-end; }
+      .shell { grid-template-columns: 220px 1fr; }
+      .sidebar { display: block; }
+      .mobile-nav { display: none; }
+      main { padding: 28px; }
+      .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .filter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <section id="bootScreen" class="boot">
+    <div class="boot-card">
+      <div class="eyebrow">CRM</div>
+      <h2>Chargement</h2>
+      <p class="muted">Reprise de votre session.</p>
+      <div class="boot-line"></div>
+      <div class="boot-line" style="width:72%"></div>
+    </div>
+  </section>
+
+  <section id="loginScreen" class="login" style="display:none">
+    <div class="brand-panel">
+      <div>
+        <div class="hero-logo" aria-hidden="true">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="luxoraGlowHero" cx="50%" cy="46%" r="62%">
+                <stop offset="0%" stop-color="#fffaf0"/>
+                <stop offset="55%" stop-color="#f5eac9"/>
+                <stop offset="100%" stop-color="#e6d5a3"/>
+              </radialGradient>
+            </defs>
+            <g stroke="#c9a24b" stroke-width="2" stroke-linecap="round" opacity="0.65">
+              <line x1="50" y1="2" x2="50" y2="14"/>
+              <line x1="50" y1="86" x2="50" y2="98"/>
+              <line x1="2" y1="50" x2="14" y2="50"/>
+              <line x1="86" y1="50" x2="98" y2="50"/>
+              <line x1="15" y1="15" x2="23" y2="23"/>
+              <line x1="77" y1="77" x2="85" y2="85"/>
+              <line x1="15" y1="85" x2="23" y2="77"/>
+              <line x1="77" y1="23" x2="85" y2="15"/>
+            </g>
+            <circle cx="50" cy="50" r="44" fill="url(#luxoraGlowHero)" stroke="#c9a24b" stroke-width="1.6"/>
+            <g transform="translate(50,54)">
+              <path d="M-3,9 L-13,24 L-6,15 L0,22 L4,14 L9,23 L3,9 Z" fill="#1b1a24"/>
+              <ellipse cx="0" cy="-3" rx="6.6" ry="13" fill="#1b1a24"/>
+              <circle cx="2.2" cy="-16" r="5" fill="#1b1a24"/>
+              <path d="M6,-16 L12.5,-14 L6,-11.6 Z" fill="#1b1a24"/>
+              <path d="M-4,-7 C-19,-11 -32,-24 -36,-37 C-28,-30 -17,-22 -6,-18 C-13,-16 -19,-10 -21,-3 C-15,-6 -9,-8 -4,-7 Z" fill="#1b1a24"/>
+              <path d="M4,-7 C19,-11 32,-24 36,-37 C28,-30 17,-22 6,-18 C13,-16 19,-10 21,-3 C15,-6 9,-8 4,-7 Z" fill="#1b1a24"/>
+              <circle cx="3.6" cy="-16.6" r="1" fill="#f5eac9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="eyebrow" style="color:#e9d9ab">CRM multi-entreprise</div>
+        <h1>Lux<span class="o-dove"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50,54)"><path d="M-3,9 L-13,24 L-6,15 L0,22 L4,14 L9,23 L3,9 Z" fill="#1b1a24"/><ellipse cx="0" cy="-3" rx="6.6" ry="13" fill="#1b1a24"/><circle cx="2.2" cy="-16" r="5" fill="#1b1a24"/><path d="M6,-16 L12.5,-14 L6,-11.6 Z" fill="#1b1a24"/><path d="M-4,-7 C-19,-11 -32,-24 -36,-37 C-28,-30 -17,-22 -6,-18 C-13,-16 -19,-10 -21,-3 C-15,-6 -9,-8 -4,-7 Z" fill="#1b1a24"/><path d="M4,-7 C19,-11 32,-24 36,-37 C28,-30 17,-22 6,-18 C13,-16 19,-10 21,-3 C15,-6 9,-8 4,-7 Z" fill="#1b1a24"/><circle cx="3.6" cy="-16.6" r="1" fill="#f5eac9"/></g></svg><span class="sr-only">O</span></span>ra</h1>
+        <p>Chaque entreprise a ses propres comptes. Un admin ne peut creer que des utilisateurs de son entreprise.</p>
+      </div>
+    </div>
+    <div class="login-panel">
+      <form id="loginForm" class="card">
+        <div class="eyebrow">Connexion</div>
+        <h2>Accéder à LuxOra</h2>
+        <p class="muted">Identifiant et mot de passe depuis le sheet master.</p>
+        <label for="login">Identifiant</label>
+        <input id="login" autocomplete="username" required>
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+        <button id="loginBtn" class="btn btn-primary full" type="submit">Se connecter</button>
+        <div id="loginError" class="alert"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="app" class="app">
+    <header class="topbar">
+      <div class="logo">
+        <span>Lux</span>
+        <span class="logo-mark">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="luxoraGlowTop" cx="50%" cy="46%" r="62%">
+                <stop offset="0%" stop-color="#fffaf0"/>
+                <stop offset="55%" stop-color="#f5eac9"/>
+                <stop offset="100%" stop-color="#e6d5a3"/>
+              </radialGradient>
+            </defs>
+            <g stroke="#c9a24b" stroke-width="2.4" stroke-linecap="round" opacity="0.6">
+              <line x1="50" y1="2" x2="50" y2="14"/>
+              <line x1="50" y1="86" x2="50" y2="98"/>
+              <line x1="2" y1="50" x2="14" y2="50"/>
+              <line x1="86" y1="50" x2="98" y2="50"/>
+              <line x1="15" y1="15" x2="23" y2="23"/>
+              <line x1="77" y1="77" x2="85" y2="85"/>
+              <line x1="15" y1="85" x2="23" y2="77"/>
+              <line x1="77" y1="23" x2="85" y2="15"/>
+            </g>
+            <circle cx="50" cy="50" r="44" fill="url(#luxoraGlowTop)" stroke="#c9a24b" stroke-width="2"/>
+            <g transform="translate(50,54)">
+              <path d="M-3,9 L-13,24 L-6,15 L0,22 L4,14 L9,23 L3,9 Z" fill="#1b1a24"/>
+              <ellipse cx="0" cy="-3" rx="6.6" ry="13" fill="#1b1a24"/>
+              <circle cx="2.2" cy="-16" r="5" fill="#1b1a24"/>
+              <path d="M6,-16 L12.5,-14 L6,-11.6 Z" fill="#1b1a24"/>
+              <path d="M-4,-7 C-19,-11 -32,-24 -36,-37 C-28,-30 -17,-22 -6,-18 C-13,-16 -19,-10 -21,-3 C-15,-6 -9,-8 -4,-7 Z" fill="#1b1a24"/>
+              <path d="M4,-7 C19,-11 32,-24 36,-37 C28,-30 17,-22 6,-18 C13,-16 19,-10 21,-3 C15,-6 9,-8 4,-7 Z" fill="#1b1a24"/>
+              <circle cx="3.6" cy="-16.6" r="1" fill="#f5eac9"/>
+            </g>
+          </svg>
+        </span>
+        <span>ra</span>
+      </div>
+      <span id="companyName" class="muted"></span>
+      <div class="topbar-spacer"></div>
+      <button id="logoutBtn" class="btn btn-secondary">Deconnexion</button>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <button class="btn nav-btn active" data-view="dashboard">Tableau de bord</button>
+        <button class="btn nav-btn" data-view="users">Utilisateurs</button>
+        <button class="btn nav-btn" data-view="clients">Clients</button>
+        <button class="btn nav-btn" data-view="appointments">Rendez-vous</button>
+        <button class="btn nav-btn" data-view="revenue">CA</button>
+      </aside>
+
+      <main>
+        <nav class="mobile-nav">
+          <button class="btn nav-btn active" data-view="dashboard">Tableau</button>
+          <button class="btn nav-btn" data-view="users">Comptes</button>
+          <button class="btn nav-btn" data-view="clients">Clients</button>
+          <button class="btn nav-btn" data-view="appointments">RDV</button>
+          <button class="btn nav-btn" data-view="revenue">CA</button>
+        </nav>
+
+        <section id="dashboard" class="view active">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Entreprise</div>
+              <h2 id="dashboardTitle">Tableau de bord</h2>
+              <p class="muted" id="userLine"></p>
+            </div>
+            <button class="btn btn-secondary" id="refreshBtn">Actualiser</button>
+          </div>
+          <div class="grid">
+            <div class="stat admin-stat">
+              <div class="muted">Utilisateurs</div>
+              <div id="statUsers" class="value">0</div>
+            </div>
+            <div class="stat admin-stat">
+              <div class="muted">Admins</div>
+              <div id="statAdmins" class="value">0</div>
+            </div>
+            <div class="stat admin-stat">
+              <div class="muted">Apporteurs</div>
+              <div id="statApporteurs" class="value">0</div>
+            </div>
+            <div class="stat">
+              <div class="muted">Clients</div>
+              <div id="statClients" class="value">0</div>
+            </div>
+            <div class="stat">
+              <div class="muted">Rendez-vous</div>
+              <div id="statAppointments" class="value">0</div>
+            </div>
+            <div class="stat">
+              <div class="muted">CR en attente</div>
+              <div id="statPendingReports" class="value">0</div>
+            </div>
+            <div class="stat">
+              <div class="muted">Chiffre d'affaires</div>
+              <div id="statRevenue" class="value">0 EUR</div>
+            </div>
+            <div class="stat">
+              <div class="muted">Contrats</div>
+              <div id="statContracts" class="value">0</div>
+            </div>
+          </div>
+
+          <div class="dashboard-stack">
+            <div class="panel">
+              <h3>Filtres</h3>
+              <div class="filter-grid">
+                <div>
+                  <label for="filter_start">Debut</label>
+                  <input id="filter_start" type="date">
+                </div>
+                <div>
+                  <label for="filter_end">Fin</label>
+                  <input id="filter_end" type="date">
+                </div>
+                <div>
+                  <label for="filter_client">Client</label>
+                  <select id="filter_client"></select>
+                </div>
+                <div>
+                  <button id="clearFiltersBtn" class="btn btn-secondary full" type="button">Reinitialiser</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Objectifs</h3>
+              <div id="objectiveProgress" class="progress-block"></div>
+            </div>
+
+            <div class="panel">
+              <h3>Evolution et repartition</h3>
+              <div id="revenueBars" class="mini-bars"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="users" class="view">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Comptes</div>
+              <h2>Utilisateurs de l'entreprise</h2>
+              <p class="muted" id="usersHelp"></p>
+            </div>
+          </div>
+
+          <div id="adminCreatePanel" class="panel" style="display:none">
+            <h3>Nouvel utilisateur</h3>
+            <p class="muted">Le compte sera automatiquement rattache a votre entreprise.</p>
+            <div class="form-grid">
+              <div>
+                <label for="full_name">Nom de la personne</label>
+                <input id="full_name">
+              </div>
+              <div>
+                <label for="new_login">Identifiant</label>
+                <input id="new_login" autocomplete="off">
+              </div>
+              <div>
+                <label for="new_password">Mot de passe</label>
+                <input id="new_password" type="text" autocomplete="new-password">
+              </div>
+              <div>
+                <label for="role">Role</label>
+                <select id="role">
+                  <option value="apporteur">Apporteur d'affaires</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="actions">
+              <button id="createUserBtn" class="btn btn-primary">Creer l'utilisateur</button>
+            </div>
+          </div>
+
+          <div id="adminEditPanel" class="panel" style="display:none;margin-top:14px">
+            <h3>Modifier utilisateur</h3>
+            <input id="edit_old_id" type="hidden">
+            <div class="form-grid">
+              <div>
+                <label for="edit_name">Nom</label>
+                <input id="edit_name">
+              </div>
+              <div>
+                <label for="edit_login">Identifiant</label>
+                <input id="edit_login">
+              </div>
+              <div>
+                <label for="edit_password">Mot de passe</label>
+                <input id="edit_password" type="text">
+              </div>
+              <div>
+                <label for="edit_role">Role</label>
+                <select id="edit_role">
+                  <option value="apporteur">Apporteur d'affaires</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="actions">
+              <button id="cancelEditUserBtn" class="btn btn-secondary">Annuler</button>
+              <button id="updateUserBtn" class="btn btn-primary">Enregistrer</button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th>ID</th>
+                    <th>Entreprise</th>
+                    <th>Role</th>
+                    <th class="admin-user-col">MDP</th>
+                    <th class="admin-user-col">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="usersRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="clients" class="view">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Portefeuille</div>
+              <h2>Clients</h2>
+              <p class="muted" id="clientsHelp"></p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Nouveau client</h3>
+            <div class="form-grid">
+              <div>
+                <label for="client_name">Nom de l'entreprise</label>
+                <input id="client_name">
+              </div>
+              <div>
+                <label for="client_phone">Telephone</label>
+                <input id="client_phone">
+              </div>
+              <div>
+                <label for="client_site">Site internet</label>
+                <input id="client_site">
+              </div>
+              <div>
+                <label for="client_address">Adresse</label>
+                <input id="client_address">
+              </div>
+              <div>
+                <label for="ref_nom">Referent - Nom</label>
+                <input id="ref_nom">
+              </div>
+              <div>
+                <label for="ref_prenom">Referent - Prenom</label>
+                <input id="ref_prenom">
+              </div>
+              <div>
+                <label for="ref_fonction">Referent - Fonction</label>
+                <input id="ref_fonction">
+              </div>
+              <div>
+                <label for="ref_email">Referent - Email</label>
+                <input id="ref_email">
+              </div>
+              <div>
+                <label for="ref_phone">Referent - Telephone</label>
+                <input id="ref_phone">
+              </div>
+              <div>
+                <label for="client_notes">Notes</label>
+                <input id="client_notes">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="createClientBtn" class="btn btn-primary">Creer le client</button>
+            </div>
+          </div>
+
+          <div id="referentPanel" class="panel" style="display:none;margin-top:14px">
+            <h3>Ajouter un référent</h3>
+            <p class="muted" id="referentClientName"></p>
+            <input id="referent_client_id" type="hidden">
+            <div class="form-grid">
+              <div>
+                <label for="add_ref_nom">Nom</label>
+                <input id="add_ref_nom">
+              </div>
+              <div>
+                <label for="add_ref_prenom">Prénom</label>
+                <input id="add_ref_prenom">
+              </div>
+              <div>
+                <label for="add_ref_fonction">Fonction</label>
+                <input id="add_ref_fonction">
+              </div>
+              <div>
+                <label for="add_ref_email">Email</label>
+                <input id="add_ref_email">
+              </div>
+              <div>
+                <label for="add_ref_phone">Téléphone</label>
+                <input id="add_ref_phone">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="cancelReferentBtn" class="btn btn-secondary">Annuler</button>
+              <button id="createReferentBtn" class="btn btn-primary">Ajouter le référent</button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th>Telephone</th>
+                    <th>Referent</th>
+                    <th>Contact</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="clientsRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="appointments" class="view">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Activite</div>
+              <h2>Rendez-vous</h2>
+              <p class="muted">Les ajouts s'affichent immediatement puis se synchronisent avec le back-end et Google Agenda.</p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Nouveau rendez-vous</h3>
+            <div class="form-grid">
+              <div>
+                <label for="rdv_client">Client</label>
+                <select id="rdv_client"></select>
+              </div>
+              <div>
+                <label for="rdv_referent">Referent rencontre</label>
+                <select id="rdv_referent"></select>
+              </div>
+              <div>
+                <label for="rdv_date">Date</label>
+                <input id="rdv_date" type="date">
+              </div>
+              <div>
+                <label for="rdv_time">Heure</label>
+                <input id="rdv_time" type="time">
+              </div>
+              <div>
+                <label for="rdv_address">Adresse</label>
+                <input id="rdv_address">
+              </div>
+              <div>
+                <label for="rdv_subject">Objet</label>
+                <input id="rdv_subject">
+              </div>
+              <div>
+                <label for="rdv_notes">Notes</label>
+                <input id="rdv_notes">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="createAppointmentBtn" class="btn btn-primary">Creer le rendez-vous</button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Client</th>
+                    <th>Objet</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="appointmentsRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel" id="reportPanel" style="display:none;margin-top:14px">
+            <h3>Compte rendu</h3>
+            <p class="muted" id="reportTitle"></p>
+            <input id="report_appointment_id" type="hidden">
+            <div class="form-grid">
+              <div>
+                <label for="report_resume">Resume</label>
+                <input id="report_resume">
+              </div>
+              <div>
+                <label for="report_besoins">Besoins du client</label>
+                <input id="report_besoins">
+              </div>
+              <div>
+                <label for="report_decisions">Decisions prises</label>
+                <input id="report_decisions">
+              </div>
+              <div>
+                <label for="report_actions">Prochaines actions</label>
+                <input id="report_actions">
+              </div>
+              <div>
+                <label for="report_next_date">Date du prochain contact</label>
+                <input id="report_next_date" type="date">
+              </div>
+              <div>
+                <label for="report_probability">Probabilite de signature</label>
+                <select id="report_probability">
+                  <option value="">Non renseignee</option>
+                  <option value="25%">25%</option>
+                  <option value="50%">50%</option>
+                  <option value="75%">75%</option>
+                  <option value="90%">90%</option>
+                </select>
+              </div>
+              <div>
+                <label for="report_comments">Commentaires</label>
+                <input id="report_comments">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="saveReportBtn" class="btn btn-primary">Enregistrer le compte rendu</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="revenue" class="view">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Performance</div>
+              <h2>Chiffre d'affaires et objectifs</h2>
+              <p class="muted" id="revenueHelp"></p>
+            </div>
+          </div>
+
+          <div id="adminRevenuePanel" class="panel" style="display:none">
+            <h3>Nouveau contrat signe</h3>
+            <div class="form-grid">
+              <div>
+                <label for="revenue_client">Client</label>
+                <select id="revenue_client"></select>
+              </div>
+              <div>
+                <label for="revenue_owner">Apporteur concerne</label>
+                <select id="revenue_owner"></select>
+              </div>
+              <div>
+                <label for="revenue_date">Date</label>
+                <input id="revenue_date" type="date">
+              </div>
+              <div>
+                <label for="revenue_amount">Montant du contrat</label>
+                <input id="revenue_amount" type="number" min="0" step="0.01">
+              </div>
+              <div>
+                <label for="revenue_contracts">Nombre de contrats</label>
+                <input id="revenue_contracts" type="number" min="0" step="1" value="1">
+              </div>
+              <div>
+                <label for="revenue_comments">Commentaires</label>
+                <input id="revenue_comments">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="createRevenueBtn" class="btn btn-primary">Enregistrer le contrat</button>
+            </div>
+          </div>
+
+          <div id="adminObjectivePanel" class="panel" style="display:none;margin-top:14px">
+            <h3>Objectifs apporteur</h3>
+            <div class="form-grid">
+              <div>
+                <label for="objective_owner">Apporteur</label>
+                <select id="objective_owner"></select>
+              </div>
+              <div>
+                <label for="objective_ca">Objectif CA</label>
+                <input id="objective_ca" type="number" min="0" step="0.01">
+              </div>
+              <div>
+                <label for="objective_contracts">Objectif contrats</label>
+                <input id="objective_contracts" type="number" min="0" step="1">
+              </div>
+              <div>
+                <label for="objective_start">Date de debut</label>
+                <input id="objective_start" type="date">
+              </div>
+              <div>
+                <label for="objective_end">Date de fin</label>
+                <input id="objective_end" type="date">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="saveObjectiveBtn" class="btn btn-primary">Enregistrer l'objectif</button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Client</th>
+                    <th>Apporteur</th>
+                    <th>Montant</th>
+                    <th>Contrats</th>
+                    <th>Commentaires</th>
+                  </tr>
+                </thead>
+                <tbody id="revenueRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const MASTER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwzO0Hel-tKYSclEggKCxlv7fA7zes0DfHOxNs-x0WUwdhKFT5pPH-EtTaBpzLjWd-K/exec';
+    const FRONT_SESSION_TTL_MS = 60 * 60 * 1000;
+
+    const CONFIG = {
+      masterEndpoint: MASTER_ENDPOINT,
+    };
+
+    const StoredSession = readStoredSession();
+
+    const State = {
+      token: StoredSession?.token || '',
+      user: StoredSession?.user || null,
+      company: StoredSession?.company || null,
+      businessEndpoint: StoredSession?.businessEndpoint || '',
+      stats: null,
+      users: StoredSession?.users || [],
+      clients: StoredSession?.clients || [],
+      appointments: StoredSession?.appointments || [],
+      revenue: StoredSession?.revenue || [],
+      objectives: StoredSession?.objectives || [],
+      loading: {
+        users: false,
+        clients: false,
+        appointments: false,
+        revenue: false,
+      },
+    };
+
+    class ApiClient {
+      constructor(getUrl, getBasePayload) {
+        this.getUrl = getUrl;
+        this.getBasePayload = getBasePayload || (() => ({}));
+      }
+
+      async request(action, payload = {}) {
+        const url = this.getUrl();
+        if (!url) throw new Error('Service temporairement indisponible');
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action, ...this.getBasePayload(), ...payload }),
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || 'Erreur API');
+        return data.data;
+      }
+    }
+
+    const masterApi = new ApiClient(() => CONFIG.masterEndpoint, () => ({ token: State.token }));
+    const businessApi = new ApiClient(() => State.businessEndpoint, () => ({ actor: State.user }));
+    const $ = (id) => document.getElementById(id);
+
+    function showToast(message) {
+      const el = $('toast');
+      el.textContent = message;
+      el.style.display = 'block';
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => el.style.display = 'none', 2600);
+    }
+
+    function setView(viewId) {
+      document.querySelectorAll('.view').forEach(view => view.classList.toggle('active', view.id === viewId));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.view === viewId));
+    }
+
+    async function login(event) {
+      event.preventDefault();
+      $('loginError').style.display = 'none';
+      setButtonLoading('loginBtn', true);
+      try {
+        const data = await masterApi.request('login', {
+          login: $('login').value.trim(),
+          password: $('password').value,
+        });
+        State.token = data.token;
+        State.user = data.user;
+        State.company = data.company;
+        State.businessEndpoint = data.company?.business_endpoint || '';
+        persistSession();
+        await bootstrapApp();
+      } catch (err) {
+        $('loginError').textContent = err.message;
+        $('loginError').style.display = 'block';
+      } finally {
+        setButtonLoading('loginBtn', false);
+      }
+    }
+
+    async function bootstrapApp() {
+      const data = await masterApi.request('me');
+      State.user = data.user;
+      State.company = data.company;
+      State.businessEndpoint = data.company?.business_endpoint || '';
+      State.stats = data.stats;
+      await loadUsers();
+      await loadClients();
+      await loadAppointments();
+      await loadRevenueData();
+      renderAll();
+      $('loginScreen').style.display = 'none';
+      $('bootScreen').style.display = 'none';
+      $('app').style.display = 'block';
+      persistSession();
+    }
+
+    async function loadUsers() {
+      if (State.user.role === 'admin') {
+        State.loading.users = true;
+        renderUsers();
+      try {
+        State.users = await masterApi.request('listUsers');
+      } finally {
+        State.loading.users = false;
+      }
+      } else {
+        State.users = [State.user];
+      }
+    }
+
+    async function loadClients() {
+      if (!State.businessEndpoint) {
+        State.clients = [];
+        return;
+      }
+      State.loading.clients = true;
+      renderClients();
+      try {
+        State.clients = await businessApi.request('listClients');
+        persistSession();
+      } finally {
+        State.loading.clients = false;
+      }
+    }
+
+    async function loadAppointments() {
+      if (!State.businessEndpoint) {
+        State.appointments = [];
+        return;
+      }
+      State.loading.appointments = true;
+      renderAppointments();
+      try {
+        State.appointments = await businessApi.request('listAppointments');
+        persistSession();
+      } finally {
+        State.loading.appointments = false;
+      }
+    }
+
+    async function loadRevenueData() {
+      if (!State.businessEndpoint) {
+        State.revenue = [];
+        State.objectives = [];
+        return;
+      }
+      State.loading.revenue = true;
+      renderRevenue();
+      try {
+        const [revenue, objectives] = await Promise.all([
+          businessApi.request('listRevenue'),
+          businessApi.request('listObjectives'),
+        ]);
+        State.revenue = revenue;
+        State.objectives = objectives;
+        persistSession();
+      } finally {
+        State.loading.revenue = false;
+      }
+    }
+
+    function renderAll() {
+      const isAdmin = State.user.role === 'admin';
+      document.querySelectorAll('[data-view="users"]').forEach(btn => {
+        btn.style.display = isAdmin ? 'inline-flex' : 'none';
+      });
+      document.querySelectorAll('.admin-stat').forEach(el => {
+        el.style.display = isAdmin ? 'block' : 'none';
+      });
+      document.querySelectorAll('.admin-user-col').forEach(el => {
+        el.style.display = isAdmin ? 'table-cell' : 'none';
+      });
+      if (!isAdmin && document.getElementById('users').classList.contains('active')) setView('dashboard');
+      $('companyName').textContent = State.company?.entreprise || '';
+      $('dashboardTitle').textContent = State.company?.entreprise || 'Tableau de bord';
+      $('userLine').textContent = `${State.user.Nom} - ${roleLabel(State.user.role)}`;
+      $('usersHelp').textContent = isAdmin
+        ? `Creation limitee a l'entreprise ${State.company?.entreprise || ''}.`
+        : 'Votre compte apporteur.';
+      $('adminCreatePanel').style.display = isAdmin ? 'block' : 'none';
+      if (!isAdmin) $('adminEditPanel').style.display = 'none';
+      $('clientsHelp').textContent = isAdmin
+        ? 'Vue globale des clients de l entreprise.'
+        : 'Votre portefeuille client.';
+      $('revenueHelp').textContent = isAdmin
+        ? 'Saisie admin des contrats signes et pilotage des objectifs.'
+        : 'Suivi automatique de votre CA, de vos contrats et de vos objectifs.';
+      $('adminRevenuePanel').style.display = isAdmin ? 'block' : 'none';
+      $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
+      renderStats();
+      renderUsers();
+      renderClients();
+      renderAppointmentClientOptions();
+      renderAppointments();
+      renderRevenueOptions();
+      renderRevenue();
+      renderDashboardAnalytics();
+    }
+
+    function renderStats() {
+      const filteredRevenue = filterRevenue(State.revenue);
+      $('statUsers').textContent = State.stats?.users || State.users.length || 0;
+      $('statAdmins').textContent = State.stats?.admins || State.users.filter(user => user.role === 'admin').length || 0;
+      $('statApporteurs').textContent = State.stats?.apporteurs || State.users.filter(user => user.role === 'apporteur').length || 0;
+      $('statClients').textContent = State.clients.length || 0;
+      $('statAppointments').textContent = State.appointments.length || 0;
+      $('statPendingReports').textContent = State.appointments.filter(item => item.statut === 'En attente de compte rendu').length || 0;
+      $('statRevenue').textContent = formatMoney(sumField(filteredRevenue, 'montant'));
+      $('statContracts').textContent = sumField(filteredRevenue, 'nombre_contrats');
+    }
+
+    function renderUsers() {
+      if (State.loading.users) {
+        $('usersRows').innerHTML = skeletonRows(6, 4);
+        return;
+      }
+      $('usersRows').innerHTML = State.users.map(user => `
+        <tr class="${user._pending ? 'row-pending' : ''}">
+          <td><strong>${escapeHtml(user.Nom)}</strong></td>
+          <td>${escapeHtml(user.ID)}</td>
+          <td>${escapeHtml(user.entreprise)}</td>
+          <td><span class="badge ${user.role === 'admin' ? 'warn' : 'ok'}">${roleLabel(user.role)}</span></td>
+          <td class="admin-user-col">${escapeHtml(user.MDP || '')}</td>
+          <td class="admin-user-col"><button class="btn btn-secondary" data-edit-user="${escapeAttr(user.ID)}">Modifier</button></td>
+        </tr>
+      `).join('') || `<tr><td colspan="6" class="muted">Aucun utilisateur.</td></tr>`;
+    }
+
+    function renderClients() {
+      if (State.loading.clients) {
+        $('clientsRows').innerHTML = skeletonRows(5, 4);
+        return;
+      }
+      $('clientsRows').innerHTML = State.clients.map(client => {
+        const referents = client.referents || [];
+        const referentList = referents.map(ref => escapeHtml([ref.prenom, ref.nom].filter(Boolean).join(' ') || 'Référent')).join('<br>');
+        const contact = referents.map(ref => escapeHtml([ref.email, ref.telephone].filter(Boolean).join(' - '))).filter(Boolean).join('<br>');
+        return `
+          <tr class="${client._pending ? 'row-pending' : ''}">
+            <td>
+              <strong>${escapeHtml(client.nom_entreprise)}</strong>
+              <div class="muted">${escapeHtml(client.adresse || '')}</div>
+              <div style="margin-top:8px"><button class="btn btn-secondary" data-add-referent="${escapeAttr(client.client_id)}">Ajouter un référent</button></div>
+            </td>
+            <td>${escapeHtml(client.telephone || '')}</td>
+            <td>
+              ${referentList || ''}
+            </td>
+            <td>${contact || ''}</td>
+            <td>${escapeHtml(client.notes || '')}</td>
+          </tr>
+        `;
+      }).join('') || `<tr><td colspan="5" class="muted">Aucun client pour le moment.</td></tr>`;
+    }
+
+    function renderAppointmentClientOptions() {
+      const current = $('rdv_client').value;
+      $('rdv_client').innerHTML = State.clients.map(client => `<option value="${escapeAttr(client.client_id)}">${escapeHtml(client.nom_entreprise)}</option>`).join('');
+      if (current) $('rdv_client').value = current;
+      renderReferentOptions();
+    }
+
+    function renderReferentOptions() {
+      const client = State.clients.find(item => item.client_id === $('rdv_client').value);
+      const referents = client?.referents || [];
+      $('rdv_referent').innerHTML = referents.map(ref => {
+        const name = [ref.prenom, ref.nom].filter(Boolean).join(' ') || 'Referent';
+        return `<option value="${escapeAttr(ref.referent_id)}">${escapeHtml(name)}</option>`;
+      }).join('');
+    }
+
+    function renderAppointments() {
+      if (State.loading.appointments) {
+        $('appointmentsRows').innerHTML = skeletonRows(5, 4);
+        return;
+      }
+      const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
+      $('appointmentsRows').innerHTML = State.appointments.map(item => `
+        <tr class="${item._pending ? 'row-pending' : ''}">
+          <td>
+            <strong>${escapeHtml(formatDate(item.date))}</strong>
+            <div class="muted">${escapeHtml(item.heure || '')}</div>
+          </td>
+          <td>${escapeHtml(clientMap.get(item.client_id) || 'Client')}</td>
+          <td>
+            ${escapeHtml(item.objet || '')}
+            <div class="muted">${escapeHtml(item.adresse || '')}</div>
+          </td>
+          <td><span class="badge ${item.statut === 'Valide' ? 'ok' : 'pending'}">${escapeHtml(item._pending ? 'Synchronisation' : item.statut)}</span></td>
+          <td>
+            <div class="inline-actions">
+              <button class="btn btn-secondary" data-report="${escapeAttr(item.appointment_id)}">Compte rendu</button>
+              <button class="btn btn-secondary" data-delete-rdv="${escapeAttr(item.appointment_id)}">Supprimer</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') || `<tr><td colspan="5" class="muted">Aucun rendez-vous pour le moment.</td></tr>`;
+    }
+
+    function renderRevenueOptions() {
+      const currentFilterClient = $('filter_client').value;
+      const currentRevenueClient = $('revenue_client').value;
+      const clientOptions = State.clients.map(client => `<option value="${escapeAttr(client.client_id)}">${escapeHtml(client.nom_entreprise)}</option>`).join('');
+      $('filter_client').innerHTML = `<option value="">Tous les clients</option>${clientOptions}`;
+      $('revenue_client').innerHTML = clientOptions;
+      if (currentFilterClient) $('filter_client').value = currentFilterClient;
+      if (currentRevenueClient) $('revenue_client').value = currentRevenueClient;
+
+      const apporteurs = getAssignableUsers();
+      const currentRevenueOwner = $('revenue_owner').value;
+      const currentObjectiveOwner = $('objective_owner').value;
+      const ownerOptions = apporteurs.map(user => `<option value="${escapeAttr(user.ID)}">${escapeHtml(user.Nom || user.ID)}</option>`).join('');
+      $('revenue_owner').innerHTML = ownerOptions;
+      $('objective_owner').innerHTML = ownerOptions;
+      if (currentRevenueOwner) $('revenue_owner').value = currentRevenueOwner;
+      if (currentObjectiveOwner) $('objective_owner').value = currentObjectiveOwner;
+      fillObjectiveForm();
+    }
+
+    function renderRevenue() {
+      if (State.loading.revenue) {
+        $('revenueRows').innerHTML = skeletonRows(6, 4);
+        $('objectiveProgress').innerHTML = '<div class="skeleton" style="height:52px"></div>';
+        $('revenueBars').innerHTML = '<div class="skeleton" style="height:80px"></div>';
+        return;
+      }
+      const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
+      const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
+      const rows = filterRevenue(State.revenue)
+        .slice()
+        .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      $('revenueRows').innerHTML = rows.map(item => `
+        <tr class="${item._pending ? 'row-pending' : ''}">
+          <td>${escapeHtml(formatDate(item.date))}</td>
+          <td>${escapeHtml(clientMap.get(item.client_id) || 'Client')}</td>
+          <td>${escapeHtml(userMap.get(item.owner_id) || item.owner_id || '')}</td>
+          <td><strong>${escapeHtml(formatMoney(item.montant))}</strong></td>
+          <td>${escapeHtml(item.nombre_contrats || 0)}</td>
+          <td>${escapeHtml(item.commentaires || '')}</td>
+        </tr>
+      `).join('') || `<tr><td colspan="6" class="muted">Aucun contrat enregistre.</td></tr>`;
+    }
+
+    function renderDashboardAnalytics() {
+      const rows = filterRevenue(State.revenue);
+      const ownerId = State.user.role === 'admin' ? $('objective_owner').value || State.user.ID : State.user.ID;
+      const objective = getObjectiveFor(ownerId);
+      const ca = sumField(rows.filter(item => State.user.role === 'admin' ? item.owner_id === ownerId : true), 'montant');
+      const contracts = sumField(rows.filter(item => State.user.role === 'admin' ? item.owner_id === ownerId : true), 'nombre_contrats');
+      const caTarget = Number(objective?.objectif_ca || 0);
+      const contractTarget = Number(objective?.objectif_contrats || 0);
+      $('objectiveProgress').innerHTML = `
+        ${progressLine("Chiffre d'affaires", ca, caTarget, formatMoney)}
+        ${progressLine('Contrats', contracts, contractTarget, value => String(value))}
+        <div class="muted">${objective ? `${formatDate(objective.date_debut)} - ${formatDate(objective.date_fin)}` : 'Aucun objectif parametre pour cette selection.'}</div>
+      `;
+
+      const clientGrouped = groupRevenueByClient(rows);
+      const monthlyGrouped = groupRevenueByMonth(rows);
+      const ownerGrouped = State.user.role === 'admin' ? groupRevenueByOwner(rows) : [];
+      $('revenueBars').innerHTML = `
+        ${barGroup('CA par client', clientGrouped)}
+        ${barGroup('Evolution mensuelle', monthlyGrouped)}
+        ${ownerGrouped.length ? barGroup('Classement apporteurs', ownerGrouped) : ''}
+      ` || '<p class="muted">Aucune donnee sur la periode.</p>';
+    }
+
+    function barGroup(title, grouped) {
+      const max = Math.max(...grouped.map(item => item.total), 1);
+      const rows = grouped.slice(0, 8).map(item => `
+        <div class="mini-bar-row">
+          <strong>${escapeHtml(item.label)}</strong>
+          <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${Math.min(100, Math.round(item.total / max * 100))}%"></div></div>
+          <span>${escapeHtml(formatMoney(item.total))}</span>
+        </div>
+      `).join('') || '<p class="muted">Aucune donnee sur la periode.</p>';
+      return `<div><h3 style="margin-top:0">${escapeHtml(title)}</h3>${rows}</div>`;
+    }
+
+    async function createUser() {
+      const optimisticUser = {
+        Nom: $('full_name').value,
+        ID: $('new_login').value,
+        entreprise: State.company?.entreprise || '',
+        role: $('role').value,
+        _pending: true,
+      };
+      if (!optimisticUser.Nom || !optimisticUser.ID) {
+        showToast('Nom et identifiant requis');
+        return;
+      }
+      State.users.unshift(optimisticUser);
+      renderUsers();
+      setButtonLoading('createUserBtn', true);
+      try {
+        const created = await masterApi.request('createUser', {
+          full_name: $('full_name').value,
+          login: $('new_login').value,
+          password: $('new_password').value,
+          role: $('role').value,
+        });
+        Object.assign(optimisticUser, created, { _pending: false });
+        $('full_name').value = '';
+        $('new_login').value = '';
+        $('new_password').value = '';
+        renderAll();
+        silentRefresh();
+        showToast('Utilisateur cree dans votre entreprise');
+      } catch (err) {
+        State.users = State.users.filter(user => user !== optimisticUser);
+        renderUsers();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('createUserBtn', false);
+      }
+    }
+
+    function openEditUser(userId) {
+      const user = State.users.find(item => item.ID === userId);
+      if (!user) return;
+      $('edit_old_id').value = user.ID;
+      $('edit_name').value = user.Nom || '';
+      $('edit_login').value = user.ID || '';
+      $('edit_password').value = user.MDP || '';
+      $('edit_role').value = user.role || 'apporteur';
+      $('adminEditPanel').style.display = 'block';
+      $('adminEditPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeEditUser() {
+      $('adminEditPanel').style.display = 'none';
+      ['edit_old_id', 'edit_name', 'edit_login', 'edit_password'].forEach(id => $(id).value = '');
+      $('edit_role').value = 'apporteur';
+    }
+
+    async function updateUser() {
+      const oldId = $('edit_old_id').value;
+      const current = State.users.find(item => item.ID === oldId);
+      if (!current) return;
+      const previous = { ...current };
+      const next = {
+        Nom: $('edit_name').value,
+        ID: $('edit_login').value,
+        MDP: $('edit_password').value,
+        role: $('edit_role').value,
+        entreprise: current.entreprise,
+      };
+      if (!next.Nom || !next.ID || !next.MDP) {
+        showToast('Nom, identifiant et mot de passe requis');
+        return;
+      }
+      Object.assign(current, next, { _pending: true });
+      renderUsers();
+      setButtonLoading('updateUserBtn', true);
+      try {
+        const saved = await masterApi.request('updateUser', {
+          old_id: oldId,
+          nom: next.Nom,
+          id: next.ID,
+          mdp: next.MDP,
+          role: next.role,
+        });
+        Object.assign(current, saved, { _pending: false });
+        closeEditUser();
+        renderAll();
+        silentRefresh();
+        showToast('Utilisateur modifie');
+      } catch (err) {
+        Object.assign(current, previous, { _pending: false });
+        renderUsers();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('updateUserBtn', false);
+      }
+    }
+
+    async function createRevenue() {
+      if (State.user.role !== 'admin') return;
+      const optimisticRevenue = buildRevenueFromForm();
+      if (!optimisticRevenue.client_id || !optimisticRevenue.owner_id || !optimisticRevenue.date) {
+        showToast('Client, apporteur et date requis');
+        return;
+      }
+      if (Number(optimisticRevenue.montant) <= 0 && Number(optimisticRevenue.nombre_contrats) <= 0) {
+        showToast('Montant ou nombre de contrats requis');
+        return;
+      }
+      State.revenue.unshift(optimisticRevenue);
+      renderAll();
+      setButtonLoading('createRevenueBtn', true);
+      try {
+        const saved = await businessApi.request('createRevenue', optimisticRevenue);
+        Object.assign(optimisticRevenue, saved, { _pending: false });
+        ['revenue_amount', 'revenue_comments'].forEach(id => $(id).value = '');
+        $('revenue_contracts').value = '1';
+        renderAll();
+        silentRefresh();
+        showToast('Contrat enregistre');
+      } catch (err) {
+        State.revenue = State.revenue.filter(item => item !== optimisticRevenue);
+        renderAll();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('createRevenueBtn', false);
+      }
+    }
+
+    async function saveObjective() {
+      if (State.user.role !== 'admin') return;
+      const ownerId = $('objective_owner').value;
+      if (!ownerId) {
+        showToast('Choisis un apporteur');
+        return;
+      }
+      const previous = State.objectives.slice();
+      const existing = getObjectiveFor(ownerId);
+      const optimisticObjective = {
+        objective_id: existing?.objective_id || tempId('obj'),
+        owner_id: ownerId,
+        objectif_ca: Number($('objective_ca').value || 0),
+        objectif_contrats: Number($('objective_contracts').value || 0),
+        date_debut: $('objective_start').value,
+        date_fin: $('objective_end').value,
+        _pending: true,
+      };
+      State.objectives = State.objectives.filter(item => item.owner_id !== ownerId);
+      State.objectives.unshift(optimisticObjective);
+      renderAll();
+      setButtonLoading('saveObjectiveBtn', true);
+      try {
+        const saved = await businessApi.request('saveObjective', optimisticObjective);
+        Object.assign(optimisticObjective, saved, { _pending: false });
+        renderAll();
+        silentRefresh();
+        showToast('Objectif enregistre');
+      } catch (err) {
+        State.objectives = previous;
+        renderAll();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('saveObjectiveBtn', false);
+      }
+    }
+
+    async function createClient() {
+      const optimisticClient = buildClientFromForm();
+      if (!optimisticClient.nom_entreprise) {
+        showToast('Nom du client requis');
+        return;
+      }
+      State.clients.unshift(optimisticClient);
+      renderStats();
+      renderClients();
+      renderAppointmentClientOptions();
+      setButtonLoading('createClientBtn', true);
+      try {
+        if (!State.businessEndpoint) throw new Error('Module client non configure');
+        const created = await businessApi.request('createClient', {
+          nom_entreprise: $('client_name').value,
+          telephone: $('client_phone').value,
+          site_internet: $('client_site').value,
+          adresse: $('client_address').value,
+          notes: $('client_notes').value,
+          referent: {
+            nom: $('ref_nom').value,
+            prenom: $('ref_prenom').value,
+            fonction: $('ref_fonction').value,
+            email: $('ref_email').value,
+            telephone: $('ref_phone').value,
+          },
+        });
+        Object.assign(optimisticClient, created, { _pending: false });
+        ['client_name', 'client_phone', 'client_site', 'client_address', 'client_notes', 'ref_nom', 'ref_prenom', 'ref_fonction', 'ref_email', 'ref_phone']
+          .forEach(id => $(id).value = '');
+        renderAll();
+        silentRefresh();
+        showToast('Client cree');
+      } catch (err) {
+        State.clients = State.clients.filter(client => client !== optimisticClient);
+        renderAll();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('createClientBtn', false);
+      }
+    }
+
+    function openReferentForm(clientId) {
+      const client = State.clients.find(item => item.client_id === clientId);
+      if (!client) return;
+      $('referent_client_id').value = clientId;
+      $('referentClientName').textContent = client.nom_entreprise || '';
+      ['add_ref_nom', 'add_ref_prenom', 'add_ref_fonction', 'add_ref_email', 'add_ref_phone'].forEach(id => $(id).value = '');
+      $('referentPanel').style.display = 'block';
+      $('referentPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeReferentForm() {
+      $('referentPanel').style.display = 'none';
+      $('referent_client_id').value = '';
+    }
+
+    async function createReferent() {
+      const clientId = $('referent_client_id').value;
+      const client = State.clients.find(item => item.client_id === clientId);
+      if (!client) return;
+      const referent = {
+        referent_id: tempId('ref'),
+        client_id: clientId,
+        nom: $('add_ref_nom').value,
+        prenom: $('add_ref_prenom').value,
+        fonction: $('add_ref_fonction').value,
+        email: $('add_ref_email').value,
+        telephone: $('add_ref_phone').value,
+        _pending: true,
+      };
+      if (![referent.nom, referent.prenom, referent.email, referent.telephone, referent.fonction].some(Boolean)) {
+        showToast('Renseigne au moins une information référent');
+        return;
+      }
+      client.referents = client.referents || [];
+      client.referents.push(referent);
+      renderClients();
+      renderReferentOptions();
+      setButtonLoading('createReferentBtn', true);
+      try {
+        const saved = await businessApi.request('createReferent', {
+          client_id: clientId,
+          nom: referent.nom,
+          prenom: referent.prenom,
+          fonction: referent.fonction,
+          email: referent.email,
+          telephone: referent.telephone,
+        });
+        Object.assign(referent, saved, { _pending: false });
+        closeReferentForm();
+        renderAll();
+        silentRefresh();
+        showToast('Référent ajouté');
+      } catch (err) {
+        client.referents = client.referents.filter(item => item !== referent);
+        renderAll();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('createReferentBtn', false);
+      }
+    }
+
+    async function createAppointment() {
+      const optimisticAppointment = buildAppointmentFromForm();
+      if (!optimisticAppointment.client_id || !optimisticAppointment.date || !optimisticAppointment.heure) {
+        showToast('Client, date et heure requis');
+        return;
+      }
+      State.appointments.unshift(optimisticAppointment);
+      renderStats();
+      renderAppointments();
+      setButtonLoading('createAppointmentBtn', true);
+      try {
+        if (!State.businessEndpoint) throw new Error('Module rendez-vous non configure');
+        const created = await businessApi.request('createAppointment', optimisticAppointment);
+        Object.assign(optimisticAppointment, created, { _pending: false });
+        ['rdv_date', 'rdv_time', 'rdv_address', 'rdv_subject', 'rdv_notes'].forEach(id => $(id).value = '');
+        renderAll();
+        silentRefresh();
+        showToast('Rendez-vous cree');
+      } catch (err) {
+        State.appointments = State.appointments.filter(item => item !== optimisticAppointment);
+        renderAll();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('createAppointmentBtn', false);
+      }
+    }
+
+    async function deleteAppointment(appointmentId) {
+      const removed = State.appointments.find(item => item.appointment_id === appointmentId);
+      State.appointments = State.appointments.filter(item => item.appointment_id !== appointmentId);
+      renderAll();
+      try {
+        await businessApi.request('deleteAppointment', { appointment_id: appointmentId });
+        silentRefresh();
+      } catch (err) {
+        if (removed) State.appointments.unshift(removed);
+        renderAll();
+        showToast(err.message);
+      }
+    }
+
+    function openReport(appointmentId) {
+      const appointment = State.appointments.find(item => item.appointment_id === appointmentId);
+      if (!appointment) return;
+      $('reportPanel').style.display = 'block';
+      $('report_appointment_id').value = appointmentId;
+      $('reportTitle').textContent = `${formatDate(appointment.date)} - ${appointment.objet || 'Rendez-vous'}`;
+      const report = appointment.report || {};
+      $('report_resume').value = report.resume || '';
+      $('report_besoins').value = report.besoins || '';
+      $('report_decisions').value = report.decisions || '';
+      $('report_actions').value = report.prochaines_actions || '';
+      $('report_next_date').value = report.date_prochain_contact || '';
+      $('report_probability').value = report.probabilite_signature || '';
+      $('report_comments').value = report.commentaires || '';
+      $('reportPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function saveReport() {
+      const appointmentId = $('report_appointment_id').value;
+      const appointment = State.appointments.find(item => item.appointment_id === appointmentId);
+      if (!appointment) return;
+      const optimisticReport = {
+        appointment_id: appointmentId,
+        resume: $('report_resume').value,
+        besoins: $('report_besoins').value,
+        decisions: $('report_decisions').value,
+        prochaines_actions: $('report_actions').value,
+        date_prochain_contact: $('report_next_date').value,
+        probabilite_signature: $('report_probability').value,
+        commentaires: $('report_comments').value,
+      };
+      const previous = { statut: appointment.statut, report: appointment.report };
+      appointment.statut = 'Valide';
+      appointment.report = optimisticReport;
+      renderAll();
+      setButtonLoading('saveReportBtn', true);
+      try {
+        const saved = await businessApi.request('saveReport', optimisticReport);
+        Object.assign(appointment, saved.appointment);
+        appointment.report = saved.report;
+        $('reportPanel').style.display = 'none';
+        renderAll();
+        silentRefresh();
+        showToast('Compte rendu enregistre');
+      } catch (err) {
+        appointment.statut = previous.statut;
+        appointment.report = previous.report;
+        renderAll();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('saveReportBtn', false);
+      }
+    }
+
+    async function refresh() {
+      setButtonLoading('refreshBtn', true);
+      try {
+      const me = await masterApi.request('me');
+      State.user = me.user;
+      State.company = me.company;
+      State.businessEndpoint = me.company?.business_endpoint || '';
+      State.stats = me.stats;
+      await loadUsers();
+      await loadClients();
+      await loadAppointments();
+      await loadRevenueData();
+      renderAll();
+      persistSession();
+      } finally {
+        setButtonLoading('refreshBtn', false);
+      }
+    }
+
+    function silentRefresh(options = {}) {
+      (async () => {
+        const me = await masterApi.request('me');
+        State.user = me.user;
+        State.company = me.company;
+        State.businessEndpoint = me.company?.business_endpoint || '';
+        State.stats = me.stats;
+        State.users = State.user.role === 'admin' ? await masterApi.request('listUsers') : [State.user];
+        if (State.businessEndpoint) {
+          State.clients = await businessApi.request('listClients');
+          State.appointments = await businessApi.request('listAppointments');
+          State.revenue = await businessApi.request('listRevenue');
+          State.objectives = await businessApi.request('listObjectives');
+        }
+        renderAll();
+        persistSession();
+      })().catch(() => {
+        if (options.onAuthFail) {
+          clearStoredSession();
+          State.token = '';
+          State.user = null;
+          State.company = null;
+          State.businessEndpoint = '';
+          showLogin();
+        }
+      });
+    }
+
+    async function logout() {
+      const tokenToClose = State.token;
+      clearStoredSession();
+      State.token = '';
+      State.user = null;
+      State.company = null;
+      State.businessEndpoint = '';
+      masterApi.request('logout', { token: tokenToClose }).catch(() => {});
+      location.reload();
+    }
+
+    function roleLabel(role) {
+      return {
+        admin: 'Admin',
+        apporteur: "Apporteur d'affaires",
+      }[role] || role;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+      }[char]));
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, '&#096;');
+    }
+
+    function buildClientFromForm() {
+      const referent = {
+        referent_id: tempId('ref'),
+        nom: $('ref_nom').value,
+        prenom: $('ref_prenom').value,
+        fonction: $('ref_fonction').value,
+        email: $('ref_email').value,
+        telephone: $('ref_phone').value,
+      };
+      return {
+        client_id: tempId('cli'),
+        owner_id: State.user?.ID || '',
+        nom_entreprise: $('client_name').value,
+        telephone: $('client_phone').value,
+        site_internet: $('client_site').value,
+        adresse: $('client_address').value,
+        notes: $('client_notes').value,
+        referents: Object.values(referent).some(Boolean) ? [referent] : [],
+        _pending: true,
+      };
+    }
+
+    function buildAppointmentFromForm() {
+      return {
+        appointment_id: tempId('rdv'),
+        owner_id: State.user?.ID || '',
+        client_id: $('rdv_client').value,
+        referent_id: $('rdv_referent').value,
+        date: $('rdv_date').value,
+        heure: $('rdv_time').value,
+        adresse: $('rdv_address').value,
+        objet: $('rdv_subject').value,
+        notes: $('rdv_notes').value,
+        statut: 'En attente de compte rendu',
+        _pending: true,
+      };
+    }
+
+    function buildRevenueFromForm() {
+      return {
+        revenue_id: tempId('ca'),
+        client_id: $('revenue_client').value,
+        owner_id: $('revenue_owner').value,
+        date: $('revenue_date').value,
+        montant: Number($('revenue_amount').value || 0),
+        nombre_contrats: Number($('revenue_contracts').value || 0),
+        commentaires: $('revenue_comments').value,
+        _pending: true,
+      };
+    }
+
+    function getAssignableUsers() {
+      if (State.user?.role !== 'admin') return [State.user].filter(Boolean);
+      return State.users.filter(user => user.role === 'apporteur' || user.role === 'admin');
+    }
+
+    function getObjectiveFor(ownerId) {
+      return State.objectives.find(item => String(item.owner_id).toLowerCase() === String(ownerId || '').toLowerCase()) || null;
+    }
+
+    function fillObjectiveForm() {
+      if (!$('objective_owner') || State.user?.role !== 'admin') return;
+      const objective = getObjectiveFor($('objective_owner').value);
+      $('objective_ca').value = objective?.objectif_ca || '';
+      $('objective_contracts').value = objective?.objectif_contrats || '';
+      $('objective_start').value = objective?.date_debut || '';
+      $('objective_end').value = objective?.date_fin || '';
+    }
+
+    function filterRevenue(rows) {
+      const start = $('filter_start')?.value || '';
+      const end = $('filter_end')?.value || '';
+      const clientId = $('filter_client')?.value || '';
+      return rows.filter(item => {
+        if (start && item.date < start) return false;
+        if (end && item.date > end) return false;
+        if (clientId && item.client_id !== clientId) return false;
+        return true;
+      });
+    }
+
+    function groupRevenueByClient(rows) {
+      const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
+      const grouped = new Map();
+      rows.forEach(item => {
+        const label = clientMap.get(item.client_id) || 'Client';
+        grouped.set(label, (grouped.get(label) || 0) + Number(item.montant || 0));
+      });
+      return Array.from(grouped, ([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total);
+    }
+
+    function groupRevenueByMonth(rows) {
+      const grouped = new Map();
+      rows.forEach(item => {
+        const label = String(item.date || '').slice(0, 7) || 'Sans date';
+        grouped.set(label, (grouped.get(label) || 0) + Number(item.montant || 0));
+      });
+      return Array.from(grouped, ([label, total]) => ({ label, total })).sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    function groupRevenueByOwner(rows) {
+      const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
+      const grouped = new Map();
+      rows.forEach(item => {
+        const label = userMap.get(item.owner_id) || item.owner_id || 'Apporteur';
+        grouped.set(label, (grouped.get(label) || 0) + Number(item.montant || 0));
+      });
+      return Array.from(grouped, ([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total);
+    }
+
+    function progressLine(label, current, target, formatter) {
+      const percent = target > 0 ? Math.min(100, Math.round(current / target * 100)) : 0;
+      return `
+        <div class="progress-line">
+          <div class="progress-meta">
+            <span>${escapeHtml(label)}</span>
+            <span>${escapeHtml(formatter(current))} / ${escapeHtml(target ? formatter(target) : 'Non defini')} (${percent}%)</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:${percent}%"></div></div>
+        </div>
+      `;
+    }
+
+    function sumField(rows, field) {
+      return rows.reduce((total, item) => total + Number(item[field] || 0), 0);
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0));
+    }
+
+    function setButtonLoading(id, loading) {
+      const button = $(id);
+      button.disabled = loading;
+      button.classList.toggle('loading', loading);
+    }
+
+    function skeletonRows(cols, rows) {
+      return Array.from({ length: rows }).map(() => `
+        <tr class="skeleton-row">
+          ${Array.from({ length: cols }).map(() => '<td><div class="skeleton"></div></td>').join('')}
+        </tr>
+      `).join('');
+    }
+
+    function tempId(prefix) {
+      return `${prefix}_tmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      const date = new Date(value + 'T00:00:00');
+      if (isNaN(date.getTime())) return value;
+      return date.toLocaleDateString('fr-FR');
+    }
+
+    function readStoredSession() {
+      try {
+        const raw = localStorage.getItem('crm.session');
+        if (!raw) return null;
+        const session = JSON.parse(raw);
+        if (!session.savedAt || Date.now() - session.savedAt > FRONT_SESSION_TTL_MS) {
+          clearStoredSession();
+          return null;
+        }
+        return session;
+      } catch (err) {
+        clearStoredSession();
+        return null;
+      }
+    }
+
+    function persistSession() {
+      if (!State.token || !State.user) return;
+      localStorage.setItem('crm.session', JSON.stringify({
+        token: State.token,
+        user: State.user,
+        company: State.company,
+        businessEndpoint: State.businessEndpoint,
+        users: State.users,
+        clients: State.clients,
+        appointments: State.appointments,
+        revenue: State.revenue,
+        objectives: State.objectives,
+        savedAt: Date.now(),
+      }));
+    }
+
+    function clearStoredSession() {
+      localStorage.removeItem('crm.session');
+      localStorage.removeItem('crm.sessionToken');
+    }
+
+    function showLogin() {
+      $('bootScreen').style.display = 'none';
+      $('app').style.display = 'none';
+      $('loginScreen').style.display = 'grid';
+    }
+
+    async function startApp() {
+      if (!State.token) {
+        showLogin();
+        return;
+      }
+      if (State.user) {
+        $('bootScreen').style.display = 'none';
+        $('loginScreen').style.display = 'none';
+        $('app').style.display = 'block';
+        renderAll();
+        silentRefresh({ onAuthFail: true });
+        return;
+      }
+      $('bootScreen').style.display = 'grid';
+      $('loginScreen').style.display = 'none';
+      $('app').style.display = 'none';
+      try {
+        await bootstrapApp();
+      } catch (err) {
+        clearStoredSession();
+        State.token = '';
+        showLogin();
+      }
+    }
+
+    $('loginForm').addEventListener('submit', login);
+    $('logoutBtn').addEventListener('click', logout);
+    $('refreshBtn').addEventListener('click', () => refresh().then(() => showToast('Donnees actualisees')).catch(err => showToast(err.message)));
+    $('createUserBtn').addEventListener('click', createUser);
+    $('updateUserBtn').addEventListener('click', updateUser);
+    $('cancelEditUserBtn').addEventListener('click', closeEditUser);
+    $('createClientBtn').addEventListener('click', createClient);
+    $('createReferentBtn').addEventListener('click', createReferent);
+    $('cancelReferentBtn').addEventListener('click', closeReferentForm);
+    $('createAppointmentBtn').addEventListener('click', createAppointment);
+    $('saveReportBtn').addEventListener('click', saveReport);
+    $('createRevenueBtn').addEventListener('click', createRevenue);
+    $('saveObjectiveBtn').addEventListener('click', saveObjective);
+    $('rdv_client').addEventListener('change', renderReferentOptions);
+    $('objective_owner').addEventListener('change', () => {
+      fillObjectiveForm();
+      renderDashboardAnalytics();
+    });
+    ['filter_start', 'filter_end', 'filter_client'].forEach(id => {
+      $(id).addEventListener('change', () => {
+        renderStats();
+        renderRevenue();
+        renderDashboardAnalytics();
+      });
+    });
+    $('clearFiltersBtn').addEventListener('click', () => {
+      ['filter_start', 'filter_end', 'filter_client'].forEach(id => $(id).value = '');
+      renderAll();
+    });
+    document.addEventListener('click', event => {
+      const reportBtn = event.target.closest('[data-report]');
+      if (reportBtn) openReport(reportBtn.dataset.report);
+      const deleteBtn = event.target.closest('[data-delete-rdv]');
+      if (deleteBtn) deleteAppointment(deleteBtn.dataset.deleteRdv);
+      const editUserBtn = event.target.closest('[data-edit-user]');
+      if (editUserBtn) openEditUser(editUserBtn.dataset.editUser);
+      const addReferentBtn = event.target.closest('[data-add-referent]');
+      if (addReferentBtn) openReferentForm(addReferentBtn.dataset.addReferent);
+    });
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
+
+    startApp();
+  </script>
+</body>
+</html>
