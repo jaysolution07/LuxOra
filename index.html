@@ -1467,20 +1467,60 @@
       async request(action, payload = {}) {
         const url = this.getUrl();
         if (!url) throw new Error('Service temporairement indisponible');
+        const body = { action, ...this.getBasePayload(), ...payload };
+        if (isAppsScriptUrl(url)) return this.jsonpRequest(url, body);
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action, ...this.getBasePayload(), ...payload }),
+          body: JSON.stringify(body),
         });
         const data = await response.json();
         if (!data.ok) throw new Error(data.error || 'Erreur API');
         return data.data;
+      }
+
+      jsonpRequest(url, payload) {
+        return new Promise((resolve, reject) => {
+          const callback = `crm_jsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+          const script = document.createElement('script');
+          const cleanup = () => {
+            delete window[callback];
+            script.remove();
+            clearTimeout(timer);
+          };
+          const timer = setTimeout(() => {
+            cleanup();
+            reject(new Error('Delai depasse avec Apps Script'));
+          }, 30000);
+          window[callback] = response => {
+            cleanup();
+            if (!response?.ok) reject(new Error(response?.error || 'Erreur API'));
+            else resolve(response.data);
+          };
+          const separator = url.includes('?') ? '&' : '?';
+          const encodedPayload = encodeURIComponent(JSON.stringify(payload));
+          if (encodedPayload.length > 12000) {
+            cleanup();
+            reject(new Error('Donnees trop longues pour Apps Script JSONP'));
+            return;
+          }
+          script.src = `${url}${separator}callback=${encodeURIComponent(callback)}&payload=${encodedPayload}&_=${Date.now()}`;
+          script.onerror = () => {
+            cleanup();
+            reject(new Error('Apps Script inaccessible'));
+          };
+          document.head.appendChild(script);
+        });
       }
     }
 
     const masterApi = new ApiClient(() => CONFIG.masterEndpoint, () => ({ token: State.token }));
     const businessApi = new ApiClient(() => State.businessEndpoint, () => ({ actor: State.user, google_access_token: getGoogleAccessToken() }));
     const $ = (id) => document.getElementById(id);
+
+    function isAppsScriptUrl(url) {
+      return /script\.google\.com\/macros\/s\//.test(String(url));
+    }
 
     function showToast(message) {
       const el = $('toast');
