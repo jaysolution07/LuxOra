@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LuxOra</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='46%25' r='62%25'%3E%3Cstop offset='0%25' stop-color='%23fffaf0'/%3E%3Cstop offset='55%25' stop-color='%23f5eac9'/%3E%3Cstop offset='100%25' stop-color='%23e6d5a3'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)' stroke='%23c9a24b' stroke-width='4'/%3E%3Cg stroke='%23c9a24b' stroke-width='2.4' stroke-linecap='round' opacity='.7'%3E%3Cline x1='50' y1='4' x2='50' y2='14'/%3E%3Cline x1='50' y1='86' x2='50' y2='96'/%3E%3Cline x1='4' y1='50' x2='14' y2='50'/%3E%3Cline x1='86' y1='50' x2='96' y2='50'/%3E%3Cline x1='17' y1='17' x2='24' y2='24'/%3E%3Cline x1='76' y1='76' x2='83' y2='83'/%3E%3Cline x1='17' y1='83' x2='24' y2='76'/%3E%3Cline x1='76' y1='24' x2='83' y2='17'/%3E%3C/g%3E%3Cg transform='translate(50 55) scale(1.05)' fill='%231b1a24'%3E%3Cpath d='M-3 9-13 24-6 15 0 22 4 14 9 23 3 9Z'/%3E%3Cellipse cx='0' cy='-3' rx='6.6' ry='13'/%3E%3Ccircle cx='2.2' cy='-16' r='5'/%3E%3Cpath d='M6-16 12.5-14 6-11.6Z'/%3E%3Cpath d='M-4-7C-19-11-32-24-36-37-28-30-17-22-6-18-13-16-19-10-21-3-15-6-9-8-4-7Z'/%3E%3Cpath d='M4-7C19-11 32-24 36-37 28-30 17-22 6-18 13-16 19-10 21-3 15-6 9-8 4-7Z'/%3E%3Ccircle cx='3.6' cy='-16.6' r='1' fill='%23f5eac9'/%3E%3C/g%3E%3C/svg%3E">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -459,6 +460,43 @@
       border-radius: inherit;
     }
 
+    .planner {
+      display: grid;
+      gap: 10px;
+      min-width: 720px;
+    }
+
+    .planner-row {
+      display: grid;
+      grid-template-columns: 180px minmax(360px, 1fr) 110px;
+      gap: 12px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .planner-track {
+      position: relative;
+      height: 20px;
+      border-radius: 999px;
+      background: #f1ede4;
+      overflow: hidden;
+    }
+
+    .planner-bar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      min-width: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #027a48, #175cd3);
+    }
+
+    .status-signe { color: var(--ok); background: #ecfdf3; }
+    .status-negociation { color: #175cd3; background: #eff8ff; }
+    .status-termine { color: #7c611f; background: #fffaeb; }
+    .status-annule { color: var(--danger); background: #fff1f0; }
+
     .stat, .panel {
       padding: 20px;
       box-shadow: none;
@@ -568,7 +606,7 @@
 
     .mobile-nav {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 8px;
       padding: 10px;
       border-bottom: 1px solid var(--line);
@@ -723,7 +761,9 @@
         <button class="btn nav-btn" data-view="users">Utilisateurs</button>
         <button class="btn nav-btn" data-view="clients">Clients</button>
         <button class="btn nav-btn" data-view="appointments">Rendez-vous</button>
+        <button class="btn nav-btn" data-view="contracts">Contrats</button>
         <button class="btn nav-btn" data-view="revenue">CA</button>
+        <button class="btn nav-btn" data-view="settings">Paramètres</button>
       </aside>
 
       <main>
@@ -732,7 +772,9 @@
           <button class="btn nav-btn" data-view="users">Comptes</button>
           <button class="btn nav-btn" data-view="clients">Clients</button>
           <button class="btn nav-btn" data-view="appointments">RDV</button>
+          <button class="btn nav-btn" data-view="contracts">Contrats</button>
           <button class="btn nav-btn" data-view="revenue">CA</button>
+          <button class="btn nav-btn" data-view="settings">Google</button>
         </nav>
 
         <section id="dashboard" class="view active">
@@ -1188,6 +1230,81 @@
           </div>
         </section>
 
+        <section id="contracts" class="view">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Contrats</div>
+              <h2>Contrats et planning partagé</h2>
+              <p class="muted">Le planning est commun a toute l'entreprise. Les changements s'affichent immediatement puis se synchronisent.</p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3 id="contractFormTitle">Nouveau contrat</h3>
+            <input id="contract_id" type="hidden">
+            <div class="form-grid">
+              <div>
+                <label for="contract_client">Marque / client</label>
+                <select id="contract_client"></select>
+              </div>
+              <div>
+                <label for="contract_status">Statut</label>
+                <select id="contract_status">
+                  <option value="En negociation">En négociation</option>
+                  <option value="Signe">Signé</option>
+                  <option value="Termine">Terminé</option>
+                  <option value="Annule">Annulé</option>
+                </select>
+              </div>
+              <div>
+                <label for="contract_start">Date de debut</label>
+                <input id="contract_start" type="date">
+              </div>
+              <div>
+                <label for="contract_end">Date de fin</label>
+                <input id="contract_end" type="date">
+              </div>
+              <div>
+                <label for="contract_amount">Montant</label>
+                <input id="contract_amount" type="number" min="0" step="0.01">
+              </div>
+              <div>
+                <label for="contract_notes">Notes</label>
+                <input id="contract_notes">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="cancelContractEditBtn" class="btn btn-secondary" type="button">Annuler</button>
+              <button id="saveContractBtn" class="btn btn-primary" type="button">Enregistrer le contrat</button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th>Vendeur</th>
+                    <th>Période</th>
+                    <th>Statut</th>
+                    <th>Montant</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="contractsRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px">
+            <h3>Planning partagé</h3>
+            <div class="table-wrap">
+              <div id="contractsPlanner" class="planner"></div>
+            </div>
+          </div>
+        </section>
+
         <section id="revenue" class="view">
           <div class="toolbar">
             <div>
@@ -1277,6 +1394,25 @@
             </div>
           </div>
         </section>
+
+        <section id="settings" class="view">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Compte</div>
+              <h2>Paramètres Google</h2>
+              <p class="muted">Associez votre propre compte Google pour Gmail, Google Agenda et Google Drive.</p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Compte Google utilisateur</h3>
+            <p class="muted" id="googleAccountStatus"></p>
+            <div class="actions">
+              <button id="connectGoogleBtn" class="btn btn-primary" type="button">Connecter mon compte Google</button>
+              <button id="disconnectGoogleBtn" class="btn btn-secondary" type="button">Déconnecter Google</button>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </section>
@@ -1286,9 +1422,15 @@
   <script>
     const MASTER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwzO0Hel-tKYSclEggKCxlv7fA7zes0DfHOxNs-x0WUwdhKFT5pPH-EtTaBpzLjWd-K/exec';
     const FRONT_SESSION_TTL_MS = 60 * 60 * 1000;
+    const GOOGLE_SCOPES = [
+      'https://www.googleapis.com/auth/calendar.events',
+      'https://www.googleapis.com/auth/gmail.send',
+      'https://www.googleapis.com/auth/drive.file',
+    ].join(' ');
 
     const CONFIG = {
       masterEndpoint: MASTER_ENDPOINT,
+      googleClientId: '904974794230-sslcq3rvhbvsp12ua6tuahe8p865muhp.apps.googleusercontent.com',
     };
 
     const StoredSession = readStoredSession();
@@ -1305,11 +1447,14 @@
       revenue: StoredSession?.revenue || [],
       objectives: StoredSession?.objectives || [],
       portfolioHistory: StoredSession?.portfolioHistory || [],
+      contracts: StoredSession?.contracts || [],
+      google: StoredSession?.google || null,
       loading: {
         users: false,
         clients: false,
         appointments: false,
         revenue: false,
+        contracts: false,
       },
     };
 
@@ -1334,7 +1479,7 @@
     }
 
     const masterApi = new ApiClient(() => CONFIG.masterEndpoint, () => ({ token: State.token }));
-    const businessApi = new ApiClient(() => State.businessEndpoint, () => ({ actor: State.user }));
+    const businessApi = new ApiClient(() => State.businessEndpoint, () => ({ actor: State.user, google_access_token: getGoogleAccessToken() }));
     const $ = (id) => document.getElementById(id);
 
     function showToast(message) {
@@ -1373,6 +1518,7 @@
         State.loading.clients = true;
         State.loading.appointments = true;
         State.loading.revenue = true;
+        State.loading.contracts = true;
         renderAll();
         await loadBusinessBootstrap().catch(err => showToast(err.message));
         renderAll();
@@ -1390,6 +1536,7 @@
       State.loading.clients = true;
       State.loading.appointments = true;
       State.loading.revenue = true;
+      State.loading.contracts = true;
       if (State.user) renderAll();
 
       const data = await masterApi.request('bootstrap');
@@ -1414,9 +1561,11 @@
         State.revenue = [];
         State.objectives = [];
         State.portfolioHistory = [];
+        State.contracts = [];
         State.loading.clients = false;
         State.loading.appointments = false;
         State.loading.revenue = false;
+        State.loading.contracts = false;
         return;
       }
       try {
@@ -1427,11 +1576,13 @@
         State.revenue = data.revenue || [];
         State.objectives = data.objectives || [];
         State.portfolioHistory = data.portfolioHistory || [];
+        State.contracts = data.contracts || [];
         persistSession();
       } finally {
         State.loading.clients = false;
         State.loading.appointments = false;
         State.loading.revenue = false;
+        State.loading.contracts = false;
       }
     }
 
@@ -1541,6 +1692,9 @@
       renderRevenue();
       renderDashboardAnalytics();
       renderPersonStats();
+      renderContractOptions();
+      renderContracts();
+      renderGoogleStatus();
     }
 
     function renderStats() {
@@ -1735,6 +1889,82 @@
           <td>${escapeHtml(item.commentaires || '')}</td>
         </tr>
       `).join('') || `<tr><td colspan="6" class="muted">Aucun contrat enregistre.</td></tr>`;
+    }
+
+    function renderContractOptions() {
+      if (!$('contract_client')) return;
+      const current = $('contract_client').value;
+      $('contract_client').innerHTML = State.clients
+        .map(client => `<option value="${escapeAttr(client.client_id)}">${escapeHtml(client.nom_entreprise)}</option>`)
+        .join('');
+      if (current) $('contract_client').value = current;
+    }
+
+    function renderContracts() {
+      if (!$('contractsRows')) return;
+      if (State.loading.contracts) {
+        $('contractsRows').innerHTML = skeletonRows(6, 4);
+        $('contractsPlanner').innerHTML = '<div class="skeleton" style="height:140px"></div>';
+        return;
+      }
+      const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
+      const rows = State.contracts.slice().sort((a, b) => String(a.date_debut).localeCompare(String(b.date_debut)));
+      $('contractsRows').innerHTML = rows.map(contract => {
+        const canManage = State.user.role === 'admin' || contract.owner_id === State.user.ID;
+        return `
+          <tr class="${contract._pending ? 'row-pending' : ''}">
+            <td><strong>${escapeHtml(contract.client_nom || getClientName(contract.client_id))}</strong><div class="muted">${escapeHtml(contract.notes || '')}</div></td>
+            <td>${escapeHtml(userMap.get(contract.owner_id) || contract.owner_id || '')}</td>
+            <td>${escapeHtml(formatDate(contract.date_debut))} - ${escapeHtml(formatDate(contract.date_fin))}</td>
+            <td><span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(contract._pending ? 'Synchronisation' : contract.statut)}</span></td>
+            <td>${escapeHtml(formatMoney(contract.montant))}</td>
+            <td>
+              <div class="inline-actions">
+                ${canManage ? `<button class="btn btn-secondary" data-edit-contract="${escapeAttr(contract.contract_id)}">Modifier</button>` : ''}
+                ${canManage ? `<button class="btn btn-secondary" data-delete-contract="${escapeAttr(contract.contract_id)}">Supprimer</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') || `<tr><td colspan="6" class="muted">Aucun contrat pour le moment.</td></tr>`;
+      renderContractsPlanner(rows);
+    }
+
+    function renderContractsPlanner(rows) {
+      const planner = $('contractsPlanner');
+      if (!planner) return;
+      if (!rows.length) {
+        planner.innerHTML = '<p class="muted">Aucun contrat a afficher dans le planning.</p>';
+        return;
+      }
+      const dates = rows.flatMap(item => [new Date(item.date_debut + 'T00:00:00'), new Date(item.date_fin + 'T00:00:00')]).filter(date => !isNaN(date.getTime()));
+      const min = Math.min(...dates.map(date => date.getTime()));
+      const max = Math.max(...dates.map(date => date.getTime()));
+      const range = Math.max(max - min, 24 * 60 * 60 * 1000);
+      planner.innerHTML = rows.map((contract, index) => {
+        const start = new Date(contract.date_debut + 'T00:00:00').getTime();
+        const end = new Date(contract.date_fin + 'T00:00:00').getTime();
+        const left = Math.max(0, Math.min(100, Math.round((start - min) / range * 100)));
+        const width = Math.max(3, Math.min(100 - left, Math.round((end - start) / range * 100)));
+        const hue = [145, 215, 32, 270, 12, 190][index % 6];
+        return `
+          <div class="planner-row">
+            <div><strong>${escapeHtml(contract.client_nom || getClientName(contract.client_id))}</strong><div class="muted">${escapeHtml(formatDate(contract.date_debut))} -> ${escapeHtml(formatDate(contract.date_fin))}</div></div>
+            <div class="planner-track"><div class="planner-bar" style="left:${left}%;width:${width}%;background:linear-gradient(90deg,hsl(${hue} 62% 42%),hsl(${hue + 28} 64% 48%))"></div></div>
+            <span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(contract.statut)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderGoogleStatus() {
+      if (!$('googleAccountStatus')) return;
+      const connected = hasGoogleToken();
+      $('googleAccountStatus').textContent = connected
+        ? `Compte Google associe${State.google?.email ? ` : ${State.google.email}` : ''}. Gmail, Agenda et Drive utiliseront ce compte.`
+        : 'Aucun compte Google associe. Les fonctions Gmail, Agenda et Drive ne peuvent pas encore agir avec votre compte.';
+      $('connectGoogleBtn').textContent = connected ? 'Reconnecter mon compte Google' : 'Connecter mon compte Google';
+      $('disconnectGoogleBtn').style.display = connected ? 'inline-flex' : 'none';
     }
 
     function renderDashboardAnalytics() {
@@ -2062,6 +2292,83 @@
       }
     }
 
+    async function saveContract() {
+      const contract = buildContractFromForm();
+      if (!contract.client_id || !contract.date_debut || !contract.date_fin) {
+        showToast('Client, date de debut et date de fin requis');
+        return;
+      }
+      const existing = State.contracts.find(item => item.contract_id === contract.contract_id);
+      const previousContracts = State.contracts.slice();
+      const previousRevenue = State.revenue.slice();
+      const optimisticRevenue = buildRevenueFromContract(contract);
+      if (existing) Object.assign(existing, contract, { _pending: true });
+      else State.contracts.unshift(contract);
+      State.revenue = State.revenue.filter(item => item.revenue_id !== optimisticRevenue.revenue_id);
+      if (Number(contract.montant) > 0) State.revenue.unshift(optimisticRevenue);
+      renderAll();
+      persistSession();
+      setButtonLoading('saveContractBtn', true);
+      try {
+        const saved = await businessApi.request(existing ? 'updateContract' : 'createContract', contract);
+        const target = State.contracts.find(item => item.contract_id === contract.contract_id);
+        if (target) Object.assign(target, saved, { _pending: false });
+        resetContractForm();
+        renderAll();
+        silentBusinessRefresh();
+        showToast(existing ? 'Contrat modifie' : 'Contrat cree');
+      } catch (err) {
+        State.contracts = previousContracts;
+        State.revenue = previousRevenue;
+        renderAll();
+        showToast(err.message);
+      } finally {
+        setButtonLoading('saveContractBtn', false);
+      }
+    }
+
+    function openEditContract(contractId) {
+      const contract = State.contracts.find(item => item.contract_id === contractId);
+      if (!contract) return;
+      $('contractFormTitle').textContent = 'Modifier contrat';
+      $('contract_id').value = contract.contract_id;
+      $('contract_client').value = contract.client_id;
+      $('contract_status').value = contract.statut || 'En negociation';
+      $('contract_start').value = contract.date_debut || '';
+      $('contract_end').value = contract.date_fin || '';
+      $('contract_amount').value = contract.montant || '';
+      $('contract_notes').value = contract.notes || '';
+      setView('contracts');
+      $('contractFormTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetContractForm() {
+      $('contractFormTitle').textContent = 'Nouveau contrat';
+      ['contract_id', 'contract_start', 'contract_end', 'contract_amount', 'contract_notes'].forEach(id => $(id).value = '');
+      $('contract_status').value = 'En negociation';
+    }
+
+    async function deleteContract(contractId) {
+      const removed = State.contracts.find(item => item.contract_id === contractId);
+      if (!removed) return;
+      const previousContracts = State.contracts.slice();
+      const previousRevenue = State.revenue.slice();
+      State.contracts = State.contracts.filter(item => item.contract_id !== contractId);
+      State.revenue = State.revenue.filter(item => item.revenue_id !== `ca_${contractId}`);
+      renderAll();
+      persistSession();
+      try {
+        await businessApi.request('deleteContract', { contract_id: contractId });
+        silentBusinessRefresh();
+        showToast('Contrat supprime');
+      } catch (err) {
+        State.contracts = previousContracts;
+        State.revenue = previousRevenue;
+        renderAll();
+        showToast(err.message);
+      }
+    }
+
     async function createClient() {
       const optimisticClient = buildClientFromForm();
       if (!optimisticClient.nom_entreprise) {
@@ -2287,6 +2594,7 @@
         showToast('Client, date et heure requis');
         return;
       }
+      if (!hasGoogleToken()) showToast('Compte Google non connecte: le rendez-vous ne sera pas encore ajoute a votre Agenda');
       State.appointments.unshift(optimisticAppointment);
       renderStats();
       renderAppointments();
@@ -2501,6 +2809,50 @@
       };
     }
 
+    function buildContractFromForm() {
+      const client = State.clients.find(item => item.client_id === $('contract_client').value);
+      const contractId = $('contract_id').value || tempId('ctr');
+      return {
+        contract_id: contractId,
+        owner_id: State.user?.ID || '',
+        client_id: $('contract_client').value,
+        client_nom: client?.nom_entreprise || '',
+        date_debut: $('contract_start').value,
+        date_fin: $('contract_end').value,
+        statut: $('contract_status').value,
+        montant: Number($('contract_amount').value || 0),
+        notes: $('contract_notes').value,
+        revenue_id: `ca_${contractId}`,
+        _pending: true,
+      };
+    }
+
+    function buildRevenueFromContract(contract) {
+      return {
+        revenue_id: `ca_${contract.contract_id}`,
+        client_id: contract.client_id,
+        owner_id: contract.owner_id,
+        date: contract.date_debut,
+        montant: Number(contract.montant || 0),
+        nombre_contrats: Number(contract.montant || 0) > 0 ? 1 : 0,
+        commentaires: `Contrat - ${contract.statut}`,
+        client_nom: contract.client_nom || getClientName(contract.client_id),
+        _pending: true,
+      };
+    }
+
+    function getClientName(clientId) {
+      return State.clients.find(client => client.client_id === clientId)?.nom_entreprise || 'Client';
+    }
+
+    function contractStatusClass(status) {
+      const value = String(status || '').toLowerCase();
+      if (value.includes('signe')) return 'status-signe';
+      if (value.includes('termine')) return 'status-termine';
+      if (value.includes('annule')) return 'status-annule';
+      return 'status-negociation';
+    }
+
     function getAssignableUsers() {
       if (State.user?.role !== 'admin') return [State.user].filter(Boolean);
       return State.users.filter(user => user.role === 'apporteur' || user.role === 'admin');
@@ -2523,6 +2875,100 @@
       if (State.user?.role !== 'admin') return;
       const client = State.clients.find(item => item.client_id === $('revenue_client').value);
       if (client?.owner_id) $('revenue_owner').value = client.owner_id;
+    }
+
+    function getGoogleAccessToken() {
+      if (!State.google?.accessToken || !State.google?.expiresAt) return '';
+      if (Date.now() > State.google.expiresAt - 60000) return '';
+      return State.google.accessToken;
+    }
+
+    function hasGoogleToken() {
+      return Boolean(getGoogleAccessToken());
+    }
+
+    function connectGoogle() {
+      if (!CONFIG.googleClientId) {
+        showToast('Ajoute d abord ton Google OAuth Client ID dans CONFIG.googleClientId');
+        return;
+      }
+      if (!window.google?.accounts?.oauth2) {
+        showToast('Google Identity Services est encore en chargement');
+        return;
+      }
+      setButtonLoading('connectGoogleBtn', true);
+      const tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CONFIG.googleClientId,
+        scope: `${GOOGLE_SCOPES} openid email profile`,
+        prompt: 'consent',
+        callback: async response => {
+          try {
+            if (response.error) throw new Error(response.error);
+            State.google = {
+              accessToken: response.access_token,
+              expiresAt: Date.now() + Number(response.expires_in || 3600) * 1000,
+              scope: response.scope || GOOGLE_SCOPES,
+              connectedAt: new Date().toISOString(),
+            };
+            await hydrateGoogleProfile();
+            persistSession();
+            renderGoogleStatus();
+            showToast('Compte Google connecte');
+          } catch (err) {
+            showToast(err.message);
+          } finally {
+            setButtonLoading('connectGoogleBtn', false);
+          }
+        },
+      });
+      tokenClient.requestAccessToken();
+    }
+
+    async function hydrateGoogleProfile() {
+      const token = getGoogleAccessToken();
+      if (!token) return;
+      try {
+        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) return;
+        const profile = await response.json();
+        State.google.email = profile.email || '';
+        State.google.name = profile.name || '';
+      } catch (err) {}
+    }
+
+    function disconnectGoogle() {
+      State.google = null;
+      persistSession();
+      renderGoogleStatus();
+      showToast('Compte Google deconnecte');
+    }
+
+    function silentBusinessRefresh() {
+      if (!State.businessEndpoint || State.syncingBusiness) return;
+      State.syncingBusiness = true;
+      businessApi.request('bootstrap')
+        .then(data => {
+          State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
+          State.clients = data.clients || State.clients;
+          State.appointments = data.appointments || State.appointments;
+          State.revenue = data.revenue || State.revenue;
+          State.objectives = data.objectives || State.objectives;
+          State.portfolioHistory = data.portfolioHistory || State.portfolioHistory;
+          State.contracts = data.contracts || State.contracts;
+          renderAll();
+          persistSession();
+        })
+        .catch(() => {})
+        .finally(() => State.syncingBusiness = false);
+    }
+
+    function startRealtimeSync() {
+      clearInterval(startRealtimeSync.timer);
+      startRealtimeSync.timer = setInterval(() => {
+        if (State.token && State.user && document.visibilityState === 'visible') silentBusinessRefresh();
+      }, 15000);
     }
 
     function filterRevenue(rows) {
@@ -2650,6 +3096,8 @@
         revenue: State.revenue,
         objectives: State.objectives,
         portfolioHistory: State.portfolioHistory,
+        contracts: State.contracts,
+        google: State.google,
         savedAt: Date.now(),
       }));
     }
@@ -2708,6 +3156,10 @@
     $('createRevenueBtn').addEventListener('click', createRevenue);
     $('saveObjectiveBtn').addEventListener('click', saveObjective);
     $('openSelectedPersonBtn').addEventListener('click', () => openPersonStats($('filter_owner').value || State.user.ID));
+    $('saveContractBtn').addEventListener('click', saveContract);
+    $('cancelContractEditBtn').addEventListener('click', resetContractForm);
+    $('connectGoogleBtn').addEventListener('click', connectGoogle);
+    $('disconnectGoogleBtn').addEventListener('click', disconnectGoogle);
     $('rdv_client').addEventListener('change', renderReferentOptions);
     $('revenue_client').addEventListener('change', syncRevenueOwnerFromClient);
     $('objective_owner').addEventListener('change', () => {
@@ -2744,10 +3196,15 @@
       if (editClientBtn) openEditClient(editClientBtn.dataset.editClient);
       const deleteClientBtn = event.target.closest('[data-delete-client]');
       if (deleteClientBtn) deleteClient(deleteClientBtn.dataset.deleteClient);
+      const editContractBtn = event.target.closest('[data-edit-contract]');
+      if (editContractBtn) openEditContract(editContractBtn.dataset.editContract);
+      const deleteContractBtn = event.target.closest('[data-delete-contract]');
+      if (deleteContractBtn) deleteContract(deleteContractBtn.dataset.deleteContract);
     });
     document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
 
     startApp();
+    startRealtimeSync();
   </script>
 </body>
 </html>
