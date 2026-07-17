@@ -606,7 +606,7 @@
 
     .mobile-nav {
       display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-columns: repeat(9, minmax(0, 1fr));
       gap: 8px;
       padding: 10px;
       border-bottom: 1px solid var(--line);
@@ -614,6 +614,13 @@
       position: sticky;
       top: 64px;
       z-index: 9;
+    }
+    .sidebar {
+      display: none;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      padding: 16px;
+      min-height: calc(100vh - 64px);
     }
 
     .toast {
@@ -633,6 +640,20 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes shimmer { to { background-position: -240% 0; } }
+
+    /* ===== CATALOGUE / DEVIS additions ===== */
+    .tabs { display:flex; gap:8px; margin:14px 0 0; flex-wrap:wrap; }
+    .tab-btn.active { background: var(--brand); color:#fff; border-color: var(--brand-dark); }
+    .admin-only { display:none; }
+    body.is-admin .admin-only { display:block; }
+    .admin-col { display:none; }
+    body.is-admin .admin-col { display:table-cell; }
+    .totaux { display:grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap:8px; }
+    .totaux > div { background:#f8f5ec; border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
+    .totaux span { display:block; font-size:12px; color: var(--muted); }
+    .totaux strong { font-size:16px; }
+    .devis-ligne-row select, .devis-ligne-row input { width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:8px; }
+    @media (max-width:880px) { .totaux { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 
     @media (min-width: 780px) {
       .login { grid-template-columns: 1.15fr .85fr; }
@@ -687,14 +708,14 @@
               <ellipse cx="0" cy="-3" rx="6.6" ry="13" fill="#1b1a24"/>
               <circle cx="2.2" cy="-16" r="5" fill="#1b1a24"/>
               <path d="M6,-16 L12.5,-14 L6,-11.6 Z" fill="#1b1a24"/>
-              <path d="M-4,-7 C-19,-11 -32,-24 -36,-37 C-28,-30 -17,-22 -6,-18 C-13,-16 -19,-10 -21,-3 C-15,-6 -9,-8 -4,-7 Z" fill="#1b1a24"/>
-              <path d="M4,-7 C19,-11 32,-24 36,-37 C28,-30 17,-22 6,-18 C13,-16 19,-10 21,-3 C15,-6 9,-8 4,-7 Z" fill="#1b1a24"/>
+              <path d="M-4,-7 C-19,-11 -32-24 -36-37 C-28,-30 -17-22 -6-18 C-13,-16 -19-10 -21-3 C-15,-6 -9-8 -4-7 Z" fill="#1b1a24"/>
+              <path d="M4,-7 C19-11 32-24 36-37 28-30 17-22 6-18 13-16 19-10 21-3 15-6 9-8 4-7 Z" fill="#1b1a24"/>
               <circle cx="3.6" cy="-16.6" r="1" fill="#f5eac9"/>
             </g>
           </svg>
         </div>
         <div class="eyebrow" style="color:#e9d9ab">CRM multi-entreprise</div>
-        <h1>Lux<span class="o-dove"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50,54)"><path d="M-3,9 L-13,24 L-6,15 L0,22 L4,14 L9,23 L3,9 Z" fill="#1b1a24"/><ellipse cx="0" cy="-3" rx="6.6" ry="13" fill="#1b1a24"/><circle cx="2.2" cy="-16" r="5" fill="#1b1a24"/><path d="M6,-16 L12.5,-14 L6,-11.6 Z" fill="#1b1a24"/><path d="M-4,-7 C-19,-11 -32,-24 -36,-37 C-28,-30 -17,-22 -6,-18 C-13,-16 -19,-10 -21,-3 C-15,-6 -9,-8 -4,-7 Z" fill="#1b1a24"/><path d="M4,-7 C19,-11 32,-24 36,-37 C28,-30 17,-22 6,-18 C13,-16 19,-10 21,-3 C15,-6 9,-8 4,-7 Z" fill="#1b1a24"/><circle cx="3.6" cy="-16.6" r="1" fill="#f5eac9"/></g></svg><span class="sr-only">O</span></span>ra</h1>
+        <h1>Lux<span class="o-dove"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50,54)"><path d="M-3,9 L-13,24 L-6,15 L0,22 L4,14 L9,23 L3,9 Z" fill="#1b1a24"/><ellipse cx="0" cy="-3" rx="6.6" ry="13" fill="#1b1a24"/><circle cx="2.2" cy="-16" r="5" fill="#1b1a24"/><path d="M6,-16 L12.5,-14 L6,-11.6 Z" fill="#1b1a24"/><path d="M-4,-7 C-19,-11 -32-24 -36-37 C-28-30 -17-22 -6-18 C-13-16 -19-10 -21-3 C-15,-6 -9-8 -4-7 Z" fill="#1b1a24"/><path d="M4,-7 C19-11 32-24 36-37 28-30 17-22 6-18 13-16 19-10 21-3 15-6 9-8 4-7 Z" fill="#1b1a24"/><circle cx="3.6" cy="-16.6" r="1" fill="#f5eac9"/></g></svg><span class="sr-only">O</span></span>ra</h1>
         <p>Chaque entreprise a ses propres comptes. Un admin ne peut creer que des utilisateurs de son entreprise.</p>
       </div>
     </div>
@@ -702,13 +723,13 @@
       <form id="loginForm" class="card">
         <div class="eyebrow">Connexion</div>
         <h2>Accéder à LuxOra</h2>
-        <p class="muted">Identifiant et mot de passe requis.</p>
+        <p class="muted">Identifiant et mot de passe depuis le sheet master.</p>
         <label for="login">Identifiant</label>
         <input id="login" autocomplete="username" required>
         <label for="password">Mot de passe</label>
         <input id="password" type="password" autocomplete="current-password" required>
-        <button id="loginBtn" class="btn btn-primary full" type="submit">Se connecter</button>
         <div id="loginError" class="alert"></div>
+        <button id="loginBtn" type="submit" class="btn btn-primary full">Se connecter</button>
       </form>
     </div>
   </section>
@@ -726,33 +747,23 @@
                 <stop offset="100%" stop-color="#e6d5a3"/>
               </radialGradient>
             </defs>
-            <g stroke="#c9a24b" stroke-width="2.4" stroke-linecap="round" opacity="0.6">
-              <line x1="50" y1="2" x2="50" y2="14"/>
-              <line x1="50" y1="86" x2="50" y2="98"/>
-              <line x1="2" y1="50" x2="14" y2="50"/>
-              <line x1="86" y1="50" x2="98" y2="50"/>
-              <line x1="15" y1="15" x2="23" y2="23"/>
-              <line x1="77" y1="77" x2="85" y2="85"/>
-              <line x1="15" y1="85" x2="23" y2="77"/>
-              <line x1="77" y1="23" x2="85" y2="15"/>
-            </g>
-            <circle cx="50" cy="50" r="44" fill="url(#luxoraGlowTop)" stroke="#c9a24b" stroke-width="2"/>
+            <circle cx="50" cy="50" r="44" fill="url(#luxoraGlowTop)" stroke="#c9a24b" stroke-width="1.6"/>
             <g transform="translate(50,54)">
               <path d="M-3,9 L-13,24 L-6,15 L0,22 L4,14 L9,23 L3,9 Z" fill="#1b1a24"/>
               <ellipse cx="0" cy="-3" rx="6.6" ry="13" fill="#1b1a24"/>
               <circle cx="2.2" cy="-16" r="5" fill="#1b1a24"/>
               <path d="M6,-16 L12.5,-14 L6,-11.6 Z" fill="#1b1a24"/>
-              <path d="M-4,-7 C-19,-11 -32,-24 -36,-37 C-28,-30 -17,-22 -6,-18 C-13,-16 -19,-10 -21,-3 C-15,-6 -9,-8 -4,-7 Z" fill="#1b1a24"/>
-              <path d="M4,-7 C19,-11 32,-24 36,-37 C28,-30 17,-22 6,-18 C13,-16 19,-10 21,-3 C15,-6 9,-8 4,-7 Z" fill="#1b1a24"/>
+              <path d="M-4,-7 C-19,-11 -32-24 -36-37 C-28,-30 -17-22 -6-18 C-13,-16 -19-10 -21-3 C-15,-6 -9-8 -4-7 Z" fill="#1b1a24"/>
+              <path d="M4,-7 C19-11 32-24 36-37 28-30 17-22 6-18 13-16 19-10 21-3 15-6 9-8 4-7 Z" fill="#1b1a24"/>
               <circle cx="3.6" cy="-16.6" r="1" fill="#f5eac9"/>
             </g>
           </svg>
         </span>
         <span>ra</span>
       </div>
-      <span id="companyName" class="muted"></span>
       <div class="topbar-spacer"></div>
-      <button id="logoutBtn" class="btn btn-secondary">Deconnexion</button>
+      <span id="companyName" class="muted"></span>
+      <button id="logoutBtn" class="btn btn-secondary" type="button">Déconnexion</button>
     </header>
 
     <div class="shell">
@@ -761,6 +772,8 @@
         <button class="btn nav-btn" data-view="users">Utilisateurs</button>
         <button class="btn nav-btn" data-view="clients">Clients</button>
         <button class="btn nav-btn" data-view="appointments">Rendez-vous</button>
+        <button class="btn nav-btn" data-view="catalogue">Catalogue</button>
+        <button class="btn nav-btn" data-view="devis">Devis</button>
         <button class="btn nav-btn" data-view="contracts">Contrats</button>
         <button class="btn nav-btn" data-view="revenue">CA</button>
         <button class="btn nav-btn" data-view="settings">Paramètres</button>
@@ -772,6 +785,8 @@
           <button class="btn nav-btn" data-view="users">Comptes</button>
           <button class="btn nav-btn" data-view="clients">Clients</button>
           <button class="btn nav-btn" data-view="appointments">RDV</button>
+          <button class="btn nav-btn" data-view="catalogue">Catalogue</button>
+          <button class="btn nav-btn" data-view="devis">Devis</button>
           <button class="btn nav-btn" data-view="contracts">Contrats</button>
           <button class="btn nav-btn" data-view="revenue">CA</button>
           <button class="btn nav-btn" data-view="settings">Google</button>
@@ -787,150 +802,62 @@
             <button class="btn btn-secondary" id="refreshBtn">Actualiser</button>
           </div>
           <div class="grid">
-            <div class="stat admin-stat">
-              <div class="muted">Utilisateurs</div>
-              <div id="statUsers" class="value">0</div>
-            </div>
-            <div class="stat admin-stat">
-              <div class="muted">Admins</div>
-              <div id="statAdmins" class="value">0</div>
-            </div>
-            <div class="stat admin-stat">
-              <div class="muted">Apporteurs</div>
-              <div id="statApporteurs" class="value">0</div>
-            </div>
-            <div class="stat">
-              <div class="muted">Clients</div>
-              <div id="statClients" class="value">0</div>
-            </div>
-            <div class="stat">
-              <div class="muted">Rendez-vous</div>
-              <div id="statAppointments" class="value">0</div>
-            </div>
-            <div class="stat">
-              <div class="muted">CR en attente</div>
-              <div id="statPendingReports" class="value">0</div>
-            </div>
-            <div class="stat">
-              <div class="muted">Chiffre d'affaires</div>
-              <div id="statRevenue" class="value">0 EUR</div>
-            </div>
-            <div class="stat">
-              <div class="muted">Contrats</div>
-              <div id="statContracts" class="value">0</div>
-            </div>
+            <div class="stat admin-stat"><div class="muted">Utilisateurs</div><div id="statUsers" class="value">0</div></div>
+            <div class="stat admin-stat"><div class="muted">Admins</div><div id="statAdmins" class="value">0</div></div>
+            <div class="stat admin-stat"><div class="muted">Apporteurs</div><div id="statApporteurs" class="value">0</div></div>
+            <div class="stat"><div class="muted">Clients</div><div id="statClients" class="value">0</div></div>
+            <div class="stat"><div class="muted">Rendez-vous</div><div id="statAppointments" class="value">0</div></div>
+            <div class="stat"><div class="muted">CR en attente</div><div id="statPendingReports" class="value">0</div></div>
+            <div class="stat"><div class="muted">Chiffre d'affaires</div><div id="statRevenue" class="value">0 EUR</div></div>
+            <div class="stat"><div class="muted">Contrats</div><div id="statContracts" class="value">0</div></div>
           </div>
 
           <div class="dashboard-stack">
             <div class="panel">
               <h3>Filtres</h3>
               <div class="filter-grid">
-                <div>
-                  <label for="filter_start">Debut</label>
-                  <input id="filter_start" type="date">
-                </div>
-                <div>
-                  <label for="filter_end">Fin</label>
-                  <input id="filter_end" type="date">
-                </div>
-                <div>
-                  <label for="filter_client">Client</label>
-                  <select id="filter_client"></select>
-                </div>
-                <div class="admin-filter">
-                  <label for="filter_owner">Apporteur</label>
-                  <select id="filter_owner"></select>
-                </div>
-                <div>
-                  <button id="clearFiltersBtn" class="btn btn-secondary full" type="button">Reinitialiser</button>
-                </div>
+                <div><label for="filter_start">Debut</label><input id="filter_start" type="date"></div>
+                <div><label for="filter_end">Fin</label><input id="filter_end" type="date"></div>
+                <div><label for="filter_client">Client</label><select id="filter_client"></select></div>
+                <div class="admin-filter"><label for="filter_owner">Apporteur</label><select id="filter_owner"></select></div>
+                <div><button id="clearFiltersBtn" class="btn btn-secondary full" type="button">Reinitialiser</button></div>
               </div>
             </div>
 
             <div class="panel admin-filter">
               <div class="toolbar" style="margin-bottom:8px">
-                <div>
-                  <h3>Stats personne</h3>
-                  <p class="muted" id="personStatsHelp"></p>
-                </div>
+                <div><h3>Stats personne</h3><p class="muted" id="personStatsHelp"></p></div>
                 <button id="openSelectedPersonBtn" class="btn btn-primary" type="button">Voir la fiche</button>
               </div>
               <div id="personStatsPanel" class="person-summary"></div>
             </div>
 
-            <div class="panel">
-              <h3>Objectifs</h3>
-              <div id="objectiveProgress" class="progress-block"></div>
-            </div>
-
-            <div class="panel">
-              <h3>Evolution et repartition</h3>
-              <div id="revenueBars" class="mini-bars"></div>
-            </div>
+            <div class="panel"><h3>Objectifs</h3><div id="objectiveProgress" class="progress-block"></div></div>
+            <div class="panel"><h3>Evolution et repartition</h3><div id="revenueBars" class="mini-bars"></div></div>
           </div>
         </section>
 
         <section id="users" class="view">
-          <div class="toolbar">
-            <div>
-              <div class="eyebrow">Comptes</div>
-              <h2>Utilisateurs de l'entreprise</h2>
-              <p class="muted" id="usersHelp"></p>
-            </div>
-          </div>
-
+          <div class="toolbar"><div><div class="eyebrow">Comptes</div><h2>Utilisateurs de l'entreprise</h2><p class="muted" id="usersHelp"></p></div></div>
           <div id="adminCreatePanel" class="panel" style="display:none">
             <h3>Nouvel utilisateur</h3>
             <p class="muted">Le compte sera automatiquement rattache a votre entreprise.</p>
             <div class="form-grid">
-              <div>
-                <label for="full_name">Nom de la personne</label>
-                <input id="full_name">
-              </div>
-              <div>
-                <label for="new_login">Identifiant</label>
-                <input id="new_login" autocomplete="off">
-              </div>
-              <div>
-                <label for="new_password">Mot de passe</label>
-                <input id="new_password" type="text" autocomplete="new-password">
-              </div>
-              <div>
-                <label for="role">Role</label>
-                <select id="role">
-                  <option value="apporteur">Apporteur d'affaires</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+              <div><label for="full_name">Nom de la personne</label><input id="full_name"></div>
+              <div><label for="new_login">Identifiant</label><input id="new_login" autocomplete="off"></div>
+              <div><label for="new_password">Mot de passe</label><input id="new_password" type="text" autocomplete="new-password"></div>
+              <div><label for="role">Role</label><select id="role"><option value="apporteur">Apporteur d'affaires</option><option value="admin">Admin</option></select></div>
             </div>
-            <div class="actions">
-              <button id="createUserBtn" class="btn btn-primary">Creer l'utilisateur</button>
-            </div>
+            <div class="actions"><button id="createUserBtn" class="btn btn-primary">Creer l'utilisateur</button></div>
           </div>
-
           <div id="adminEditPanel" class="panel" style="display:none;margin-top:14px">
             <h3>Modifier utilisateur</h3>
             <input id="edit_old_id" type="hidden">
             <div class="form-grid">
-              <div>
-                <label for="edit_name">Nom</label>
-                <input id="edit_name">
-              </div>
-              <div>
-                <label for="edit_login">Identifiant</label>
-                <input id="edit_login">
-              </div>
-              <div>
-                <label for="edit_password">Mot de passe</label>
-                <input id="edit_password" type="text">
-              </div>
-              <div>
-                <label for="edit_role">Role</label>
-                <select id="edit_role">
-                  <option value="apporteur">Apporteur d'affaires</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+              <div><label for="edit_name">Nom</label><input id="edit_name"></div>
+              <div><label for="edit_login">Identifiant</label><input id="edit_login"></div>
+              <div><label for="edit_password">Mot de passe</label><input id="edit_password" type="text"></div>
+              <div><label for="edit_role">Role</label><select id="edit_role"><option value="apporteur">Apporteur d'affaires</option><option value="admin">Admin</option></select></div>
             </div>
             <div class="actions">
               <button id="cancelEditUserBtn" class="btn btn-secondary">Annuler</button>
@@ -938,20 +865,10 @@
               <button id="updateUserBtn" class="btn btn-primary">Enregistrer</button>
             </div>
           </div>
-
           <div class="panel" style="margin-top:14px">
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Nom</th>
-                    <th>ID</th>
-                    <th>Entreprise</th>
-                    <th>Role</th>
-                    <th class="admin-user-col">MDP</th>
-                    <th class="admin-user-col">Action</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Nom</th><th>ID</th><th>Entreprise</th><th>Role</th><th class="admin-user-col">MDP</th><th class="admin-user-col">Action</th></tr></thead>
                 <tbody id="usersRows"></tbody>
               </table>
             </div>
@@ -959,123 +876,49 @@
         </section>
 
         <section id="clients" class="view">
-          <div class="toolbar">
-            <div>
-              <div class="eyebrow">Portefeuille</div>
-              <h2>Clients</h2>
-              <p class="muted" id="clientsHelp"></p>
-            </div>
-          </div>
-
+          <div class="toolbar"><div><div class="eyebrow">Portefeuille</div><h2>Clients</h2><p class="muted" id="clientsHelp"></p></div></div>
           <div class="panel">
             <h3>Nouveau client</h3>
             <div class="form-grid">
-              <div>
-                <label for="client_name">Nom de l'entreprise</label>
-                <input id="client_name">
-              </div>
-              <div>
-                <label for="client_phone">Telephone</label>
-                <input id="client_phone">
-              </div>
-              <div>
-                <label for="client_site">Site internet</label>
-                <input id="client_site">
-              </div>
-              <div>
-                <label for="client_address">Adresse</label>
-                <input id="client_address">
-              </div>
-              <div>
-                <label for="ref_nom">Referent - Nom</label>
-                <input id="ref_nom">
-              </div>
-              <div>
-                <label for="ref_prenom">Referent - Prenom</label>
-                <input id="ref_prenom">
-              </div>
-              <div>
-                <label for="ref_fonction">Referent - Fonction</label>
-                <input id="ref_fonction">
-              </div>
-              <div>
-                <label for="ref_email">Referent - Email</label>
-                <input id="ref_email">
-              </div>
-              <div>
-                <label for="ref_phone">Referent - Telephone</label>
-                <input id="ref_phone">
-              </div>
-              <div>
-                <label for="client_notes">Notes</label>
-                <input id="client_notes">
-              </div>
+              <div><label for="client_name">Nom de l'entreprise</label><input id="client_name"></div>
+              <div><label for="client_phone">Telephone</label><input id="client_phone"></div>
+              <div><label for="client_site">Site internet</label><input id="client_site"></div>
+              <div><label for="client_address">Adresse</label><input id="client_address"></div>
+              <div><label for="ref_nom">Referent - Nom</label><input id="ref_nom"></div>
+              <div><label for="ref_prenom">Referent - Prenom</label><input id="ref_prenom"></div>
+              <div><label for="ref_fonction">Referent - Fonction</label><input id="ref_fonction"></div>
+              <div><label for="ref_email">Referent - Email</label><input id="ref_email"></div>
+              <div><label for="ref_phone">Referent - Telephone</label><input id="ref_phone"></div>
+              <div><label for="client_notes">Notes</label><input id="client_notes"></div>
             </div>
-            <div class="actions">
-              <button id="createClientBtn" class="btn btn-primary">Creer le client</button>
-            </div>
+            <div class="actions"><button id="createClientBtn" class="btn btn-primary">Creer le client</button></div>
           </div>
-
           <div id="referentPanel" class="panel" style="display:none;margin-top:14px">
             <h3>Ajouter un référent</h3>
             <p class="muted" id="referentClientName"></p>
             <input id="referent_client_id" type="hidden">
             <div class="form-grid">
-              <div>
-                <label for="add_ref_nom">Nom</label>
-                <input id="add_ref_nom">
-              </div>
-              <div>
-                <label for="add_ref_prenom">Prénom</label>
-                <input id="add_ref_prenom">
-              </div>
-              <div>
-                <label for="add_ref_fonction">Fonction</label>
-                <input id="add_ref_fonction">
-              </div>
-              <div>
-                <label for="add_ref_email">Email</label>
-                <input id="add_ref_email">
-              </div>
-              <div>
-                <label for="add_ref_phone">Téléphone</label>
-                <input id="add_ref_phone">
-              </div>
+              <div><label for="add_ref_nom">Nom</label><input id="add_ref_nom"></div>
+              <div><label for="add_ref_prenom">Prénom</label><input id="add_ref_prenom"></div>
+              <div><label for="add_ref_fonction">Fonction</label><input id="add_ref_fonction"></div>
+              <div><label for="add_ref_email">Email</label><input id="add_ref_email"></div>
+              <div><label for="add_ref_phone">Téléphone</label><input id="add_ref_phone"></div>
             </div>
             <div class="actions">
               <button id="cancelReferentBtn" class="btn btn-secondary">Annuler</button>
               <button id="createReferentBtn" class="btn btn-primary">Ajouter le référent</button>
             </div>
           </div>
-
           <div id="clientEditPanel" class="panel" style="display:none;margin-top:14px">
             <h3>Modifier le client</h3>
             <input id="edit_client_id" type="hidden">
             <div class="form-grid">
-              <div>
-                <label for="edit_client_name">Nom de l'entreprise</label>
-                <input id="edit_client_name">
-              </div>
-              <div>
-                <label for="edit_client_phone">Telephone</label>
-                <input id="edit_client_phone">
-              </div>
-              <div>
-                <label for="edit_client_site">Site internet</label>
-                <input id="edit_client_site">
-              </div>
-              <div>
-                <label for="edit_client_address">Adresse</label>
-                <input id="edit_client_address">
-              </div>
-              <div>
-                <label for="edit_client_owner">Attribuer a</label>
-                <select id="edit_client_owner"></select>
-              </div>
-              <div>
-                <label for="edit_client_notes">Notes</label>
-                <input id="edit_client_notes">
-              </div>
+              <div><label for="edit_client_name">Nom de l'entreprise</label><input id="edit_client_name"></div>
+              <div><label for="edit_client_phone">Telephone</label><input id="edit_client_phone"></div>
+              <div><label for="edit_client_site">Site internet</label><input id="edit_client_site"></div>
+              <div><label for="edit_client_address">Adresse</label><input id="edit_client_address"></div>
+              <div><label for="edit_client_owner">Attribuer a</label><select id="edit_client_owner"></select></div>
+              <div><label for="edit_client_notes">Notes</label><input id="edit_client_notes"></div>
             </div>
             <div class="actions">
               <button id="cancelEditClientBtn" class="btn btn-secondary">Annuler</button>
@@ -1083,38 +926,19 @@
               <button id="updateClientBtn" class="btn btn-primary">Enregistrer</button>
             </div>
           </div>
-
           <div class="panel" style="margin-top:14px">
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Client</th>
-                    <th>Telephone</th>
-                    <th>Referent</th>
-                    <th>Contact</th>
-                    <th>Notes</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Client</th><th>Telephone</th><th>Referent</th><th>Contact</th><th>Notes</th><th>Actions</th></tr></thead>
                 <tbody id="clientsRows"></tbody>
               </table>
             </div>
           </div>
-
           <div class="panel" style="margin-top:14px">
             <h3>Historique portefeuille</h3>
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Client</th>
-                    <th>Action</th>
-                    <th>De</th>
-                    <th>Vers</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Date</th><th>Client</th><th>Action</th><th>De</th><th>Vers</th></tr></thead>
                 <tbody id="portfolioHistoryRows"></tbody>
               </table>
             </div>
@@ -1122,181 +946,259 @@
         </section>
 
         <section id="appointments" class="view">
-          <div class="toolbar">
-            <div>
-              <div class="eyebrow">Activite</div>
-              <h2>Rendez-vous</h2>
-              <p class="muted">Les ajouts s'affichent immediatement puis se synchronisent avec le back-end et Google Agenda.</p>
-            </div>
-          </div>
-
+          <div class="toolbar"><div><div class="eyebrow">Activite</div><h2>Rendez-vous</h2><p class="muted">Les ajouts s'affichent immediatement puis se synchronisent avec le back-end et Google Agenda.</p></div></div>
           <div class="panel">
             <h3>Nouveau rendez-vous</h3>
             <div class="form-grid">
-              <div>
-                <label for="rdv_client">Client</label>
-                <select id="rdv_client"></select>
-              </div>
-              <div>
-                <label for="rdv_referent">Referent rencontre</label>
-                <select id="rdv_referent"></select>
-              </div>
-              <div>
-                <label for="rdv_date">Date</label>
-                <input id="rdv_date" type="date">
-              </div>
-              <div>
-                <label for="rdv_time">Heure</label>
-                <input id="rdv_time" type="time">
-              </div>
-              <div>
-                <label for="rdv_address">Adresse</label>
-                <input id="rdv_address">
-              </div>
-              <div>
-                <label for="rdv_subject">Objet</label>
-                <input id="rdv_subject">
-              </div>
-              <div>
-                <label for="rdv_notes">Notes</label>
-                <input id="rdv_notes">
-              </div>
+              <div><label for="rdv_client">Client</label><select id="rdv_client"></select></div>
+              <div><label for="rdv_referent">Referent rencontre</label><select id="rdv_referent"></select></div>
+              <div><label for="rdv_date">Date</label><input id="rdv_date" type="date"></div>
+              <div><label for="rdv_time">Heure</label><input id="rdv_time" type="time"></div>
+              <div><label for="rdv_address">Adresse</label><input id="rdv_address"></div>
+              <div><label for="rdv_subject">Objet</label><input id="rdv_subject"></div>
+              <div><label for="rdv_notes">Notes</label><input id="rdv_notes"></div>
             </div>
-            <div class="actions">
-              <button id="createAppointmentBtn" class="btn btn-primary">Creer le rendez-vous</button>
-            </div>
+            <div class="actions"><button id="createAppointmentBtn" class="btn btn-primary">Creer le rendez-vous</button></div>
           </div>
-
           <div class="panel" style="margin-top:14px">
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Client</th>
-                    <th>Objet</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Date</th><th>Client</th><th>Objet</th><th>Statut</th><th>Actions</th></tr></thead>
                 <tbody id="appointmentsRows"></tbody>
               </table>
             </div>
           </div>
-
           <div class="panel" id="reportPanel" style="display:none;margin-top:14px">
             <h3>Compte rendu</h3>
             <p class="muted" id="reportTitle"></p>
             <input id="report_appointment_id" type="hidden">
             <div class="form-grid">
-              <div>
-                <label for="report_resume">Resume</label>
-                <input id="report_resume">
+              <div><label for="report_resume">Resume</label><input id="report_resume"></div>
+              <div><label for="report_besoins">Besoins du client</label><input id="report_besoins"></div>
+              <div><label for="report_decisions">Decisions prises</label><input id="report_decisions"></div>
+              <div><label for="report_actions">Prochaines actions</label><input id="report_actions"></div>
+              <div><label for="report_next_date">Date du prochain contact</label><input id="report_next_date" type="date"></div>
+              <div><label for="report_probability">Probabilite de signature</label><select id="report_probability"><option value="">Non renseignee</option><option value="25%">25%</option><option value="50%">50%</option><option value="75%">75%</option><option value="90%">90%</option></select></div>
+              <div><label for="report_comments">Commentaires</label><input id="report_comments"></div>
+            </div>
+            <div class="actions"><button id="saveReportBtn" class="btn btn-primary">Enregistrer le compte rendu</button></div>
+          </div>
+        </section>
+
+        <!-- ============ CATALOGUE ============ -->
+        <section id="catalogue" class="view">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Offre commerciale</div>
+              <h2>Catalogue des prestations</h2>
+              <p class="muted" id="catalogueHelp"></p>
+            </div>
+            <button class="btn btn-secondary" id="refreshCatalogueBtn">Actualiser</button>
+          </div>
+
+          <div class="grid" style="margin-top:14px">
+            <div class="stat"><div class="muted">Prestations actives</div><strong id="statPrestationCount" class="value">0</strong></div>
+            <div class="stat"><div class="muted">Suppléments dispos</div><strong id="statSupplementCount" class="value">0</strong></div>
+            <div class="stat"><div class="muted">CA vendu (catalogue)</div><strong id="statCatalogueCa" class="value">0 EUR</strong></div>
+            <div class="stat"><div class="muted">Commissions catalogue</div><strong id="statCatalogueCommission" class="value">0 EUR</strong></div>
+            <div class="stat"><div class="muted">Marge brute</div><strong id="statCatalogueMarge" class="value">0 EUR</strong></div>
+            <div class="stat"><div class="muted">Rentabilité moyenne</div><strong id="statCatalogueRentabilite" class="value">0 %</strong></div>
+          </div>
+
+          <div class="tabs">
+            <button class="btn btn-secondary tab-btn active" data-tab="cataloguePrestations">Prestations</button>
+            <button class="btn btn-secondary tab-btn" data-tab="catalogueSupplements">Suppléments</button>
+            <button class="btn btn-secondary tab-btn" data-tab="catalogueAnalytics">Rentabilité</button>
+          </div>
+
+          <div id="cataloguePrestations" class="tab-panel">
+            <div class="panel admin-only" id="adminPrestationPanel" style="margin-top:14px">
+              <h3>Nouvelle prestation</h3>
+              <div class="form-grid">
+                <div><label>Nom</label><input id="prs_nom"></div>
+                <div><label>Catégorie</label><input id="prs_categorie" placeholder="Publication, Pack, Option..."></div>
+                <div><label>Description</label><input id="prs_description"></div>
+                <div><label>Tarif conseillé (€)</label><input id="prs_conseille" type="number" step="0.01"></div>
+                <div><label>Tarif minimum (€)</label><input id="prs_minimum" type="number" step="0.01"></div>
+                <div><label>Tarif de vente (€)</label><input id="prs_vente" type="number" step="0.01"></div>
+                <div><label>Commission apporteur</label><select id="prs_commission_type"><option value="pourcentage">%</option><option value="fixe">€ fixe</option></select></div>
+                <div><label>Valeur commission</label><input id="prs_commission_valeur" type="number" step="0.01" value="15"></div>
+                <div><label>TVA (%)</label><input id="prs_tva" type="number" step="0.01" value="20"></div>
+                <div><label>Statut</label><select id="prs_statut"><option value="Actif">Actif</option><option value="Inactif">Inactif</option></select></div>
               </div>
-              <div>
-                <label for="report_besoins">Besoins du client</label>
-                <input id="report_besoins">
-              </div>
-              <div>
-                <label for="report_decisions">Decisions prises</label>
-                <input id="report_decisions">
-              </div>
-              <div>
-                <label for="report_actions">Prochaines actions</label>
-                <input id="report_actions">
-              </div>
-              <div>
-                <label for="report_next_date">Date du prochain contact</label>
-                <input id="report_next_date" type="date">
-              </div>
-              <div>
-                <label for="report_probability">Probabilite de signature</label>
-                <select id="report_probability">
-                  <option value="">Non renseignee</option>
-                  <option value="25%">25%</option>
-                  <option value="50%">50%</option>
-                  <option value="75%">75%</option>
-                  <option value="90%">90%</option>
-                </select>
-              </div>
-              <div>
-                <label for="report_comments">Commentaires</label>
-                <input id="report_comments">
+              <div class="actions">
+                <button id="cancelPrestationBtn" class="btn btn-secondary">Annuler</button>
+                <button id="deletePrestationBtn" class="btn btn-secondary">Supprimer</button>
+                <button id="savePrestationBtn" class="btn btn-primary">Enregistrer la prestation</button>
               </div>
             </div>
-            <div class="actions">
-              <button id="saveReportBtn" class="btn btn-primary">Enregistrer le compte rendu</button>
+
+            <div class="panel" style="margin-top:14px">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Prestation</th><th>Catégorie</th><th>Tarif</th><th>Commission</th><th>TVA</th><th>Statut</th><th class="admin-col">Actions</th></tr></thead>
+                  <tbody id="prestationsRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="catalogueSupplements" class="tab-panel" style="display:none">
+            <div class="panel admin-only" id="adminSupplementPanel" style="margin-top:14px">
+              <h3>Nouveau supplément</h3>
+              <div class="form-grid">
+                <div><label>Nom</label><input id="sup_nom"></div>
+                <div><label>Description</label><input id="sup_description"></div>
+                <div><label>Min (€ ou %)</label><input id="sup_min" type="number" step="0.01"></div>
+                <div><label>Max (€ ou %)</label><input id="sup_max" type="number" step="0.01"></div>
+                <div><label>Mode</label><select id="sup_mode"><option value="fixe">€ fixe</option><option value="pourcentage">%</option></select></div>
+                <div><label>Précision</label><input id="sup_precision"></div>
+                <div><label>Statut</label><select id="sup_statut"><option value="Actif">Actif</option><option value="Inactif">Inactif</option></select></div>
+              </div>
+              <div class="actions">
+                <button id="cancelSupplementBtn" class="btn btn-secondary">Annuler</button>
+                <button id="deleteSupplementBtn" class="btn btn-secondary">Supprimer</button>
+                <button id="saveSupplementBtn" class="btn btn-primary">Enregistrer le supplément</button>
+              </div>
+            </div>
+            <div class="panel" style="margin-top:14px">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Supplément</th><th>Mode</th><th>Min</th><th>Max</th><th>Précision</th><th class="admin-col">Actions</th></tr></thead>
+                  <tbody id="supplementsRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="catalogueAnalytics" class="tab-panel" style="display:none">
+            <div class="panel" style="margin-top:14px">
+              <h3>Marge par prestation</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Prestation</th><th>Quantité</th><th>CA</th><th>Commissions</th><th>Marge</th></tr></thead>
+                  <tbody id="analyticsPrestationsRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="panel" style="margin-top:14px">
+              <h3>Marge par apporteur</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Apporteur</th><th>Devis</th><th>CA HT</th><th>Commissions</th><th>Marge</th><th>Rentabilité</th></tr></thead>
+                  <tbody id="analyticsApporteursRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="panel" style="margin-top:14px">
+              <h3>Marge brute & rentabilité</h3>
+              <p>CA vendu : <strong id="analyticsCa">0 €</strong></p>
+              <p>Commissions : <strong id="analyticsCommissions">0 €</strong></p>
+              <p>Marge brute : <strong id="analyticsMarge">0 €</strong></p>
+              <p>Rentabilité moyenne : <strong id="analyticsRentabilite">0 %</strong></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ DEVIS ============ -->
+        <section id="devis" class="view">
+          <div class="toolbar">
+            <div>
+              <div class="eyebrow">Vente</div>
+              <h2>Devis</h2>
+              <p class="muted" id="devisHelp">Créer un devis depuis un client, puis le transformer en contrat signé.</p>
+            </div>
+            <button class="btn btn-secondary" id="refreshDevisBtn">Actualiser</button>
+          </div>
+
+          <div class="tabs">
+            <button class="btn btn-secondary tab-btn active" data-tab="devisListe">Liste</button>
+            <button class="btn btn-secondary tab-btn" data-tab="devisForm">Simulateur</button>
+          </div>
+
+          <div id="devisListe" class="tab-panel">
+            <div class="panel" style="margin-top:14px">
+              <h3>Devis enregistrés</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Date</th><th>Client</th><th>Statut</th><th>Total HT</th><th>TVA</th><th>Total TTC</th><th>Commission</th><th>Marge</th><th>Contrat</th><th>Actions</th></tr></thead>
+                  <tbody id="devisRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="devisForm" class="tab-panel" style="display:none">
+            <div class="panel" style="margin-top:14px">
+              <h3 id="devisFormTitle">Nouveau devis</h3>
+              <input type="hidden" id="devis_id">
+              <div class="form-grid">
+                <div><label>Client</label><select id="devis_client"></select></div>
+                <div><label>Date</label><input id="devis_date" type="date"></div>
+                <div><label>Statut</label><select id="devis_statut"><option value="Brouillon">Brouillon</option><option value="Envoye">Envoyé</option><option value="Accepte">Accepté</option><option value="Refuse">Refusé</option></select></div>
+                <div><label>Notes</label><input id="devis_notes"></div>
+              </div>
+
+              <h4 style="margin-top:14px">Lignes du devis</h4>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Type</th><th>Référence</th><th>Qté</th><th>PU (€)</th><th>Remise %</th><th>TVA %</th><th>Total HT</th><th>Commission</th><th></th></tr></thead>
+                  <tbody id="devisLignesRows"></tbody>
+                </table>
+              </div>
+              <div class="inline-actions"><button id="addDevisLigneBtn" class="btn btn-secondary">+ Ajouter une ligne</button></div>
+
+              <div class="admin-only" style="margin-top:14px">
+                <div class="form-grid">
+                  <div><label>Remise globale (%)</label><input id="devis_remise_pct" type="number" step="0.1" value="0"></div>
+                  <div><label>Remise fixe (€)</label><input id="devis_remise_montant" type="number" step="0.01" value="0"></div>
+                </div>
+                <p class="muted">Les apporteurs ne voient pas cette zone.</p>
+              </div>
+
+              <div class="totaux" style="margin-top:14px">
+                <div><span>Sous-total HT</span><strong id="devis_total_ht">0 €</strong></div>
+                <div><span>TVA</span><strong id="devis_total_tva">0 €</strong></div>
+                <div><span>Total TTC</span><strong id="devis_total_ttc">0 €</strong></div>
+                <div><span>Commission apporteur</span><strong id="devis_commission">0 €</strong></div>
+                <div><span>Marge entreprise</span><strong id="devis_marge">0 €</strong></div>
+              </div>
+
+              <div class="actions">
+                <button id="cancelDevisBtn" class="btn btn-secondary">Annuler</button>
+                <button id="saveDevisBtn" class="btn btn-primary">Enregistrer le devis</button>
+                <button id="transformDevisBtn" class="btn btn-primary" style="display:none">Transformer en contrat</button>
+              </div>
             </div>
           </div>
         </section>
 
         <section id="contracts" class="view">
-          <div class="toolbar">
-            <div>
-              <div class="eyebrow">Contrats</div>
-              <h2>Contrats et planning partagé</h2>
-              <p class="muted">Le planning est commun a toute l'entreprise. Les changements s'affichent immediatement puis se synchronisent.</p>
-            </div>
-          </div>
-
+          <div class="toolbar"><div><div class="eyebrow">Contrats</div><h2>Contrats et planning partagé</h2><p class="muted">Le planning est commun a toute l'entreprise. Les changements s'affichent immediatement puis se synchronisent.</p></div></div>
           <div class="panel">
             <h3 id="contractFormTitle">Nouveau contrat</h3>
             <input id="contract_id" type="hidden">
             <div class="form-grid">
-              <div>
-                <label for="contract_client">Marque / client</label>
-                <select id="contract_client"></select>
-              </div>
-              <div>
-                <label for="contract_status">Statut</label>
-                <select id="contract_status">
-                  <option value="En negociation">En négociation</option>
-                  <option value="Signe">Signé</option>
-                  <option value="Termine">Terminé</option>
-                  <option value="Annule">Annulé</option>
-                </select>
-              </div>
-              <div>
-                <label for="contract_start">Date de debut</label>
-                <input id="contract_start" type="date">
-              </div>
-              <div>
-                <label for="contract_end">Date de fin</label>
-                <input id="contract_end" type="date">
-              </div>
-              <div>
-                <label for="contract_amount">Montant</label>
-                <input id="contract_amount" type="number" min="0" step="0.01">
-              </div>
-              <div>
-                <label for="contract_notes">Notes</label>
-                <input id="contract_notes">
-              </div>
+              <div><label for="contract_client">Marque / client</label><select id="contract_client"></select></div>
+              <div><label for="contract_status">Statut</label><select id="contract_status"><option value="En negociation">En négociation</option><option value="Signe">Signé</option><option value="Termine">Terminé</option><option value="Annule">Annulé</option></select></div>
+              <div><label for="contract_start">Date de debut</label><input id="contract_start" type="date"></div>
+              <div><label for="contract_end">Date de fin</label><input id="contract_end" type="date"></div>
+              <div><label for="contract_amount">Montant</label><input id="contract_amount" type="number" min="0" step="0.01"></div>
+              <div><label for="contract_notes">Notes</label><input id="contract_notes"></div>
             </div>
             <div class="actions">
               <button id="cancelContractEditBtn" class="btn btn-secondary" type="button">Annuler</button>
               <button id="saveContractBtn" class="btn btn-primary" type="button">Enregistrer le contrat</button>
             </div>
           </div>
-
           <div class="panel" style="margin-top:14px">
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Client</th>
-                    <th>Vendeur</th>
-                    <th>Période</th>
-                    <th>Statut</th>
-                    <th>Montant</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Client</th><th>Vendeur</th><th>Période</th><th>Statut</th><th>Montant</th><th>Actions</th></tr></thead>
                 <tbody id="contractsRows"></tbody>
               </table>
             </div>
           </div>
-
           <div class="panel" style="margin-top:14px">
             <h3>Planning partagé</h3>
             <div class="table-wrap">
@@ -1306,89 +1208,34 @@
         </section>
 
         <section id="revenue" class="view">
-          <div class="toolbar">
-            <div>
-              <div class="eyebrow">Performance</div>
-              <h2>Chiffre d'affaires et objectifs</h2>
-              <p class="muted" id="revenueHelp"></p>
-            </div>
-          </div>
-
+          <div class="toolbar"><div><div class="eyebrow">Performance</div><h2>Chiffre d'affaires et objectifs</h2><p class="muted" id="revenueHelp"></p></div></div>
           <div id="adminRevenuePanel" class="panel" style="display:none">
             <h3>Nouveau contrat signe</h3>
             <div class="form-grid">
-              <div>
-                <label for="revenue_client">Client</label>
-                <select id="revenue_client"></select>
-              </div>
-              <div>
-                <label for="revenue_owner">Apporteur concerne</label>
-                <select id="revenue_owner"></select>
-              </div>
-              <div>
-                <label for="revenue_date">Date</label>
-                <input id="revenue_date" type="date">
-              </div>
-              <div>
-                <label for="revenue_amount">Montant du contrat</label>
-                <input id="revenue_amount" type="number" min="0" step="0.01">
-              </div>
-              <div>
-                <label for="revenue_contracts">Nombre de contrats</label>
-                <input id="revenue_contracts" type="number" min="0" step="1" value="1">
-              </div>
-              <div>
-                <label for="revenue_comments">Commentaires</label>
-                <input id="revenue_comments">
-              </div>
+              <div><label for="revenue_client">Client</label><select id="revenue_client"></select></div>
+              <div><label for="revenue_owner">Apporteur concerne</label><select id="revenue_owner"></select></div>
+              <div><label for="revenue_date">Date</label><input id="revenue_date" type="date"></div>
+              <div><label for="revenue_amount">Montant du contrat</label><input id="revenue_amount" type="number" min="0" step="0.01"></div>
+              <div><label for="revenue_contracts">Nombre de contrats</label><input id="revenue_contracts" type="number" min="0" step="1" value="1"></div>
+              <div><label for="revenue_comments">Commentaires</label><input id="revenue_comments"></div>
             </div>
-            <div class="actions">
-              <button id="createRevenueBtn" class="btn btn-primary">Enregistrer le contrat</button>
-            </div>
+            <div class="actions"><button id="createRevenueBtn" class="btn btn-primary">Enregistrer le contrat</button></div>
           </div>
-
           <div id="adminObjectivePanel" class="panel" style="display:none;margin-top:14px">
             <h3>Objectifs apporteur</h3>
             <div class="form-grid">
-              <div>
-                <label for="objective_owner">Apporteur</label>
-                <select id="objective_owner"></select>
-              </div>
-              <div>
-                <label for="objective_ca">Objectif CA</label>
-                <input id="objective_ca" type="number" min="0" step="0.01">
-              </div>
-              <div>
-                <label for="objective_contracts">Objectif contrats</label>
-                <input id="objective_contracts" type="number" min="0" step="1">
-              </div>
-              <div>
-                <label for="objective_start">Date de debut</label>
-                <input id="objective_start" type="date">
-              </div>
-              <div>
-                <label for="objective_end">Date de fin</label>
-                <input id="objective_end" type="date">
-              </div>
+              <div><label for="objective_owner">Apporteur</label><select id="objective_owner"></select></div>
+              <div><label for="objective_ca">Objectif CA</label><input id="objective_ca" type="number" min="0" step="0.01"></div>
+              <div><label for="objective_contracts">Objectif contrats</label><input id="objective_contracts" type="number" min="0" step="1"></div>
+              <div><label for="objective_start">Date de debut</label><input id="objective_start" type="date"></div>
+              <div><label for="objective_end">Date de fin</label><input id="objective_end" type="date"></div>
             </div>
-            <div class="actions">
-              <button id="saveObjectiveBtn" class="btn btn-primary">Enregistrer l'objectif</button>
-            </div>
+            <div class="actions"><button id="saveObjectiveBtn" class="btn btn-primary">Enregistrer l'objectif</button></div>
           </div>
-
           <div class="panel" style="margin-top:14px">
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Client</th>
-                    <th>Apporteur</th>
-                    <th>Montant</th>
-                    <th>Contrats</th>
-                    <th>Commentaires</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Date</th><th>Client</th><th>Apporteur</th><th>Montant</th><th>Contrats</th><th>Commentaires</th></tr></thead>
                 <tbody id="revenueRows"></tbody>
               </table>
             </div>
@@ -1396,14 +1243,7 @@
         </section>
 
         <section id="settings" class="view">
-          <div class="toolbar">
-            <div>
-              <div class="eyebrow">Compte</div>
-              <h2>Paramètres Google</h2>
-              <p class="muted">Associez votre propre compte Google pour Gmail, Google Agenda et Google Drive.</p>
-            </div>
-          </div>
-
+          <div class="toolbar"><div><div class="eyebrow">Compte</div><h2>Paramètres Google</h2><p class="muted">Associez votre propre compte Google pour Gmail, Google Agenda et Google Drive.</p></div></div>
           <div class="panel">
             <h3>Compte Google utilisateur</h3>
             <p class="muted" id="googleAccountStatus"></p>
@@ -1449,12 +1289,16 @@
       portfolioHistory: StoredSession?.portfolioHistory || [],
       contracts: StoredSession?.contracts || [],
       google: StoredSession?.google || null,
+      // CATALOGUE / DEVIS
+      devis: StoredSession?.devis || [],
+      devis_lignes: StoredSession?.devis_lignes || [],
+      prestations: StoredSession?.prestations || [],
+      supplements: StoredSession?.supplements || [],
+      catalogueAnalytics: null,
+      currentDevisDraft: null,
       loading: {
-        users: false,
-        clients: false,
-        appointments: false,
-        revenue: false,
-        contracts: false,
+        clients: false, appointments: false, revenue: false,
+        contracts: false, catalogue: false, devis: false,
       },
     };
 
@@ -1463,52 +1307,30 @@
         this.getUrl = getUrl;
         this.getBasePayload = getBasePayload || (() => ({}));
       }
-
       async request(action, payload = {}) {
         const url = this.getUrl();
         if (!url) throw new Error('Service temporairement indisponible');
         const body = { action, ...this.getBasePayload(), ...payload };
         if (isAppsScriptUrl(url)) return this.jsonpRequest(url, body);
         const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(body),
+          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body),
         });
         const data = await response.json();
         if (!data.ok) throw new Error(data.error || 'Erreur API');
         return data.data;
       }
-
       jsonpRequest(url, payload) {
         return new Promise((resolve, reject) => {
           const callback = `crm_jsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`;
           const script = document.createElement('script');
-          const cleanup = () => {
-            delete window[callback];
-            script.remove();
-            clearTimeout(timer);
-          };
-          const timer = setTimeout(() => {
-            cleanup();
-            reject(new Error('Delai depasse avec Apps Script'));
-          }, 30000);
-          window[callback] = response => {
-            cleanup();
-            if (!response?.ok) reject(new Error(response?.error || 'Erreur API'));
-            else resolve(response.data);
-          };
+          const cleanup = () => { delete window[callback]; script.remove(); clearTimeout(timer); };
+          const timer = setTimeout(() => { cleanup(); reject(new Error('Delai depasse avec Apps Script')); }, 30000);
+          window[callback] = response => { cleanup(); if (!response?.ok) reject(new Error(response?.error || 'Erreur API')); else resolve(response.data); };
           const separator = url.includes('?') ? '&' : '?';
           const encodedPayload = encodeURIComponent(JSON.stringify(payload));
-          if (encodedPayload.length > 12000) {
-            cleanup();
-            reject(new Error('Donnees trop longues pour Apps Script JSONP'));
-            return;
-          }
+          if (encodedPayload.length > 12000) { cleanup(); reject(new Error('Donnees trop longues pour Apps Script JSONP')); return; }
           script.src = `${url}${separator}callback=${encodeURIComponent(callback)}&payload=${encodedPayload}&_=${Date.now()}`;
-          script.onerror = () => {
-            cleanup();
-            reject(new Error('Apps Script inaccessible'));
-          };
+          script.onerror = () => { cleanup(); reject(new Error('Apps Script inaccessible')); };
           document.head.appendChild(script);
         });
       }
@@ -1518,14 +1340,10 @@
     const businessApi = new ApiClient(() => State.businessEndpoint, () => ({ actor: State.user, google_access_token: getGoogleAccessToken() }));
     const $ = (id) => document.getElementById(id);
 
-    function isAppsScriptUrl(url) {
-      return /script\.google\.com\/macros\/s\//.test(String(url));
-    }
+    function isAppsScriptUrl(url) { return /script\.google\.com\/macros\/s\//.test(String(url)); }
 
     function showToast(message) {
-      const el = $('toast');
-      el.textContent = message;
-      el.style.display = 'block';
+      const el = $('toast'); el.textContent = message; el.style.display = 'block';
       clearTimeout(showToast.timer);
       showToast.timer = setTimeout(() => el.style.display = 'none', 2600);
     }
@@ -1535,213 +1353,466 @@
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.view === viewId));
     }
 
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = (p.id === tabId) ? 'block' : 'none');
+    }
+
     async function login(event) {
       event.preventDefault();
       $('loginError').style.display = 'none';
       setButtonLoading('loginBtn', true);
       try {
-        const data = await masterApi.request('login', {
-          login: $('login').value.trim(),
-          password: $('password').value,
-        });
-        State.token = data.token;
-        State.user = data.user;
-        State.company = data.company;
+        const data = await masterApi.request('login', { login: $('login').value.trim(), password: $('password').value });
+        State.token = data.token; State.user = data.user; State.company = data.company;
         State.businessEndpoint = data.company?.business_endpoint || '';
-        State.users = data.users || [State.user];
-        State.stats = data.stats || null;
+        State.users = data.users || [State.user]; State.stats = data.stats || null;
         persistSession();
-        $('loginScreen').style.display = 'none';
-        $('bootScreen').style.display = 'none';
-        $('app').style.display = 'block';
-        renderAll();
-        State.loading.clients = true;
-        State.loading.appointments = true;
-        State.loading.revenue = true;
-        State.loading.contracts = true;
+        $('loginScreen').style.display = 'none'; $('bootScreen').style.display = 'none'; $('app').style.display = 'block';
         renderAll();
         await loadBusinessBootstrap().catch(err => showToast(err.message));
-        renderAll();
-        persistSession();
-      } catch (err) {
-        $('loginError').textContent = err.message;
-        $('loginError').style.display = 'block';
-      } finally {
-        setButtonLoading('loginBtn', false);
-      }
+        renderAll(); persistSession();
+      } catch (err) { $('loginError').textContent = err.message; $('loginError').style.display = 'block'; }
+      finally { setButtonLoading('loginBtn', false); }
     }
 
     async function bootstrapApp() {
-      State.loading.users = State.user?.role === 'admin';
-      State.loading.clients = true;
-      State.loading.appointments = true;
-      State.loading.revenue = true;
-      State.loading.contracts = true;
+      State.loading.clients = true; State.loading.appointments = true;
+      State.loading.revenue = true; State.loading.contracts = true;
       if (State.user) renderAll();
-
       const data = await masterApi.request('bootstrap');
-      State.user = data.user;
-      State.company = data.company;
+      State.user = data.user; State.company = data.company;
       State.businessEndpoint = data.company?.business_endpoint || '';
-      State.stats = data.stats;
-      State.users = data.users || [State.user];
-      State.loading.users = false;
+      State.stats = data.stats; State.users = data.users || [State.user];
       await loadBusinessBootstrap();
       renderAll();
-      $('loginScreen').style.display = 'none';
-      $('bootScreen').style.display = 'none';
-      $('app').style.display = 'block';
+      $('loginScreen').style.display = 'none'; $('bootScreen').style.display = 'none'; $('app').style.display = 'block';
       persistSession();
     }
 
     async function loadBusinessBootstrap() {
       if (!State.businessEndpoint) {
-        State.clients = [];
-        State.appointments = [];
-        State.revenue = [];
-        State.objectives = [];
-        State.portfolioHistory = [];
-        State.contracts = [];
-        State.loading.clients = false;
-        State.loading.appointments = false;
-        State.loading.revenue = false;
-        State.loading.contracts = false;
+        State.clients = []; State.appointments = []; State.revenue = [];
+        State.objectives = []; State.portfolioHistory = []; State.contracts = [];
+        State.prestations = []; State.supplements = []; State.devis = []; State.devis_lignes = [];
+        ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
         return;
       }
       try {
+        State.loading.catalogue = true; State.loading.devis = true;
         const data = await businessApi.request('bootstrap');
         State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
-        State.clients = data.clients || [];
-        State.appointments = data.appointments || [];
-        State.revenue = data.revenue || [];
-        State.objectives = data.objectives || [];
-        State.portfolioHistory = data.portfolioHistory || [];
-        State.contracts = data.contracts || [];
+        State.clients = data.clients || []; State.appointments = data.appointments || [];
+        State.revenue = data.revenue || []; State.objectives = data.objectives || [];
+        State.portfolioHistory = data.portfolioHistory || []; State.contracts = data.contracts || [];
+        State.prestations = data.prestations || []; State.supplements = data.supplements || [];
+        State.devis = (data.devis && data.devis.devis) || data.devis || [];
+        State.devis_lignes = (data.devis && data.devis.lignes) || data.devis_lignes || [];
         persistSession();
       } finally {
-        State.loading.clients = false;
-        State.loading.appointments = false;
-        State.loading.revenue = false;
-        State.loading.contracts = false;
+        ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
       }
     }
 
-    async function loadUsers() {
-      if (State.user.role === 'admin') {
-        State.loading.users = true;
-        renderUsers();
-      try {
-        State.users = await masterApi.request('listUsers');
-      } finally {
-        State.loading.users = false;
-      }
-      } else {
-        State.users = [State.user];
-      }
-    }
-
-    async function loadClients() {
-      if (!State.businessEndpoint) {
-        State.clients = [];
-        return;
-      }
-      State.loading.clients = true;
-      renderClients();
-      try {
-        State.clients = await businessApi.request('listClients');
-        persistSession();
-      } finally {
-        State.loading.clients = false;
-      }
-    }
-
-    async function loadAppointments() {
-      if (!State.businessEndpoint) {
-        State.appointments = [];
-        return;
-      }
-      State.loading.appointments = true;
-      renderAppointments();
-      try {
-        State.appointments = await businessApi.request('listAppointments');
-        persistSession();
-      } finally {
-        State.loading.appointments = false;
-      }
-    }
-
-    async function loadRevenueData() {
-      if (!State.businessEndpoint) {
-        State.revenue = [];
-        State.objectives = [];
-        return;
-      }
-      State.loading.revenue = true;
-      renderRevenue();
-      try {
-        const [revenue, objectives] = await Promise.all([
-          businessApi.request('listRevenue'),
-          businessApi.request('listObjectives'),
-        ]);
-        State.revenue = revenue;
-        State.objectives = objectives;
-        persistSession();
-      } finally {
-        State.loading.revenue = false;
-      }
-    }
-
-    function renderAll() {
+    // ============ CATALOGUE - renders ============
+    function renderPrestations() {
+      if (!$('prestationsRows')) return;
       const isAdmin = State.user.role === 'admin';
-      document.querySelectorAll('[data-view="users"]').forEach(btn => {
-        btn.style.display = isAdmin ? 'inline-flex' : 'none';
-      });
-      document.querySelectorAll('.admin-stat').forEach(el => {
-        el.style.display = isAdmin ? 'block' : 'none';
-      });
-      document.querySelectorAll('.admin-user-col').forEach(el => {
-        el.style.display = isAdmin ? 'table-cell' : 'none';
-      });
-      document.querySelectorAll('.admin-filter').forEach(el => {
-        el.style.display = isAdmin ? 'block' : 'none';
-      });
-      if (!isAdmin && document.getElementById('users').classList.contains('active')) setView('dashboard');
-      $('companyName').textContent = State.company?.entreprise || '';
-      $('dashboardTitle').textContent = State.company?.entreprise || 'Tableau de bord';
-      $('userLine').textContent = `${State.user.Nom} - ${roleLabel(State.user.role)}`;
-      $('usersHelp').textContent = isAdmin
-        ? `Creation limitee a l'entreprise ${State.company?.entreprise || ''}.`
-        : 'Votre compte apporteur.';
-      $('adminCreatePanel').style.display = isAdmin ? 'block' : 'none';
-      if (!isAdmin) $('adminEditPanel').style.display = 'none';
-      $('clientsHelp').textContent = isAdmin
-        ? 'Vue globale des clients de l entreprise.'
-        : 'Votre portefeuille client.';
-      $('revenueHelp').textContent = isAdmin
-        ? 'Saisie admin des contrats signes et pilotage des objectifs.'
-        : 'Suivi automatique de votre CA, de vos contrats et de vos objectifs.';
-      $('adminRevenuePanel').style.display = isAdmin ? 'block' : 'none';
-      $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
-      renderStats();
-      renderUsers();
-      renderClients();
-      renderPortfolioHistory();
-      renderAppointmentClientOptions();
-      renderAppointments();
-      renderRevenueOptions();
-      renderRevenue();
-      renderDashboardAnalytics();
-      renderPersonStats();
-      renderContractOptions();
-      renderContracts();
-      renderGoogleStatus();
+      $('prestationsRows').innerHTML = State.prestations.map(p => {
+        const commissionLabel = p.commission_type === 'fixe'
+          ? formatMoney(p.commission_valeur) : (Number(p.commission_valeur || 0) + ' %');
+        return `<tr>
+          <td><strong>${escapeHtml(p.nom)}</strong><div class="muted">${escapeHtml(p.description || '')}</div></td>
+          <td>${escapeHtml(p.categorie || '')}</td>
+          <td><strong>${formatMoney(p.tarif_vente)}</strong>
+            <div class="muted">conseillé: ${formatMoney(p.tarif_conseille)} / plancher: ${formatMoney(p.tarif_minimum)}</div></td>
+          <td>${escapeHtml(commissionLabel)}</td>
+          <td>${Number(p.tva || 0)} %</td>
+          <td><span class="badge ${p.statut === 'Actif' ? 'ok' : 'pending'}">${escapeHtml(p.statut)}</span></td>
+          <td class="admin-col">
+            <div class="inline-actions">
+              ${isAdmin ? `<button class="btn btn-secondary" data-edit-prestation="${escapeAttr(p.prestation_id)}">Modifier</button>` : ''}
+              ${isAdmin ? `<button class="btn btn-secondary" data-toggle-prestation="${escapeAttr(p.prestation_id)}">${p.statut === 'Actif' ? 'Désactiver' : 'Activer'}</button>` : ''}
+              ${isAdmin ? `<button class="btn btn-secondary" data-delete-prestation="${escapeAttr(p.prestation_id)}">Supprimer</button>` : ''}
+            </div>
+          </td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="7" class="muted">Aucune prestation dans le catalogue.</td></tr>`;
     }
 
+    function renderSupplements() {
+      if (!$('supplementsRows')) return;
+      $('supplementsRows').innerHTML = State.supplements.map(s => `
+        <tr>
+          <td><strong>${escapeHtml(s.nom)}</strong><div class="muted">${escapeHtml(s.description || '')}</div></td>
+          <td>${escapeHtml(s.mode_calcul)}</td>
+          <td>${formatMoney(s.prix_min)}</td>
+          <td>${formatMoney(s.prix_max)}</td>
+          <td>${escapeHtml(s.precision || '')}</td>
+          <td class="admin-col">
+            <div class="inline-actions">
+              <button class="btn btn-secondary" data-edit-supplement="${escapeAttr(s.supplement_id)}">Modifier</button>
+              <button class="btn btn-secondary" data-delete-supplement="${escapeAttr(s.supplement_id)}">Supprimer</button>
+            </div>
+          </td>
+        </tr>`).join('') || `<tr><td colspan="6" class="muted">Aucun supplément.</td></tr>`;
+    }
+
+    function renderCatalogueAnalytics() {
+      if (!$('statPrestationCount')) return;
+      $('statPrestationCount').textContent = State.prestations.filter(p => p.statut === 'Actif').length;
+      $('statSupplementCount').textContent = State.supplements.filter(s => (s.statut || 'Actif') === 'Actif').length;
+      const acc = State.devis.filter(d => d.statut === 'Accepte' || d.statut === 'Transforme');
+      const ca = acc.reduce((s, d) => s + Number(d.total_ht || 0), 0);
+      const commissions = State.devis.reduce((s, d) => s + Number(d.commission_apporteur || 0), 0);
+      const marge = acc.reduce((s, d) => s + Number(d.montant_entreprise || 0), 0);
+      const rentabilite = ca > 0 ? Math.round(marge / ca * 100) : 0;
+      $('statCatalogueCa').textContent = formatMoney(ca);
+      $('statCatalogueCommission').textContent = formatMoney(commissions);
+      $('statCatalogueMarge').textContent = formatMoney(marge);
+      $('statCatalogueRentabilite').textContent = rentabilite + ' %';
+      $('analyticsCa').textContent = formatMoney(ca);
+      $('analyticsCommissions').textContent = formatMoney(commissions);
+      $('analyticsMarge').textContent = formatMoney(marge);
+      $('analyticsRentabilite').textContent = rentabilite + ' %';
+
+      const userMap = new Map(State.users.map(u => [u.ID, u.Nom || u.ID]));
+      const mp = new Map();
+      State.devis_lignes.forEach(l => { if (!mp.has(l.devis_id)) mp.set(l.devis_id, []); mp.get(l.devis_id).push(l); });
+
+      const statsP = {}, statsO = {};
+      acc.forEach(d => {
+        const ls = mp.get(d.devis_id) || [];
+        const sumHt = ls.reduce((s, l) => s + Number(l.total_ht || 0), 0) || 1;
+        ls.forEach(l => {
+          if (l.type === 'prestation') {
+            const ref = State.prestations.find(p => p.prestation_id === l.ref_id);
+            const key = ref ? ref.nom : (l.nom || 'Prestation');
+            if (!statsP[key]) statsP[key] = { nom: key, quantite:0, ca:0, commission:0, marge:0 };
+            statsP[key].quantite += Number(l.quantite || 0);
+            statsP[key].ca += Number(l.total_ht || 0);
+            statsP[key].commission += Number(l.commission_valeur || 0);
+            statsP[key].marge += Number(d.montant_entreprise || 0) * (Number(l.total_ht || 0) / sumHt);
+          }
+        });
+        if (!statsO[d.owner_id]) statsO[d.owner_id] = { owner: d.owner_id, devis:0, ca:0, commission:0, marge:0 };
+        statsO[d.owner_id].devis += 1; statsO[d.owner_id].ca += Number(d.total_ht || 0);
+        statsO[d.owner_id].commission += Number(d.commission_apporteur || 0);
+        statsO[d.owner_id].marge += Number(d.montant_entreprise || 0);
+      });
+      $('analyticsPrestationsRows').innerHTML = Object.values(statsP).sort((a,b) => b.ca-a.ca).map(p =>
+        `<tr><td>${escapeHtml(p.nom)}</td><td>${p.quantite}</td><td>${formatMoney(p.ca)}</td><td>${formatMoney(p.commission)}</td><td>${formatMoney(p.marge)}</td></tr>`
+      ).join('') || '<tr><td colspan="5" class="muted">Aucune vente.</td></tr>';
+      $('analyticsApporteursRows').innerHTML = Object.values(statsO).map(o =>
+        `<tr><td>${escapeHtml(userMap.get(o.owner) || o.owner)}</td><td>${o.devis}</td>
+         <td>${formatMoney(o.ca)}</td><td>${formatMoney(o.commission)}</td><td>${formatMoney(o.marge)}</td>
+         <td>${o.ca > 0 ? Math.round(o.marge / o.ca * 100) : 0} %</td></tr>`
+      ).join('') || '<tr><td colspan="6" class="muted">Aucun apporteur actif.</td></tr>';
+    }
+
+    function renderDevisOptions() {
+      if (!$('devis_client')) return;
+      const cur = $('devis_client').value;
+      $('devis_client').innerHTML = State.clients.map(c => `<option value="${escapeAttr(c.client_id)}">${escapeHtml(c.nom_entreprise)}</option>`).join('');
+      if (cur) $('devis_client').value = cur;
+    }
+
+    function renderDevisListe() {
+      if (!$('devisRows')) return;
+      const userMap = new Map(State.users.map(u => [u.ID, u.Nom || u.ID]));
+      $('devisRows').innerHTML = State.devis.slice().sort((a,b) => String(b.date).localeCompare(String(a.date))).map(d => `
+        <tr class="${d._pending ? 'row-pending' : ''}">
+          <td>${formatDate(d.date)}</td>
+          <td><strong>${escapeHtml(d.client_nom || getClientName(d.client_id))}</strong></td>
+          <td><span class="badge ${devisStatusClass(d.statut)}">${escapeHtml(d.statut)}</span></td>
+          <td>${formatMoney(d.total_ht)}</td>
+          <td>${formatMoney(d.total_tva)}</td>
+          <td>${formatMoney(d.total_ttc)}</td>
+          <td>${formatMoney(d.commission_apporteur)}</td>
+          <td>${formatMoney(d.montant_entreprise)}</td>
+          <td>${d.contrat_id ? `<a href="#" data-open-contract="${escapeAttr(d.contrat_id)}">Contrat</a>` : ''}</td>
+          <td>
+            <div class="inline-actions">
+              <button class="btn btn-secondary" data-edit-devis="${escapeAttr(d.devis_id)}">Modifier</button>
+              ${d.statut !== 'Transforme' ? `<button class="btn btn-secondary" data-transform-devis="${escapeAttr(d.devis_id)}">Transformer</button>` : ''}
+              ${d.statut !== 'Transforme' ? `<button class="btn btn-secondary" data-delete-devis="${escapeAttr(d.devis_id)}">Supprimer</button>` : ''}
+            </div>
+          </td>
+        </tr>`).join('') || '<tr><td colspan="10" class="muted">Aucun devis.</td></tr>';
+    }
+
+    function devisStatusClass(s) {
+      s = String(s || '').toLowerCase();
+      if (s.includes('accepte') || s.includes('transforme')) return 'ok';
+      if (s.includes('refuse') || s.includes('annul')) return 'status-annule';
+      return 'pending';
+    }
+
+    // ============ Simulateur de devis ============
+    function makeEmptyLigneDraft(position) {
+      return { ligne_id: tempId('lig'), type: 'prestation', ref_id: '', nom: '', quantite: 1, prix_unitaire: 0, remise_pct: 0, tva_pct: 20, total_ht: 0, commission_valeur: 0, position, _persisted: false };
+    }
+    function buildEmptyDevisDraft() { return [makeEmptyLigneDraft(1)]; }
+    function getDevisDraft() {
+      if (!State.currentDevisDraft) State.currentDevisDraft = { devis_id: '', client_id: State.clients[0]?.client_id || '', date: new Date().toISOString().slice(0,10), statut: 'Brouillon', notes: '', remise_pct: 0, remise_montant: 0, lignes: buildEmptyDevisDraft() };
+      return State.currentDevisDraft;
+    }
+    function resetDevisDraft(existing) {
+      State.currentDevisDraft = existing ? JSON.parse(JSON.stringify(existing)) : { devis_id: '', client_id: State.clients[0]?.client_id || '', date: new Date().toISOString().slice(0,10), statut: 'Brouillon', notes: '', remise_pct: 0, remise_montant: 0, lignes: buildEmptyDevisDraft() };
+      if (!State.currentDevisDraft.lignes || !State.currentDevisDraft.lignes.length) State.currentDevisDraft.lignes = buildEmptyDevisDraft();
+      switchTab('devisForm'); renderDevisForm(); computeDevisTotalsUI();
+    }
+    function renderDevisForm() {
+      const d = getDevisDraft();
+      $('devisFormTitle').textContent = d.devis_id ? 'Modifier devis' : 'Nouveau devis';
+      $('devis_id').value = d.devis_id || '';
+      $('devis_client').value = d.client_id || '';
+      $('devis_date').value = d.date || '';
+      $('devis_statut').value = d.statut || 'Brouillon';
+      $('devis_notes').value = d.notes || '';
+      $('devis_remise_pct').value = d.remise_pct || 0;
+      $('devis_remise_montant').value = d.remise_montant || 0;
+      $('transformDevisBtn').style.display = d.devis_id ? 'inline-flex' : 'none';
+      renderDevisLignes();
+    }
+    function renderDevisLignes() {
+      const d = getDevisDraft();
+      const refOptions = (selectedType) => {
+        if (selectedType === 'prestation') {
+          return '<option value=""></option>' + State.prestations.filter(p => p.statut === 'Actif').map(p => `<option value="${escapeAttr(p.prestation_id)}">${escapeHtml(p.nom)} - ${formatMoney(p.tarif_vente)}</option>`).join('');
+        }
+        return '<option value=""></option>' + State.supplements.filter(s => (s.statut || 'Actif') === 'Actif').map(s => `<option value="${escapeAttr(s.supplement_id)}">${escapeHtml(s.nom)}</option>`).join('');
+      };
+      $('devisLignesRows').innerHTML = d.lignes.map((l) => `
+        <tr class="devis-ligne-row">
+          <td><select data-ligne-field="type" data-ligne-id="${l.ligne_id}">
+            <option value="prestation" ${l.type === 'prestation' ? 'selected' : ''}>Prestation</option>
+            <option value="supplement" ${l.type === 'supplement' ? 'selected' : ''}>Supplément</option>
+          </select></td>
+          <td><select data-ligne-field="ref_id" data-ligne-id="${l.ligne_id}">${refOptions(l.type)}</select></td>
+          <td><input type="number" min="1" step="1" value="${l.quantite}" data-ligne-field="quantite" data-ligne-id="${l.ligne_id}"></td>
+          <td><input type="number" min="0" step="0.01" value="${l.prix_unitaire}" data-ligne-field="prix_unitaire" data-ligne-id="${l.ligne_id}"></td>
+          <td><input type="number" min="0" max="100" step="0.1" value="${l.remise_pct}" data-ligne-field="remise_pct" data-ligne-id="${l.ligne_id}"></td>
+          <td><input type="number" min="0" max="100" step="0.1" value="${l.tva_pct}" data-ligne-field="tva_pct" data-ligne-id="${l.ligne_id}"></td>
+          <td><strong data-ligne-total="${l.ligne_id}">${formatMoney(l.total_ht)}</strong></td>
+          <td><strong data-ligne-commission="${l.ligne_id}">${formatMoney(l.commission_valeur)}</strong></td>
+          <td><button class="btn btn-secondary" data-remove-ligne="${l.ligne_id}">×</button></td>
+        </tr>`).join('');
+      d.lignes.forEach(l => {
+        const sel = document.querySelector(`select[data-ligne-field="ref_id"][data-ligne-id="${l.ligne_id}"]`);
+        if (sel && l.ref_id) sel.value = l.ref_id;
+      });
+    }
+    function onDevisLigneChange(ligneId, field, value) {
+      const d = getDevisDraft();
+      const l = d.lignes.find(x => x.ligne_id === ligneId);
+      if (!l) return;
+      if (['quantite','prix_unitaire','remise_pct','tva_pct'].includes(field)) {
+        l[field] = Number(value);
+      } else {
+        l[field] = value;
+      }
+      if (field === 'ref_id' && value) {
+        if (l.type === 'prestation') {
+          const p = State.prestations.find(x => x.prestation_id === value);
+          if (p) { l.nom = p.nom; l.prix_unitaire = Number(p.tarif_vente || 0); l.tva_pct = Number(p.tva || 20); }
+        } else {
+          const s = State.supplements.find(x => x.supplement_id === value);
+          if (s) { l.nom = s.nom; l.prix_unitaire = Number(s.prix_max || s.prix_min || 0); l.tva_pct = 20; }
+        }
+        renderDevisLignes();
+      }
+      if (field === 'type') {
+        l.ref_id = ''; l.nom = ''; l.prix_unitaire = 0;
+        renderDevisLignes();
+      }
+      computeDevisTotalsUI();
+    }
+    function computeDevisTotalsUI() {
+      const d = getDevisDraft();
+      let total_ht = 0, total_tva = 0, total_ttc = 0, commission = 0;
+      d.lignes.forEach(l => {
+        const ht = Number(l.quantite || 0) * Number(l.prix_unitaire || 0) * (1 - Number(l.remise_pct || 0) / 100);
+        l.total_ht = Math.round(ht * 100) / 100;
+        if (l.type === 'prestation') {
+          const p = State.prestations.find(x => x.prestation_id === l.ref_id);
+          if (p) {
+            l.commission_valeur = p.commission_type === 'pourcentage'
+              ? Math.round(ht * (Number(p.commission_valeur || 0) / 100) * 100) / 100
+              : Math.round(Number(l.quantite || 0) * Number(p.commission_valeur || 0) * 100) / 100;
+          } else { l.commission_valeur = 0; }
+        } else { l.commission_valeur = 0; }
+        const tvaL = ht * (Number(l.tva_pct || 0) / 100);
+        total_ht += ht; total_tva += tvaL; total_ttc += ht + tvaL;
+        commission += Number(l.commission_valeur || 0);
+        const tEl = document.querySelector(`[data-ligne-total="${l.ligne_id}"]`);
+        const cEl = document.querySelector(`[data-ligne-commission="${l.ligne_id}"]`);
+        if (tEl) tEl.textContent = formatMoney(l.total_ht);
+        if (cEl) cEl.textContent = formatMoney(l.commission_valeur);
+      });
+      const remisePct = State.user.role === 'admin' ? Number($('devis_remise_pct')?.value || 0) : 0;
+      const remiseMontant = State.user.role === 'admin' ? Number($('devis_remise_montant')?.value || 0) : 0;
+      d.remise_pct = remisePct; d.remise_montant = remiseMontant;
+      const factor = Math.max(0, 1 - remisePct / 100);
+      total_ht *= factor; total_tva *= factor; total_ttc *= factor; commission *= factor;
+      total_ttc = Math.max(0, total_ttc - remiseMontant);
+      const marge = Math.max(0, total_ht - commission);
+      $('devis_total_ht').textContent = formatMoney(total_ht);
+      $('devis_total_tva').textContent = formatMoney(total_tva);
+      $('devis_total_ttc').textContent = formatMoney(total_ttc);
+      $('devis_commission').textContent = formatMoney(commission);
+      $('devis_marge').textContent = formatMoney(marge);
+    }
+    async function saveDevisFromDraft() {
+      const d = getDevisDraft();
+      d.client_id = $('devis_client').value;
+      d.date = $('devis_date').value;
+      d.statut = $('devis_statut').value;
+      d.notes = $('devis_notes').value;
+      d.lignes = d.lignes.filter(l => l.ref_id && l.quantite > 0);
+      if (!d.client_id) return showToast('Client requis');
+      if (!d.lignes.length) return showToast('Au moins une ligne requise');
+      const payload = { client_id: d.client_id, date: d.date, statut: d.statut, notes: d.notes,
+        remise_pct: d.remise_pct, remise_montant: d.remise_montant,
+        lignes: d.lignes.map(l => ({ type: l.type, ref_id: l.ref_id, nom: l.nom, quantite: l.quantite,
+          prix_unitaire: l.prix_unitaire, remise_pct: l.remise_pct, tva_pct: l.tva_pct })) };
+      setButtonLoading('saveDevisBtn', true);
+      try {
+        let saved;
+        if (d.devis_id) {
+          saved = await businessApi.request('updateDevis', Object.assign({ devis_id: d.devis_id }, payload));
+          State.devis = State.devis.map(x => x.devis_id === saved.devis.devis_id ? saved.devis : x);
+          State.devis_lignes = State.devis_lignes.filter(l => l.devis_id !== saved.devis.devis_id).concat(saved.lignes);
+          showToast('Devis modifié');
+        } else {
+          saved = await businessApi.request('createDevis', payload);
+          State.devis.unshift(saved.devis);
+          State.devis_lignes = State.devis_lignes.concat(saved.lignes);
+          showToast('Devis créé');
+        }
+        renderAll(); persistSession();
+      } catch (err) { showToast(err.message); }
+      finally { setButtonLoading('saveDevisBtn', false); }
+    }
+    async function transformDevisToContract(devisId) {
+      const d = State.devis.find(x => x.devis_id === devisId);
+      if (!d) return;
+      if (!confirm('Transformer ce devis en contrat signé ? Cette action est définitive.')) return;
+      try {
+        const res = await businessApi.request('transformerEnContrat', { devis_id: devisId, date_debut: d.date, date_fin: addOneYear(d.date) });
+        showToast('Devis transformé en contrat');
+        const target = State.devis.find(x => x.devis_id === devisId);
+        if (target) { target.statut = 'Transforme'; target.contrat_id = res.contrat.contract_id; }
+        State.contracts.unshift(res.contrat);
+        renderAll(); persistSession();
+      } catch (err) { showToast(err.message); }
+    }
+    async function deleteDevisAction(devisId) {
+      if (!confirm('Supprimer ce devis ?')) return;
+      try {
+        await businessApi.request('deleteDevis', { devis_id: devisId });
+        State.devis = State.devis.filter(d => d.devis_id !== devisId);
+        State.devis_lignes = State.devis_lignes.filter(l => l.devis_id !== devisId);
+        showToast('Devis supprimé');
+        renderDevisListe(); renderCatalogueAnalytics();
+      } catch (err) { showToast(err.message); }
+    }
+    function addOneYear(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00'); d.setFullYear(d.getFullYear() + 1);
+      return d.toISOString().slice(0, 10);
+    }
+    function openEditDevis(id) {
+      const d = State.devis.find(x => x.devis_id === id); if (!d) return;
+      const lignes = State.devis_lignes.filter(l => l.devis_id === id).sort((a,b) => Number(a.position) - Number(b.position));
+      State.currentDevisDraft = Object.assign({}, d, { lignes: lignes.length ? lignes : buildEmptyDevisDraft() });
+      switchTab('devisForm'); setView('devis'); renderDevisForm(); computeDevisTotalsUI();
+    }
+    function openEditPrestation(id) {
+      const p = State.prestations.find(x => x.prestation_id === id); if (!p) return;
+      $('prs_nom').value = p.nom; $('prs_categorie').value = p.categorie; $('prs_description').value = p.description;
+      $('prs_conseille').value = p.tarif_conseille; $('prs_minimum').value = p.tarif_minimum; $('prs_vente').value = p.tarif_vente;
+      $('prs_commission_type').value = p.commission_type; $('prs_commission_valeur').value = p.commission_valeur;
+      $('prs_tva').value = p.tva; $('prs_statut').value = p.statut;
+      $('savePrestationBtn').dataset.editing = id;
+      $('adminPrestationPanel').scrollIntoView({ behavior: 'smooth' });
+    }
+    async function savePrestationAction() {
+      const editing = $('savePrestationBtn').dataset.editing;
+      const payload = {
+        nom: $('prs_nom').value, categorie: $('prs_categorie').value, description: $('prs_description').value,
+        tarif_conseille: Number($('prs_conseille').value || 0), tarif_minimum: Number($('prs_minimum').value || 0),
+        tarif_vente: Number($('prs_vente').value || 0), commission_type: $('prs_commission_type').value,
+        commission_valeur: Number($('prs_commission_valeur').value || 0), tva: Number($('prs_tva').value || 20),
+        statut: $('prs_statut').value,
+      };
+      if (!payload.nom) return showToast('Nom requis');
+      try {
+        const saved = editing
+          ? await businessApi.request('updatePrestation', Object.assign({ prestation_id: editing }, payload))
+          : await businessApi.request('createPrestation', payload);
+        if (editing) State.prestations = State.prestations.map(p => p.prestation_id === editing ? saved : p);
+        else State.prestations.unshift(saved);
+        showToast('Prestation enregistrée');
+        ['prs_nom','prs_categorie','prs_description','prs_conseille','prs_minimum','prs_vente','prs_commission_valeur'].forEach(id => $(id).value = '');
+        delete $('savePrestationBtn').dataset.editing;
+        renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes(); persistSession();
+      } catch (err) { showToast(err.message); }
+    }
+    async function togglePrestationAction(id) {
+      try {
+        const saved = await businessApi.request('togglePrestation', { prestation_id: id });
+        State.prestations = State.prestations.map(p => p.prestation_id === id ? saved : p);
+        renderPrestations(); renderCatalogueAnalytics(); persistSession();
+      } catch (err) { showToast(err.message); }
+    }
+    async function deletePrestationAction(id) {
+      if (!confirm('Supprimer cette prestation ?')) return;
+      try {
+        await businessApi.request('deletePrestation', { prestation_id: id });
+        State.prestations = State.prestations.filter(p => p.prestation_id !== id);
+        showToast('Prestation supprimée');
+        renderPrestations(); renderCatalogueAnalytics(); persistSession();
+      } catch (err) { showToast(err.message); }
+    }
+    function openEditSupplement(id) {
+      const s = State.supplements.find(x => x.supplement_id === id); if (!s) return;
+      $('sup_nom').value = s.nom; $('sup_description').value = s.description;
+      $('sup_min').value = s.prix_min; $('sup_max').value = s.prix_max;
+      $('sup_mode').value = s.mode_calcul; $('sup_precision').value = s.precision; $('sup_statut').value = s.statut || 'Actif';
+      $('saveSupplementBtn').dataset.editing = id;
+    }
+    async function saveSupplementAction() {
+      const editing = $('saveSupplementBtn').dataset.editing;
+      const payload = { nom: $('sup_nom').value, description: $('sup_description').value,
+        prix_min: Number($('sup_min').value || 0), prix_max: Number($('sup_max').value || 0),
+        mode_calcul: $('sup_mode').value, precision: $('sup_precision').value,
+        statut: $('sup_statut').value };
+      if (!payload.nom) return showToast('Nom requis');
+      try {
+        const saved = editing
+          ? await businessApi.request('updateSupplement', Object.assign({ supplement_id: editing }, payload))
+          : await businessApi.request('createSupplement', payload);
+        if (editing) State.supplements = State.supplements.map(s => s.supplement_id === editing ? saved : s);
+        else State.supplements.unshift(saved);
+        showToast('Supplément enregistré');
+        ['sup_nom','sup_description','sup_min','sup_max','sup_precision'].forEach(id => $(id).value = '');
+        delete $('saveSupplementBtn').dataset.editing;
+        renderSupplements(); persistSession();
+      } catch (err) { showToast(err.message); }
+    }
+    async function deleteSupplementAction(id) {
+      if (!confirm('Supprimer ce supplément ?')) return;
+      try {
+        await businessApi.request('deleteSupplement', { supplement_id: id });
+        State.supplements = State.supplements.filter(s => s.supplement_id !== id);
+        showToast('Supplément supprimé'); renderSupplements(); persistSession();
+      } catch (err) { showToast(err.message); }
+    }
+
+    // ============ Existing render functions ============
     function renderStats() {
       if (State.loading.clients || State.loading.appointments || State.loading.revenue) {
-        ['statClients', 'statAppointments', 'statPendingReports', 'statRevenue', 'statContracts'].forEach(id => {
-          $(id).innerHTML = '<div class="skeleton" style="height:30px"></div>';
-        });
+        ['statClients','statAppointments','statPendingReports','statRevenue','statContracts'].forEach(id => { $(id).innerHTML = '<div class="skeleton" style="height:30px"></div>'; });
         return;
       }
       const filteredRevenue = filterRevenue(State.revenue);
@@ -1755,11 +1826,37 @@
       $('statContracts').textContent = sumField(filteredRevenue, 'nombre_contrats');
     }
 
+    function renderAll() {
+      const isAdmin = State.user?.role === 'admin';
+      document.body.classList.toggle('is-admin', !!isAdmin);
+      document.querySelectorAll('[data-view="users"]').forEach(btn => { btn.style.display = isAdmin ? 'inline-flex' : 'none'; });
+      document.querySelectorAll('.admin-stat').forEach(el => { el.style.display = isAdmin ? 'block' : 'none'; });
+      document.querySelectorAll('.admin-user-col').forEach(el => { el.style.display = isAdmin ? 'table-cell' : 'none'; });
+      document.querySelectorAll('.admin-filter').forEach(el => { el.style.display = isAdmin ? 'block' : 'none'; });
+      if (!isAdmin && document.getElementById('users').classList.contains('active')) setView('dashboard');
+      $('companyName').textContent = State.company?.entreprise || '';
+      $('dashboardTitle').textContent = State.company?.entreprise || 'Tableau de bord';
+      $('userLine').textContent = `${State.user?.Nom || ''} - ${roleLabel(State.user?.role)}`;
+      $('usersHelp').textContent = isAdmin ? `Creation limitee a l'entreprise ${State.company?.entreprise || ''}.` : 'Votre compte apporteur.';
+      $('adminCreatePanel').style.display = isAdmin ? 'block' : 'none';
+      if (!isAdmin) $('adminEditPanel').style.display = 'none';
+      $('clientsHelp').textContent = isAdmin ? 'Vue globale des clients de l entreprise.' : 'Votre portefeuille client.';
+      $('revenueHelp').textContent = isAdmin ? 'Saisie admin des contrats signes et pilotage des objectifs.' : 'Suivi automatique de votre CA, de vos contrats et de vos objectifs.';
+      $('adminRevenuePanel').style.display = isAdmin ? 'block' : 'none';
+      $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
+      $('catalogueHelp').textContent = isAdmin ? 'Gérez vos prestations, suppléments et la rentabilité.' : 'Consultez les prestations commercialisables par l\u2019entreprise.';
+      renderStats();
+      renderUsers(); renderClients(); renderPortfolioHistory();
+      renderAppointmentClientOptions(); renderAppointments();
+      renderRevenueOptions(); renderRevenue(); renderDashboardAnalytics();
+      renderPersonStats(); renderContractOptions(); renderContracts(); renderGoogleStatus();
+      // CATALOGUE / DEVIS
+      renderPrestations(); renderSupplements(); renderCatalogueAnalytics();
+      renderDevisOptions(); renderDevisListe();
+    }
+
     function renderUsers() {
-      if (State.loading.users) {
-        $('usersRows').innerHTML = skeletonRows(6, 4);
-        return;
-      }
+      if (!$('usersRows')) return;
       $('usersRows').innerHTML = State.users.map(user => `
         <tr class="${user._pending ? 'row-pending' : ''}">
           <td><strong>${escapeHtml(user.Nom)}</strong></td>
@@ -1774,15 +1871,11 @@
               ${user.role === 'apporteur' ? `<button class="btn btn-secondary" data-delete-user="${escapeAttr(user.ID)}">Supprimer</button>` : ''}
             </div>
           </td>
-        </tr>
-      `).join('') || `<tr><td colspan="6" class="muted">Aucun utilisateur.</td></tr>`;
+        </tr>`).join('') || `<tr><td colspan="6" class="muted">Aucun utilisateur.</td></tr>`;
     }
 
     function renderClients() {
-      if (State.loading.clients) {
-        $('clientsRows').innerHTML = skeletonRows(6, 4);
-        return;
-      }
+      if (State.loading.clients) { $('clientsRows').innerHTML = skeletonRows(6, 4); return; }
       $('clientsRows').innerHTML = State.clients.map(client => {
         const referents = client.referents || [];
         const referentList = referents.map(ref => escapeHtml([ref.prenom, ref.nom].filter(Boolean).join(' ') || 'Référent')).join('<br>');
@@ -1794,12 +1887,11 @@
               <strong>${escapeHtml(client.nom_entreprise)}</strong>
               <div class="muted">${escapeHtml(client.adresse || '')}</div>
               <div class="muted">${escapeHtml(owner ? `Portefeuille: ${owner.Nom}` : '')}</div>
-              <div style="margin-top:8px"><button class="btn btn-secondary" data-add-referent="${escapeAttr(client.client_id)}">Ajouter un référent</button></div>
+              <div style="margin-top:8px"><button class="btn btn-secondary" data-add-referent="${escapeAttr(client.client_id)}">Ajouter un référent</button>
+              <button class="btn btn-secondary" data-new-devis-from-client="${escapeAttr(client.client_id)}">Créer un devis</button></div>
             </td>
             <td>${escapeHtml(client.telephone || '')}</td>
-            <td>
-              ${referentList || ''}
-            </td>
+            <td>${referentList || ''}</td>
             <td>${contact || ''}</td>
             <td>${escapeHtml(client.notes || '')}</td>
             <td>
@@ -1808,8 +1900,7 @@
                 <button class="btn btn-secondary" data-delete-client="${escapeAttr(client.client_id)}">Supprimer</button>
               </div>
             </td>
-          </tr>
-        `;
+          </tr>`;
       }).join('') || `<tr><td colspan="6" class="muted">Aucun client pour le moment.</td></tr>`;
     }
 
@@ -1830,22 +1921,13 @@
     }
 
     function renderAppointments() {
-      if (State.loading.appointments) {
-        $('appointmentsRows').innerHTML = skeletonRows(5, 4);
-        return;
-      }
+      if (State.loading.appointments) { $('appointmentsRows').innerHTML = skeletonRows(5, 4); return; }
       const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
       $('appointmentsRows').innerHTML = State.appointments.map(item => `
         <tr class="${item._pending ? 'row-pending' : ''}">
-          <td>
-            <strong>${escapeHtml(formatDate(item.date))}</strong>
-            <div class="muted">${escapeHtml(item.heure || '')}</div>
-          </td>
+          <td><strong>${escapeHtml(formatDate(item.date))}</strong><div class="muted">${escapeHtml(item.heure || '')}</div></td>
           <td>${escapeHtml(clientMap.get(item.client_id) || 'Client')}</td>
-          <td>
-            ${escapeHtml(item.objet || '')}
-            <div class="muted">${escapeHtml(item.adresse || '')}</div>
-          </td>
+          <td>${escapeHtml(item.objet || '')}<div class="muted">${escapeHtml(item.adresse || '')}</div></td>
           <td><span class="badge ${item.statut === 'Valide' ? 'ok' : 'pending'}">${escapeHtml(item._pending ? 'Synchronisation' : item.statut)}</span></td>
           <td>
             <div class="inline-actions">
@@ -1853,8 +1935,7 @@
               <button class="btn btn-secondary" data-delete-rdv="${escapeAttr(item.appointment_id)}">Supprimer</button>
             </div>
           </td>
-        </tr>
-      `).join('') || `<tr><td colspan="5" class="muted">Aucun rendez-vous pour le moment.</td></tr>`;
+        </tr>`).join('') || `<tr><td colspan="5" class="muted">Aucun rendez-vous pour le moment.</td></tr>`;
     }
 
     function renderRevenueOptions() {
@@ -1865,7 +1946,6 @@
       $('revenue_client').innerHTML = clientOptions;
       if (currentFilterClient) $('filter_client').value = currentFilterClient;
       if (currentRevenueClient) $('revenue_client').value = currentRevenueClient;
-
       const apporteurs = getAssignableUsers();
       const currentRevenueOwner = $('revenue_owner').value;
       const currentObjectiveOwner = $('objective_owner').value;
@@ -1886,16 +1966,12 @@
 
     function renderPortfolioHistory() {
       if (!$('portfolioHistoryRows')) return;
-      if (State.loading.clients || State.loading.revenue) {
-        $('portfolioHistoryRows').innerHTML = skeletonRows(5, 3);
-        return;
-      }
+      if (State.loading.clients || State.loading.revenue) { $('portfolioHistoryRows').innerHTML = skeletonRows(5, 3); return; }
       const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
       const ownerId = $('filter_owner')?.value || '';
       const rows = (State.portfolioHistory || [])
         .filter(item => !ownerId || item.from_owner_id === ownerId || item.to_owner_id === ownerId)
-        .slice()
-        .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+        .slice().sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
       $('portfolioHistoryRows').innerHTML = rows.map(item => `
         <tr class="${item._pending ? 'row-pending' : ''}">
           <td>${escapeHtml(formatDateTime(item.created_at))}</td>
@@ -1903,8 +1979,7 @@
           <td><span class="badge pending">${escapeHtml(item._pending ? 'synchronisation' : item.action || '')}</span></td>
           <td>${escapeHtml(userMap.get(item.from_owner_id) || item.from_owner_id || '')}</td>
           <td>${escapeHtml(userMap.get(item.to_owner_id) || item.to_owner_id || '')}</td>
-        </tr>
-      `).join('') || `<tr><td colspan="5" class="muted">Aucun historique.</td></tr>`;
+        </tr>`).join('') || `<tr><td colspan="5" class="muted">Aucun historique.</td></tr>`;
     }
 
     function renderRevenue() {
@@ -1916,9 +1991,7 @@
       }
       const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
       const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
-      const rows = filterRevenue(State.revenue)
-        .slice()
-        .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      const rows = filterRevenue(State.revenue).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
       $('revenueRows').innerHTML = rows.map(item => `
         <tr class="${item._pending ? 'row-pending' : ''}">
           <td>${escapeHtml(formatDate(item.date))}</td>
@@ -1927,16 +2000,13 @@
           <td><strong>${escapeHtml(formatMoney(item.montant))}</strong></td>
           <td>${escapeHtml(item.nombre_contrats || 0)}</td>
           <td>${escapeHtml(item.commentaires || '')}</td>
-        </tr>
-      `).join('') || `<tr><td colspan="6" class="muted">Aucun contrat enregistre.</td></tr>`;
+        </tr>`).join('') || `<tr><td colspan="6" class="muted">Aucun contrat enregistre.</td></tr>`;
     }
 
     function renderContractOptions() {
       if (!$('contract_client')) return;
       const current = $('contract_client').value;
-      $('contract_client').innerHTML = State.clients
-        .map(client => `<option value="${escapeAttr(client.client_id)}">${escapeHtml(client.nom_entreprise)}</option>`)
-        .join('');
+      $('contract_client').innerHTML = State.clients.map(client => `<option value="${escapeAttr(client.client_id)}">${escapeHtml(client.nom_entreprise)}</option>`).join('');
       if (current) $('contract_client').value = current;
     }
 
@@ -1961,22 +2031,18 @@
             <td>
               <div class="inline-actions">
                 ${canManage ? `<button class="btn btn-secondary" data-edit-contract="${escapeAttr(contract.contract_id)}">Modifier</button>` : ''}
+                ${canManage ? `<button class="btn btn-secondary" data-new-devis-from-contract="${escapeAttr(contract.contract_id)}">Devis</button>` : ''}
                 ${canManage ? `<button class="btn btn-secondary" data-delete-contract="${escapeAttr(contract.contract_id)}">Supprimer</button>` : ''}
               </div>
             </td>
-          </tr>
-        `;
+          </tr>`;
       }).join('') || `<tr><td colspan="6" class="muted">Aucun contrat pour le moment.</td></tr>`;
       renderContractsPlanner(rows);
     }
 
     function renderContractsPlanner(rows) {
-      const planner = $('contractsPlanner');
-      if (!planner) return;
-      if (!rows.length) {
-        planner.innerHTML = '<p class="muted">Aucun contrat a afficher dans le planning.</p>';
-        return;
-      }
+      const planner = $('contractsPlanner'); if (!planner) return;
+      if (!rows.length) { planner.innerHTML = '<p class="muted">Aucun contrat a afficher dans le planning.</p>'; return; }
       const dates = rows.flatMap(item => [new Date(item.date_debut + 'T00:00:00'), new Date(item.date_fin + 'T00:00:00')]).filter(date => !isNaN(date.getTime()));
       const min = Math.min(...dates.map(date => date.getTime()));
       const max = Math.max(...dates.map(date => date.getTime()));
@@ -1992,8 +2058,7 @@
             <div><strong>${escapeHtml(contract.client_nom || getClientName(contract.client_id))}</strong><div class="muted">${escapeHtml(formatDate(contract.date_debut))} -> ${escapeHtml(formatDate(contract.date_fin))}</div></div>
             <div class="planner-track"><div class="planner-bar" style="left:${left}%;width:${width}%;background:linear-gradient(90deg,hsl(${hue} 62% 42%),hsl(${hue + 28} 64% 48%))"></div></div>
             <span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(contract.statut)}</span>
-          </div>
-        `;
+          </div>`;
       }).join('');
     }
 
@@ -2001,8 +2066,8 @@
       if (!$('googleAccountStatus')) return;
       const connected = hasGoogleToken();
       $('googleAccountStatus').textContent = connected
-        ? `Compte Google associe${State.google?.email ? ` : ${State.google.email}` : ''}. Gmail, Agenda et Drive utiliseront ce compte.`
-        : 'Aucun compte Google associe. Les fonctions Gmail, Agenda et Drive ne peuvent pas encore agir avec votre compte.';
+        ? `Compte Google associe${State.google?.email ? ` - ${State.google.email}` : ''}. Calendrier, Gmail et Drive utilisent ce compte.`
+        : 'Aucun compte Google associe.';
       $('connectGoogleBtn').textContent = connected ? 'Reconnecter mon compte Google' : 'Connecter mon compte Google';
       $('disconnectGoogleBtn').style.display = connected ? 'inline-flex' : 'none';
     }
@@ -2025,7 +2090,6 @@
         ${progressLine('Contrats', contracts, contractTarget, value => String(value))}
         <div class="muted">${objective ? `${formatDate(objective.date_debut)} - ${formatDate(objective.date_fin)}` : 'Aucun objectif parametre pour cette selection.'}</div>
       `;
-
       const clientGrouped = groupRevenueByClient(rows);
       const monthlyGrouped = groupRevenueByMonth(rows);
       const ownerGrouped = State.user.role === 'admin' ? groupRevenueByOwner(rows) : [];
@@ -2043,20 +2107,14 @@
           <strong>${escapeHtml(item.label)}</strong>
           <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${Math.min(100, Math.round(item.total / max * 100))}%"></div></div>
           <span>${escapeHtml(formatMoney(item.total))}</span>
-        </div>
-      `).join('') || '<p class="muted">Aucune donnee sur la periode.</p>';
+        </div>`).join('') || '<p class="muted">Aucune donnee sur la periode.</p>';
       return `<div><h3 style="margin-top:0">${escapeHtml(title)}</h3>${rows}</div>`;
     }
 
     function openPersonStats(ownerId) {
       const id = ownerId || $('filter_owner').value || State.user.ID;
       if ($('filter_owner')) $('filter_owner').value = id;
-      setView('dashboard');
-      renderStats();
-      renderRevenue();
-      renderDashboardAnalytics();
-      renderPortfolioHistory();
-      renderPersonStats();
+      setView('dashboard'); renderStats(); renderRevenue(); renderDashboardAnalytics(); renderPortfolioHistory(); renderPersonStats();
       $('personStatsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -2070,8 +2128,7 @@
       const ownerId = $('filter_owner').value || State.user.ID;
       const person = State.users.find(user => user.ID === ownerId) || State.user;
       const clients = State.clients.filter(client => client.owner_id === ownerId);
-      const revenueRows = State.revenue
-        .filter(item => item.owner_id === ownerId)
+      const revenueRows = State.revenue.filter(item => item.owner_id === ownerId)
         .filter(item => {
           const start = $('filter_start')?.value || '';
           const end = $('filter_end')?.value || '';
@@ -2080,9 +2137,7 @@
           if (end && item.date > end) return false;
           if (clientId && item.client_id !== clientId) return false;
           return true;
-        })
-        .slice()
-        .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+        }).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
       const appointments = State.appointments.filter(item => item.owner_id === ownerId);
       const objective = getObjectiveFor(ownerId);
       const totalCa = sumField(revenueRows, 'montant');
@@ -2111,113 +2166,55 @@
                   <td><strong>${escapeHtml(formatMoney(item.montant))}</strong></td>
                   <td>${escapeHtml(item.nombre_contrats || 0)}</td>
                   <td>${escapeHtml(item.commentaires || '')}</td>
-                </tr>
-              `).join('') || '<tr><td colspan="5" class="muted">Aucun chiffre enregistre pour cette selection.</td></tr>'}
+                </tr>`).join('') || '<tr><td colspan="5" class="muted">Aucun chiffre enregistre pour cette selection.</td></tr>'}
             </tbody>
           </table>
         </div>
-        <div>
-          <h3>Clients du portefeuille</h3>
-          <p class="muted">${clients.map(client => escapeHtml(client.nom_entreprise)).join(' - ') || 'Aucun client attribue.'}</p>
-        </div>
-      `;
+        <div><h3>Clients du portefeuille</h3><p class="muted">${clients.map(client => escapeHtml(client.nom_entreprise)).join(' - ') || 'Aucun client attribue.'}</p></div>`;
     }
 
+    // CRUD fonctions (existantes + ajustées) :
     async function createUser() {
-      const optimisticUser = {
-        Nom: $('full_name').value,
-        ID: $('new_login').value,
-        entreprise: State.company?.entreprise || '',
-        role: $('role').value,
-        _pending: true,
-      };
-      if (!optimisticUser.Nom || !optimisticUser.ID) {
-        showToast('Nom et identifiant requis');
-        return;
-      }
-      State.users.unshift(optimisticUser);
-      renderUsers();
+      const optimisticUser = { Nom: $('full_name').value, ID: $('new_login').value, entreprise: State.company?.entreprise || '', role: $('role').value, _pending: true };
+      if (!optimisticUser.Nom || !optimisticUser.ID) return showToast('Nom et identifiant requis');
+      State.users.unshift(optimisticUser); renderUsers();
       setButtonLoading('createUserBtn', true);
       try {
-        const created = await masterApi.request('createUser', {
-          full_name: $('full_name').value,
-          login: $('new_login').value,
-          password: $('new_password').value,
-          role: $('role').value,
-        });
+        const created = await masterApi.request('createUser', { full_name: $('full_name').value, login: $('new_login').value, password: $('new_password').value, role: $('role').value });
         Object.assign(optimisticUser, created, { _pending: false });
-        $('full_name').value = '';
-        $('new_login').value = '';
-        $('new_password').value = '';
-        renderAll();
-        silentRefresh();
-        showToast('Utilisateur cree dans votre entreprise');
-      } catch (err) {
-        State.users = State.users.filter(user => user !== optimisticUser);
-        renderUsers();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('createUserBtn', false);
-      }
+        $('full_name').value = ''; $('new_login').value = ''; $('new_password').value = '';
+        renderAll(); silentRefresh(); showToast('Utilisateur cree dans votre entreprise');
+      } catch (err) { State.users = State.users.filter(user => user !== optimisticUser); renderUsers(); showToast(err.message); }
+      finally { setButtonLoading('createUserBtn', false); }
     }
 
     function openEditUser(userId) {
-      const user = State.users.find(item => item.ID === userId);
-      if (!user) return;
-      $('edit_old_id').value = user.ID;
-      $('edit_name').value = user.Nom || '';
-      $('edit_login').value = user.ID || '';
-      $('edit_password').value = user.MDP || '';
+      const user = State.users.find(item => item.ID === userId); if (!user) return;
+      $('edit_old_id').value = user.ID; $('edit_name').value = user.Nom || '';
+      $('edit_login').value = user.ID || ''; $('edit_password').value = user.MDP || '';
       $('edit_role').value = user.role || 'apporteur';
-      $('adminEditPanel').style.display = 'block';
-      $('adminEditPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('adminEditPanel').style.display = 'block'; $('adminEditPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function closeEditUser() {
       $('adminEditPanel').style.display = 'none';
-      ['edit_old_id', 'edit_name', 'edit_login', 'edit_password'].forEach(id => $(id).value = '');
+      ['edit_old_id','edit_name','edit_login','edit_password'].forEach(id => $(id).value = '');
       $('edit_role').value = 'apporteur';
     }
 
     async function updateUser() {
       const oldId = $('edit_old_id').value;
-      const current = State.users.find(item => item.ID === oldId);
-      if (!current) return;
+      const current = State.users.find(item => item.ID === oldId); if (!current) return;
       const previous = { ...current };
-      const next = {
-        Nom: $('edit_name').value,
-        ID: $('edit_login').value,
-        MDP: $('edit_password').value,
-        role: $('edit_role').value,
-        entreprise: current.entreprise,
-      };
-      if (!next.Nom || !next.ID || !next.MDP) {
-        showToast('Nom, identifiant et mot de passe requis');
-        return;
-      }
-      Object.assign(current, next, { _pending: true });
-      renderUsers();
+      const next = { Nom: $('edit_name').value, ID: $('edit_login').value, MDP: $('edit_password').value, role: $('edit_role').value, entreprise: current.entreprise };
+      if (!next.Nom || !next.ID || !next.MDP) return showToast('Nom, identifiant et mot de passe requis');
+      Object.assign(current, next, { _pending: true }); renderUsers();
       setButtonLoading('updateUserBtn', true);
       try {
-        const saved = await masterApi.request('updateUser', {
-          old_id: oldId,
-          nom: next.Nom,
-          id: next.ID,
-          mdp: next.MDP,
-          role: next.role,
-        });
-        Object.assign(current, saved, { _pending: false });
-        closeEditUser();
-        renderAll();
-        silentRefresh();
-        showToast('Utilisateur modifie');
-      } catch (err) {
-        Object.assign(current, previous, { _pending: false });
-        renderUsers();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('updateUserBtn', false);
-      }
+        const saved = await masterApi.request('updateUser', { old_id: oldId, nom: next.Nom, id: next.ID, mdp: next.MDP, role: next.role });
+        Object.assign(current, saved, { _pending: false }); closeEditUser(); renderAll(); silentRefresh(); showToast('Utilisateur modifie');
+      } catch (err) { Object.assign(current, previous, { _pending: false }); renderUsers(); showToast(err.message); }
+      finally { setButtonLoading('updateUserBtn', false); }
     }
 
     async function deleteUser(userId) {
@@ -2228,956 +2225,423 @@
       const previousHistory = State.portfolioHistory.slice();
       const reassignedClients = State.clients.filter(client => client.owner_id === userId);
       reassignedClients.forEach(client => {
-        State.portfolioHistory.unshift({
-          history_id: tempId('hist'),
-          client_id: client.client_id,
-          client_nom: client.nom_entreprise,
-          from_owner_id: userId,
-          to_owner_id: State.user.ID,
-          action: 'transfert',
-          created_at: new Date().toISOString(),
-        });
-        client.owner_id = State.user.ID;
-        client._pending = true;
+        State.portfolioHistory.unshift({ history_id: tempId('hist'), client_id: client.client_id, client_nom: client.nom_entreprise, from_owner_id: userId, to_owner_id: State.user.ID, action: 'transfert', created_at: new Date().toISOString() });
+        client.owner_id = State.user.ID; client._pending = true;
       });
-      State.users = State.users.filter(item => item.ID !== userId);
-      renderAll();
-      persistSession();
+      State.users = State.users.filter(item => item.ID !== userId); renderAll(); persistSession();
       try {
         for (const client of reassignedClients) {
-          await businessApi.request('transferClient', {
-            client_id: client.client_id,
-            owner_id: State.user.ID,
-            commentaires: `Reprise automatique avant suppression de ${user.Nom || userId}`,
-          });
+          await businessApi.request('transferClient', { client_id: client.client_id, owner_id: State.user.ID, commentaires: `Reprise automatique avant suppression de ${user.Nom || userId}` });
           client._pending = false;
         }
         await masterApi.request('deleteUser', { id: userId });
-        silentRefresh();
-        showToast('Apporteur supprime');
-      } catch (err) {
-        State.users = previousUsers;
-        State.clients = previousClients;
-        State.portfolioHistory = previousHistory;
-        renderAll();
-        showToast(err.message);
-      }
+        silentRefresh(); showToast('Apporteur supprime');
+      } catch (err) { State.users = previousUsers; State.clients = previousClients; State.portfolioHistory = previousHistory; renderAll(); showToast(err.message); }
     }
 
     async function createRevenue() {
       if (State.user.role !== 'admin') return;
       const optimisticRevenue = buildRevenueFromForm();
-      if (!optimisticRevenue.client_id || !optimisticRevenue.owner_id || !optimisticRevenue.date) {
-        showToast('Client, apporteur et date requis');
-        return;
-      }
-      if (Number(optimisticRevenue.montant) <= 0 && Number(optimisticRevenue.nombre_contrats) <= 0) {
-        showToast('Montant ou nombre de contrats requis');
-        return;
-      }
-      State.revenue.unshift(optimisticRevenue);
-      renderAll();
+      if (!optimisticRevenue.client_id || !optimisticRevenue.owner_id || !optimisticRevenue.date) return showToast('Client, apporteur et date requis');
+      if (Number(optimisticRevenue.montant) <= 0 && Number(optimisticRevenue.nombre_contrats) <= 0) return showToast('Montant ou nombre de contrats requis');
+      State.revenue.unshift(optimisticRevenue); renderAll();
       setButtonLoading('createRevenueBtn', true);
       try {
         const saved = await businessApi.request('createRevenue', optimisticRevenue);
         Object.assign(optimisticRevenue, saved, { _pending: false });
-        ['revenue_amount', 'revenue_comments'].forEach(id => $(id).value = '');
-        $('revenue_contracts').value = '1';
-        renderAll();
-        silentRefresh();
-        showToast('Contrat enregistre');
-      } catch (err) {
-        State.revenue = State.revenue.filter(item => item !== optimisticRevenue);
-        renderAll();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('createRevenueBtn', false);
-      }
+        ['revenue_amount','revenue_comments'].forEach(id => $(id).value = ''); $('revenue_contracts').value = '1';
+        renderAll(); silentRefresh(); showToast('Contrat enregistre');
+      } catch (err) { State.revenue = State.revenue.filter(item => item !== optimisticRevenue); renderAll(); showToast(err.message); }
+      finally { setButtonLoading('createRevenueBtn', false); }
     }
 
     async function saveObjective() {
       if (State.user.role !== 'admin') return;
-      const ownerId = $('objective_owner').value;
-      if (!ownerId) {
-        showToast('Choisis un apporteur');
-        return;
-      }
+      const ownerId = $('objective_owner').value; if (!ownerId) return showToast('Choisis un apporteur');
       const previous = State.objectives.slice();
       const existing = getObjectiveFor(ownerId);
       const optimisticObjective = {
-        objective_id: existing?.objective_id || tempId('obj'),
-        owner_id: ownerId,
-        objectif_ca: Number($('objective_ca').value || 0),
-        objectif_contrats: Number($('objective_contracts').value || 0),
-        date_debut: $('objective_start').value,
-        date_fin: $('objective_end').value,
-        _pending: true,
+        objective_id: existing?.objective_id || tempId('obj'), owner_id: ownerId,
+        objectif_ca: Number($('objective_ca').value || 0), objectif_contrats: Number($('objective_contracts').value || 0),
+        date_debut: $('objective_start').value, date_fin: $('objective_end').value, _pending: true,
       };
       State.objectives = State.objectives.filter(item => item.owner_id !== ownerId);
-      State.objectives.unshift(optimisticObjective);
-      renderAll();
+      State.objectives.unshift(optimisticObjective); renderAll();
       setButtonLoading('saveObjectiveBtn', true);
       try {
         const saved = await businessApi.request('saveObjective', optimisticObjective);
         Object.assign(optimisticObjective, saved, { _pending: false });
-        renderAll();
-        silentRefresh();
-        showToast('Objectif enregistre');
-      } catch (err) {
-        State.objectives = previous;
-        renderAll();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('saveObjectiveBtn', false);
-      }
+        renderAll(); silentRefresh(); showToast('Objectif enregistre');
+      } catch (err) { State.objectives = previous; renderAll(); showToast(err.message); }
+      finally { setButtonLoading('saveObjectiveBtn', false); }
     }
 
     async function saveContract() {
       const contract = buildContractFromForm();
-      if (!contract.client_id || !contract.date_debut || !contract.date_fin) {
-        showToast('Client, date de debut et date de fin requis');
-        return;
-      }
+      if (!contract.client_id || !contract.date_debut || !contract.date_fin) return showToast('Client, date de debut et date de fin requis');
       const existing = State.contracts.find(item => item.contract_id === contract.contract_id);
       const previousContracts = State.contracts.slice();
       const previousRevenue = State.revenue.slice();
       const optimisticRevenue = buildRevenueFromContract(contract);
-      if (existing) Object.assign(existing, contract, { _pending: true });
-      else State.contracts.unshift(contract);
+      if (existing) Object.assign(existing, contract, { _pending: true }); else State.contracts.unshift(contract);
       State.revenue = State.revenue.filter(item => item.revenue_id !== optimisticRevenue.revenue_id);
       if (Number(contract.montant) > 0) State.revenue.unshift(optimisticRevenue);
-      renderAll();
-      persistSession();
+      renderAll(); persistSession();
       setButtonLoading('saveContractBtn', true);
       try {
         const saved = await businessApi.request(existing ? 'updateContract' : 'createContract', contract);
         const target = State.contracts.find(item => item.contract_id === contract.contract_id);
         if (target) Object.assign(target, saved, { _pending: false });
-        resetContractForm();
-        renderAll();
-        silentBusinessRefresh();
-        showToast(existing ? 'Contrat modifie' : 'Contrat cree');
-      } catch (err) {
-        State.contracts = previousContracts;
-        State.revenue = previousRevenue;
-        renderAll();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('saveContractBtn', false);
-      }
+        resetContractForm(); renderAll(); silentBusinessRefresh(); showToast(existing ? 'Contrat modifie' : 'Contrat cree');
+      } catch (err) { State.contracts = previousContracts; State.revenue = previousRevenue; renderAll(); showToast(err.message); }
+      finally { setButtonLoading('saveContractBtn', false); }
     }
 
     function openEditContract(contractId) {
-      const contract = State.contracts.find(item => item.contract_id === contractId);
-      if (!contract) return;
+      const contract = State.contracts.find(item => item.contract_id === contractId); if (!contract) return;
       $('contractFormTitle').textContent = 'Modifier contrat';
-      $('contract_id').value = contract.contract_id;
-      $('contract_client').value = contract.client_id;
+      $('contract_id').value = contract.contract_id; $('contract_client').value = contract.client_id;
       $('contract_status').value = contract.statut || 'En negociation';
-      $('contract_start').value = contract.date_debut || '';
-      $('contract_end').value = contract.date_fin || '';
-      $('contract_amount').value = contract.montant || '';
-      $('contract_notes').value = contract.notes || '';
-      setView('contracts');
-      $('contractFormTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('contract_start').value = contract.date_debut || ''; $('contract_end').value = contract.date_fin || '';
+      $('contract_amount').value = contract.montant || ''; $('contract_notes').value = contract.notes || '';
+      setView('contracts'); $('contractFormTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function resetContractForm() {
       $('contractFormTitle').textContent = 'Nouveau contrat';
-      ['contract_id', 'contract_start', 'contract_end', 'contract_amount', 'contract_notes'].forEach(id => $(id).value = '');
+      ['contract_id','contract_start','contract_end','contract_amount','contract_notes'].forEach(id => $(id).value = '');
       $('contract_status').value = 'En negociation';
     }
 
     async function deleteContract(contractId) {
-      const removed = State.contracts.find(item => item.contract_id === contractId);
-      if (!removed) return;
+      const removed = State.contracts.find(item => item.contract_id === contractId); if (!removed) return;
       const previousContracts = State.contracts.slice();
       const previousRevenue = State.revenue.slice();
       State.contracts = State.contracts.filter(item => item.contract_id !== contractId);
       State.revenue = State.revenue.filter(item => item.revenue_id !== `ca_${contractId}`);
-      renderAll();
-      persistSession();
+      renderAll(); persistSession();
       try {
         await businessApi.request('deleteContract', { contract_id: contractId });
-        silentBusinessRefresh();
-        showToast('Contrat supprime');
-      } catch (err) {
-        State.contracts = previousContracts;
-        State.revenue = previousRevenue;
-        renderAll();
-        showToast(err.message);
-      }
+        silentBusinessRefresh(); showToast('Contrat supprime');
+      } catch (err) { State.contracts = previousContracts; State.revenue = previousRevenue; renderAll(); showToast(err.message); }
     }
 
     async function createClient() {
       const optimisticClient = buildClientFromForm();
-      if (!optimisticClient.nom_entreprise) {
-        showToast('Nom du client requis');
-        return;
-      }
-      State.clients.unshift(optimisticClient);
-      renderStats();
-      renderClients();
-      renderAppointmentClientOptions();
+      if (!optimisticClient.nom_entreprise) return showToast('Nom du client requis');
+      State.clients.unshift(optimisticClient); renderStats(); renderClients(); renderAppointmentClientOptions();
       setButtonLoading('createClientBtn', true);
       try {
         if (!State.businessEndpoint) throw new Error('Module client non configure');
         const created = await businessApi.request('createClient', {
-          nom_entreprise: $('client_name').value,
-          telephone: $('client_phone').value,
-          site_internet: $('client_site').value,
-          adresse: $('client_address').value,
-          notes: $('client_notes').value,
-          referent: {
-            nom: $('ref_nom').value,
-            prenom: $('ref_prenom').value,
-            fonction: $('ref_fonction').value,
-            email: $('ref_email').value,
-            telephone: $('ref_phone').value,
-          },
+          nom_entreprise: $('client_name').value, telephone: $('client_phone').value, site_internet: $('client_site').value,
+          adresse: $('client_address').value, notes: $('client_notes').value,
+          referent: { nom: $('ref_nom').value, prenom: $('ref_prenom').value, fonction: $('ref_fonction').value, email: $('ref_email').value, telephone: $('ref_phone').value },
         });
         Object.assign(optimisticClient, created, { _pending: false });
-        ['client_name', 'client_phone', 'client_site', 'client_address', 'client_notes', 'ref_nom', 'ref_prenom', 'ref_fonction', 'ref_email', 'ref_phone']
-          .forEach(id => $(id).value = '');
-        renderAll();
-        silentRefresh();
-        showToast('Client cree');
-      } catch (err) {
-        State.clients = State.clients.filter(client => client !== optimisticClient);
-        renderAll();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('createClientBtn', false);
-      }
+        ['client_name','client_phone','client_site','client_address','client_notes','ref_nom','ref_prenom','ref_fonction','ref_email','ref_phone'].forEach(id => $(id).value = '');
+        renderAll(); silentRefresh(); showToast('Client cree');
+      } catch (err) { State.clients = State.clients.filter(client => client !== optimisticClient); renderAll(); showToast(err.message); }
+      finally { setButtonLoading('createClientBtn', false); }
     }
 
     function openEditClient(clientId) {
-      const client = State.clients.find(item => item.client_id === clientId);
-      if (!client) return;
+      const client = State.clients.find(item => item.client_id === clientId); if (!client) return;
       renderRevenueOptions();
-      $('edit_client_id').value = client.client_id;
-      $('edit_client_name').value = client.nom_entreprise || '';
-      $('edit_client_phone').value = client.telephone || '';
-      $('edit_client_site').value = client.site_internet || '';
-      $('edit_client_address').value = client.adresse || '';
-      $('edit_client_notes').value = client.notes || '';
+      $('edit_client_id').value = client.client_id; $('edit_client_name').value = client.nom_entreprise || '';
+      $('edit_client_phone').value = client.telephone || ''; $('edit_client_site').value = client.site_internet || '';
+      $('edit_client_address').value = client.adresse || ''; $('edit_client_notes').value = client.notes || '';
       $('edit_client_owner').value = client.owner_id || State.user?.ID || '';
       $('edit_client_owner').disabled = State.user.role !== 'admin';
-      $('clientEditPanel').style.display = 'block';
-      $('clientEditPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('clientEditPanel').style.display = 'block'; $('clientEditPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function closeEditClient() {
       $('clientEditPanel').style.display = 'none';
-      ['edit_client_id', 'edit_client_name', 'edit_client_phone', 'edit_client_site', 'edit_client_address', 'edit_client_notes'].forEach(id => $(id).value = '');
+      ['edit_client_id','edit_client_name','edit_client_phone','edit_client_site','edit_client_address','edit_client_notes'].forEach(id => $(id).value = '');
     }
 
     async function updateClient() {
       const clientId = $('edit_client_id').value;
-      const current = State.clients.find(item => item.client_id === clientId);
-      if (!current) return;
+      const current = State.clients.find(item => item.client_id === clientId); if (!current) return;
       const previous = { ...current, referents: [...(current.referents || [])] };
       const previousHistory = State.portfolioHistory.slice();
       const nextOwner = $('edit_client_owner').value || current.owner_id;
       Object.assign(current, {
-        nom_entreprise: $('edit_client_name').value,
-        telephone: $('edit_client_phone').value,
-        site_internet: $('edit_client_site').value,
-        adresse: $('edit_client_address').value,
-        notes: $('edit_client_notes').value,
-        owner_id: State.user.role === 'admin' ? nextOwner : current.owner_id,
-        _pending: true,
+        nom_entreprise: $('edit_client_name').value, telephone: $('edit_client_phone').value, site_internet: $('edit_client_site').value,
+        adresse: $('edit_client_address').value, notes: $('edit_client_notes').value,
+        owner_id: State.user.role === 'admin' ? nextOwner : current.owner_id, _pending: true,
       });
       let optimisticHistory = null;
       if (State.user.role === 'admin' && previous.owner_id !== nextOwner) {
-        optimisticHistory = {
-          history_id: tempId('hist'),
-          client_id: clientId,
-          client_nom: current.nom_entreprise,
-          from_owner_id: previous.owner_id,
-          to_owner_id: nextOwner,
-          action: 'transfert',
-          created_at: new Date().toISOString(),
-          _pending: true,
-        };
+        optimisticHistory = { history_id: tempId('hist'), client_id: clientId, client_nom: current.nom_entreprise, from_owner_id: previous.owner_id, to_owner_id: nextOwner, action: 'transfert', created_at: new Date().toISOString(), _pending: true };
         State.portfolioHistory.unshift(optimisticHistory);
       }
-      renderAll();
-      persistSession();
+      renderAll(); persistSession();
       setButtonLoading('updateClientBtn', true);
       try {
-        let saved = await businessApi.request('updateClient', {
-          client_id: clientId,
-          nom_entreprise: current.nom_entreprise,
-          telephone: current.telephone,
-          site_internet: current.site_internet,
-          adresse: current.adresse,
-          notes: current.notes,
-        });
+        let saved = await businessApi.request('updateClient', { client_id: clientId, nom_entreprise: current.nom_entreprise, telephone: current.telephone, site_internet: current.site_internet, adresse: current.adresse, notes: current.notes });
         if (State.user.role === 'admin' && previous.owner_id !== nextOwner) {
-          saved = await businessApi.request('transferClient', {
-            client_id: clientId,
-            owner_id: nextOwner,
-            commentaires: 'Transfert depuis fiche client',
-          });
+          saved = await businessApi.request('transferClient', { client_id: clientId, owner_id: nextOwner, commentaires: 'Transfert depuis fiche client' });
           if (optimisticHistory) optimisticHistory._pending = false;
         }
-        Object.assign(current, saved, { _pending: false });
-        closeEditClient();
-        renderAll();
-        silentRefresh();
-        showToast('Client modifie');
-      } catch (err) {
-        Object.assign(current, previous, { _pending: false });
-        State.portfolioHistory = previousHistory;
-        renderAll();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('updateClientBtn', false);
-      }
+        Object.assign(current, saved, { _pending: false }); closeEditClient(); renderAll(); silentRefresh(); showToast('Client modifie');
+      } catch (err) { Object.assign(current, previous, { _pending: false }); State.portfolioHistory = previousHistory; renderAll(); showToast(err.message); }
+      finally { setButtonLoading('updateClientBtn', false); }
     }
 
     async function deleteClient(clientId) {
-      const removed = State.clients.find(item => item.client_id === clientId);
-      if (!removed) return;
+      const removed = State.clients.find(item => item.client_id === clientId); if (!removed) return;
       const previousClients = State.clients.slice();
       const previousHistory = State.portfolioHistory.slice();
       State.clients = State.clients.filter(item => item.client_id !== clientId);
-      State.portfolioHistory.unshift({
-        history_id: tempId('hist'),
-        client_id: clientId,
-        client_nom: removed.nom_entreprise,
-        from_owner_id: removed.owner_id,
-        to_owner_id: '',
-        action: 'suppression',
-        created_at: new Date().toISOString(),
-      });
-      renderAll();
-      persistSession();
+      State.portfolioHistory.unshift({ history_id: tempId('hist'), client_id: clientId, client_nom: removed.nom_entreprise, from_owner_id: removed.owner_id, to_owner_id: '', action: 'suppression', created_at: new Date().toISOString() });
+      renderAll(); persistSession();
       try {
         await businessApi.request('deleteClient', { client_id: clientId });
-        closeEditClient();
-        silentRefresh();
-        showToast('Client supprime');
-      } catch (err) {
-        State.clients = previousClients;
-        State.portfolioHistory = previousHistory;
-        renderAll();
-        showToast(err.message);
-      }
+        closeEditClient(); silentRefresh(); showToast('Client supprime');
+      } catch (err) { State.clients = previousClients; State.portfolioHistory = previousHistory; renderAll(); showToast(err.message); }
     }
 
     function openReferentForm(clientId) {
-      const client = State.clients.find(item => item.client_id === clientId);
-      if (!client) return;
-      $('referent_client_id').value = clientId;
-      $('referentClientName').textContent = client.nom_entreprise || '';
-      ['add_ref_nom', 'add_ref_prenom', 'add_ref_fonction', 'add_ref_email', 'add_ref_phone'].forEach(id => $(id).value = '');
-      $('referentPanel').style.display = 'block';
-      $('referentPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const client = State.clients.find(item => item.client_id === clientId); if (!client) return;
+      $('referent_client_id').value = clientId; $('referentClientName').textContent = client.nom_entreprise || '';
+      ['add_ref_nom','add_ref_prenom','add_ref_fonction','add_ref_email','add_ref_phone'].forEach(id => $(id).value = '');
+      $('referentPanel').style.display = 'block'; $('referentPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function closeReferentForm() {
-      $('referentPanel').style.display = 'none';
-      $('referent_client_id').value = '';
-    }
+    function closeReferentForm() { $('referentPanel').style.display = 'none'; $('referent_client_id').value = ''; }
 
     async function createReferent() {
       const clientId = $('referent_client_id').value;
-      const client = State.clients.find(item => item.client_id === clientId);
-      if (!client) return;
-      const referent = {
-        referent_id: tempId('ref'),
-        client_id: clientId,
-        nom: $('add_ref_nom').value,
-        prenom: $('add_ref_prenom').value,
-        fonction: $('add_ref_fonction').value,
-        email: $('add_ref_email').value,
-        telephone: $('add_ref_phone').value,
-        _pending: true,
-      };
-      if (![referent.nom, referent.prenom, referent.email, referent.telephone, referent.fonction].some(Boolean)) {
-        showToast('Renseigne au moins une information référent');
-        return;
-      }
-      client.referents = client.referents || [];
-      client.referents.push(referent);
-      renderClients();
-      renderReferentOptions();
+      const client = State.clients.find(item => item.client_id === clientId); if (!client) return;
+      const referent = { referent_id: tempId('ref'), client_id: clientId, nom: $('add_ref_nom').value, prenom: $('add_ref_prenom').value, fonction: $('add_ref_fonction').value, email: $('add_ref_email').value, telephone: $('add_ref_phone').value, _pending: true };
+      if (![referent.nom, referent.prenom, referent.email, referent.telephone, referent.fonction].some(Boolean)) return showToast('Renseigne au moins une information référent');
+      client.referents = client.referents || []; client.referents.push(referent);
+      renderClients(); renderReferentOptions();
       setButtonLoading('createReferentBtn', true);
       try {
-        const saved = await businessApi.request('createReferent', {
-          client_id: clientId,
-          nom: referent.nom,
-          prenom: referent.prenom,
-          fonction: referent.fonction,
-          email: referent.email,
-          telephone: referent.telephone,
-        });
-        Object.assign(referent, saved, { _pending: false });
-        closeReferentForm();
-        renderAll();
-        silentRefresh();
-        showToast('Référent ajouté');
-      } catch (err) {
-        client.referents = client.referents.filter(item => item !== referent);
-        renderAll();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('createReferentBtn', false);
-      }
+        const saved = await businessApi.request('createReferent', { client_id: clientId, nom: referent.nom, prenom: referent.prenom, fonction: referent.fonction, email: referent.email, telephone: referent.telephone });
+        Object.assign(referent, saved, { _pending: false }); closeReferentForm(); renderAll(); silentRefresh(); showToast('Référent ajouté');
+      } catch (err) { client.referents = client.referents.filter(item => item !== referent); renderAll(); showToast(err.message); }
+      finally { setButtonLoading('createReferentBtn', false); }
     }
 
     async function createAppointment() {
       const optimisticAppointment = buildAppointmentFromForm();
-      if (!optimisticAppointment.client_id || !optimisticAppointment.date || !optimisticAppointment.heure) {
-        showToast('Client, date et heure requis');
-        return;
-      }
+      if (!optimisticAppointment.client_id || !optimisticAppointment.date || !optimisticAppointment.heure) return showToast('Client, date et heure requis');
       if (!hasGoogleToken()) showToast('Compte Google non connecte: le rendez-vous ne sera pas encore ajoute a votre Agenda');
-      State.appointments.unshift(optimisticAppointment);
-      renderStats();
-      renderAppointments();
+      State.appointments.unshift(optimisticAppointment); renderStats(); renderAppointments();
       setButtonLoading('createAppointmentBtn', true);
       try {
         if (!State.businessEndpoint) throw new Error('Module rendez-vous non configure');
         const created = await businessApi.request('createAppointment', optimisticAppointment);
         Object.assign(optimisticAppointment, created, { _pending: false });
-        ['rdv_date', 'rdv_time', 'rdv_address', 'rdv_subject', 'rdv_notes'].forEach(id => $(id).value = '');
-        renderAll();
-        silentRefresh();
-        showToast('Rendez-vous cree');
-      } catch (err) {
-        State.appointments = State.appointments.filter(item => item !== optimisticAppointment);
-        renderAll();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('createAppointmentBtn', false);
-      }
+        ['rdv_date','rdv_time','rdv_address','rdv_subject','rdv_notes'].forEach(id => $(id).value = '');
+        renderAll(); silentRefresh(); showToast('Rendez-vous cree');
+      } catch (err) { State.appointments = State.appointments.filter(item => item !== optimisticAppointment); renderAll(); showToast(err.message); }
+      finally { setButtonLoading('createAppointmentBtn', false); }
     }
 
     async function deleteAppointment(appointmentId) {
       const removed = State.appointments.find(item => item.appointment_id === appointmentId);
-      State.appointments = State.appointments.filter(item => item.appointment_id !== appointmentId);
-      renderAll();
-      try {
-        await businessApi.request('deleteAppointment', { appointment_id: appointmentId });
-        silentRefresh();
-      } catch (err) {
-        if (removed) State.appointments.unshift(removed);
-        renderAll();
-        showToast(err.message);
-      }
+      State.appointments = State.appointments.filter(item => item.appointment_id !== appointmentId); renderAll();
+      try { await businessApi.request('deleteAppointment', { appointment_id: appointmentId }); silentRefresh(); }
+      catch (err) { if (removed) State.appointments.unshift(removed); renderAll(); showToast(err.message); }
     }
 
     function openReport(appointmentId) {
-      const appointment = State.appointments.find(item => item.appointment_id === appointmentId);
-      if (!appointment) return;
-      $('reportPanel').style.display = 'block';
-      $('report_appointment_id').value = appointmentId;
+      const appointment = State.appointments.find(item => item.appointment_id === appointmentId); if (!appointment) return;
+      $('reportPanel').style.display = 'block'; $('report_appointment_id').value = appointmentId;
       $('reportTitle').textContent = `${formatDate(appointment.date)} - ${appointment.objet || 'Rendez-vous'}`;
       const report = appointment.report || {};
-      $('report_resume').value = report.resume || '';
-      $('report_besoins').value = report.besoins || '';
-      $('report_decisions').value = report.decisions || '';
-      $('report_actions').value = report.prochaines_actions || '';
-      $('report_next_date').value = report.date_prochain_contact || '';
-      $('report_probability').value = report.probabilite_signature || '';
+      $('report_resume').value = report.resume || ''; $('report_besoins').value = report.besoins || '';
+      $('report_decisions').value = report.decisions || ''; $('report_actions').value = report.prochaines_actions || '';
+      $('report_next_date').value = report.date_prochain_contact || ''; $('report_probability').value = report.probabilite_signature || '';
       $('report_comments').value = report.commentaires || '';
       $('reportPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     async function saveReport() {
       const appointmentId = $('report_appointment_id').value;
-      const appointment = State.appointments.find(item => item.appointment_id === appointmentId);
-      if (!appointment) return;
+      const appointment = State.appointments.find(item => item.appointment_id === appointmentId); if (!appointment) return;
       const optimisticReport = {
-        appointment_id: appointmentId,
-        resume: $('report_resume').value,
-        besoins: $('report_besoins').value,
-        decisions: $('report_decisions').value,
-        prochaines_actions: $('report_actions').value,
-        date_prochain_contact: $('report_next_date').value,
-        probabilite_signature: $('report_probability').value,
+        appointment_id: appointmentId, resume: $('report_resume').value, besoins: $('report_besoins').value,
+        decisions: $('report_decisions').value, prochaines_actions: $('report_actions').value,
+        date_prochain_contact: $('report_next_date').value, probabilite_signature: $('report_probability').value,
         commentaires: $('report_comments').value,
       };
       const previous = { statut: appointment.statut, report: appointment.report };
-      appointment.statut = 'Valide';
-      appointment.report = optimisticReport;
-      renderAll();
+      appointment.statut = 'Valide'; appointment.report = optimisticReport; renderAll();
       setButtonLoading('saveReportBtn', true);
       try {
         const saved = await businessApi.request('saveReport', optimisticReport);
-        Object.assign(appointment, saved.appointment);
-        appointment.report = saved.report;
-        $('reportPanel').style.display = 'none';
-        renderAll();
-        silentRefresh();
-        showToast('Compte rendu enregistre');
-      } catch (err) {
-        appointment.statut = previous.statut;
-        appointment.report = previous.report;
-        renderAll();
-        showToast(err.message);
-      } finally {
-        setButtonLoading('saveReportBtn', false);
-      }
+        Object.assign(appointment, saved.appointment); appointment.report = saved.report;
+        $('reportPanel').style.display = 'none'; renderAll(); silentRefresh(); showToast('Compte rendu enregistre');
+      } catch (err) { appointment.statut = previous.statut; appointment.report = previous.report; renderAll(); showToast(err.message); }
+      finally { setButtonLoading('saveReportBtn', false); }
     }
 
     async function refresh() {
       setButtonLoading('refreshBtn', true);
       try {
-        State.loading.clients = true;
-        State.loading.appointments = true;
-        State.loading.revenue = true;
+        State.loading.clients = true; State.loading.appointments = true; State.loading.revenue = true;
         renderAll();
         const data = await masterApi.request('bootstrap');
-        State.user = data.user;
-        State.company = data.company;
-        State.businessEndpoint = data.company?.business_endpoint || '';
-        State.stats = data.stats;
-        State.users = data.users || [State.user];
-        await loadBusinessBootstrap();
-        renderAll();
-        persistSession();
-      } finally {
-        setButtonLoading('refreshBtn', false);
-      }
+        State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
+        State.stats = data.stats; State.users = data.users || [State.user];
+        await loadBusinessBootstrap(); renderAll(); persistSession();
+      } finally { setButtonLoading('refreshBtn', false); }
     }
 
     function silentRefresh(options = {}) {
       (async () => {
         const data = await masterApi.request('bootstrap');
-        State.user = data.user;
-        State.company = data.company;
-        State.businessEndpoint = data.company?.business_endpoint || '';
-        State.stats = data.stats;
-        State.users = data.users || [State.user];
-        await loadBusinessBootstrap();
-        renderAll();
-        persistSession();
+        State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
+        State.stats = data.stats; State.users = data.users || [State.user];
+        await loadBusinessBootstrap(); renderAll(); persistSession();
       })().catch(() => {
-        if (options.onAuthFail) {
-          clearStoredSession();
-          State.token = '';
-          State.user = null;
-          State.company = null;
-          State.businessEndpoint = '';
-          showLogin();
-        }
+        if (options.onAuthFail) { clearStoredSession(); State.token = ''; State.user = null; State.company = null; State.businessEndpoint = ''; showLogin(); }
       });
     }
 
     async function logout() {
-      const tokenToClose = State.token;
-      clearStoredSession();
-      State.token = '';
-      State.user = null;
-      State.company = null;
-      State.businessEndpoint = '';
+      const tokenToClose = State.token; clearStoredSession();
+      State.token = ''; State.user = null; State.company = null; State.businessEndpoint = '';
       masterApi.request('logout', { token: tokenToClose }).catch(() => {});
       location.reload();
     }
 
-    function roleLabel(role) {
-      return {
-        admin: 'Admin',
-        apporteur: "Apporteur d'affaires",
-      }[role] || role;
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>"']/g, char => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
-      }[char]));
-    }
-
-    function escapeAttr(value) {
-      return escapeHtml(value).replace(/`/g, '&#096;');
-    }
+    function roleLabel(role) { return { admin: 'Admin', apporteur: "Apporteur d'affaires" }[role] || role; }
+    function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char])); }
+    function escapeAttr(value) { return escapeHtml(value).replace(/`/g, '&#096;'); }
 
     function buildClientFromForm() {
-      const referent = {
-        referent_id: tempId('ref'),
-        nom: $('ref_nom').value,
-        prenom: $('ref_prenom').value,
-        fonction: $('ref_fonction').value,
-        email: $('ref_email').value,
-        telephone: $('ref_phone').value,
-      };
+      const referent = { referent_id: tempId('ref'), nom: $('ref_nom').value, prenom: $('ref_prenom').value, fonction: $('ref_fonction').value, email: $('ref_email').value, telephone: $('ref_phone').value };
       return {
-        client_id: tempId('cli'),
-        owner_id: State.user?.ID || '',
-        nom_entreprise: $('client_name').value,
-        telephone: $('client_phone').value,
-        site_internet: $('client_site').value,
-        adresse: $('client_address').value,
-        notes: $('client_notes').value,
-        referents: Object.values(referent).some(Boolean) ? [referent] : [],
-        _pending: true,
+        client_id: tempId('cli'), owner_id: State.user?.ID || '', nom_entreprise: $('client_name').value,
+        telephone: $('client_phone').value, site_internet: $('client_site').value, adresse: $('client_address').value,
+        notes: $('client_notes').value, referents: Object.values(referent).some(Boolean) ? [referent] : [], _pending: true,
       };
     }
-
     function buildAppointmentFromForm() {
-      return {
-        appointment_id: tempId('rdv'),
-        owner_id: State.user?.ID || '',
-        client_id: $('rdv_client').value,
-        referent_id: $('rdv_referent').value,
-        date: $('rdv_date').value,
-        heure: $('rdv_time').value,
-        adresse: $('rdv_address').value,
-        objet: $('rdv_subject').value,
-        notes: $('rdv_notes').value,
-        statut: 'En attente de compte rendu',
-        _pending: true,
-      };
+      return { appointment_id: tempId('rdv'), owner_id: State.user?.ID || '', client_id: $('rdv_client').value, referent_id: $('rdv_referent').value, date: $('rdv_date').value, heure: $('rdv_time').value, adresse: $('rdv_address').value, objet: $('rdv_subject').value, notes: $('rdv_notes').value, statut: 'En attente de compte rendu', _pending: true };
     }
-
     function buildRevenueFromForm() {
       const client = State.clients.find(item => item.client_id === $('revenue_client').value);
-      return {
-        revenue_id: tempId('ca'),
-        client_id: $('revenue_client').value,
-        owner_id: $('revenue_owner').value,
-        date: $('revenue_date').value,
-        montant: Number($('revenue_amount').value || 0),
-        nombre_contrats: Number($('revenue_contracts').value || 0),
-        commentaires: $('revenue_comments').value,
-        client_nom: client?.nom_entreprise || '',
-        _pending: true,
-      };
+      return { revenue_id: tempId('ca'), client_id: $('revenue_client').value, owner_id: $('revenue_owner').value, date: $('revenue_date').value, montant: Number($('revenue_amount').value || 0), nombre_contrats: Number($('revenue_contracts').value || 0), commentaires: $('revenue_comments').value, client_nom: client?.nom_entreprise || '', _pending: true };
     }
-
     function buildContractFromForm() {
       const client = State.clients.find(item => item.client_id === $('contract_client').value);
       const contractId = $('contract_id').value || tempId('ctr');
-      return {
-        contract_id: contractId,
-        owner_id: State.user?.ID || '',
-        client_id: $('contract_client').value,
-        client_nom: client?.nom_entreprise || '',
-        date_debut: $('contract_start').value,
-        date_fin: $('contract_end').value,
-        statut: $('contract_status').value,
-        montant: Number($('contract_amount').value || 0),
-        notes: $('contract_notes').value,
-        revenue_id: `ca_${contractId}`,
-        _pending: true,
-      };
+      return { contract_id: contractId, owner_id: State.user?.ID || '', client_id: $('contract_client').value, client_nom: client?.nom_entreprise || '', date_debut: $('contract_start').value, date_fin: $('contract_end').value, statut: $('contract_status').value, montant: Number($('contract_amount').value || 0), notes: $('contract_notes').value, revenue_id: `ca_${contractId}`, _pending: true };
     }
-
     function buildRevenueFromContract(contract) {
-      return {
-        revenue_id: `ca_${contract.contract_id}`,
-        client_id: contract.client_id,
-        owner_id: contract.owner_id,
-        date: contract.date_debut,
-        montant: Number(contract.montant || 0),
-        nombre_contrats: Number(contract.montant || 0) > 0 ? 1 : 0,
-        commentaires: `Contrat - ${contract.statut}`,
-        client_nom: contract.client_nom || getClientName(contract.client_id),
-        _pending: true,
-      };
+      return { revenue_id: `ca_${contract.contract_id}`, client_id: contract.client_id, owner_id: contract.owner_id, date: contract.date_debut, montant: Number(contract.montant || 0), nombre_contrats: Number(contract.montant || 0) > 0 ? 1 : 0, commentaires: `Contrat - ${contract.statut}`, client_nom: contract.client_nom || getClientName(contract.client_id), _pending: true };
     }
-
-    function getClientName(clientId) {
-      return State.clients.find(client => client.client_id === clientId)?.nom_entreprise || 'Client';
-    }
-
-    function contractStatusClass(status) {
-      const value = String(status || '').toLowerCase();
-      if (value.includes('signe')) return 'status-signe';
-      if (value.includes('termine')) return 'status-termine';
-      if (value.includes('annule')) return 'status-annule';
-      return 'status-negociation';
-    }
-
-    function getAssignableUsers() {
-      if (State.user?.role !== 'admin') return [State.user].filter(Boolean);
-      return State.users.filter(user => user.role === 'apporteur' || user.role === 'admin');
-    }
-
-    function getObjectiveFor(ownerId) {
-      return State.objectives.find(item => String(item.owner_id).toLowerCase() === String(ownerId || '').toLowerCase()) || null;
-    }
-
-    function fillObjectiveForm() {
-      if (!$('objective_owner') || State.user?.role !== 'admin') return;
-      const objective = getObjectiveFor($('objective_owner').value);
-      $('objective_ca').value = objective?.objectif_ca || '';
-      $('objective_contracts').value = objective?.objectif_contrats || '';
-      $('objective_start').value = objective?.date_debut || '';
-      $('objective_end').value = objective?.date_fin || '';
-    }
-
-    function syncRevenueOwnerFromClient() {
-      if (State.user?.role !== 'admin') return;
-      const client = State.clients.find(item => item.client_id === $('revenue_client').value);
-      if (client?.owner_id) $('revenue_owner').value = client.owner_id;
-    }
-
-    function getGoogleAccessToken() {
-      if (!State.google?.accessToken || !State.google?.expiresAt) return '';
-      if (Date.now() > State.google.expiresAt - 60000) return '';
-      return State.google.accessToken;
-    }
-
-    function hasGoogleToken() {
-      return Boolean(getGoogleAccessToken());
-    }
-
+    function getClientName(clientId) { return State.clients.find(client => client.client_id === clientId)?.nom_entreprise || 'Client'; }
+    function contractStatusClass(status) { const v = String(status || '').toLowerCase(); if (v.includes('signe')) return 'status-signe'; if (v.includes('termine')) return 'status-termine'; if (v.includes('annule')) return 'status-annule'; return 'status-negociation'; }
+    function getAssignableUsers() { if (State.user?.role !== 'admin') return [State.user].filter(Boolean); return State.users.filter(user => user.role === 'apporteur' || user.role === 'admin'); }
+    function getObjectiveFor(ownerId) { return State.objectives.find(item => String(item.owner_id).toLowerCase() === String(ownerId || '').toLowerCase()) || null; }
+    function fillObjectiveForm() { if (!$('objective_owner') || State.user?.role !== 'admin') return; const o = getObjectiveFor($('objective_owner').value); $('objective_ca').value = o?.objectif_ca || ''; $('objective_contracts').value = o?.objectif_contrats || ''; $('objective_start').value = o?.date_debut || ''; $('objective_end').value = o?.date_fin || ''; }
+    function syncRevenueOwnerFromClient() { if (State.user?.role !== 'admin') return; const c = State.clients.find(item => item.client_id === $('revenue_client').value); if (c?.owner_id) $('revenue_owner').value = c.owner_id; }
+    function getGoogleAccessToken() { if (!State.google?.accessToken || !State.google?.expiresAt) return ''; if (Date.now() > State.google.expiresAt - 60000) return ''; return State.google.accessToken; }
+    function hasGoogleToken() { return Boolean(getGoogleAccessToken()); }
     function connectGoogle() {
-      if (!CONFIG.googleClientId) {
-        showToast('Ajoute d abord ton Google OAuth Client ID dans CONFIG.googleClientId');
-        return;
-      }
-      if (!window.google?.accounts?.oauth2) {
-        showToast('Google Identity Services est encore en chargement');
-        return;
-      }
+      if (!CONFIG.googleClientId) return showToast('Ajoute d abord ton Google OAuth Client ID dans CONFIG.googleClientId');
+      if (!window.google?.accounts?.oauth2) return showToast('Google Identity Services est encore en chargement');
       setButtonLoading('connectGoogleBtn', true);
       const tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CONFIG.googleClientId,
-        scope: `${GOOGLE_SCOPES} openid email profile`,
-        prompt: 'consent',
+        client_id: CONFIG.googleClientId, scope: `${GOOGLE_SCOPES} openid email profile`, prompt: 'consent',
         callback: async response => {
           try {
             if (response.error) throw new Error(response.error);
-            State.google = {
-              accessToken: response.access_token,
-              expiresAt: Date.now() + Number(response.expires_in || 3600) * 1000,
-              scope: response.scope || GOOGLE_SCOPES,
-              connectedAt: new Date().toISOString(),
-            };
-            await hydrateGoogleProfile();
-            persistSession();
-            renderGoogleStatus();
-            showToast('Compte Google connecte');
-          } catch (err) {
-            showToast(err.message);
-          } finally {
-            setButtonLoading('connectGoogleBtn', false);
-          }
+            State.google = { accessToken: response.access_token, expiresAt: Date.now() + Number(response.expires_in || 3600) * 1000, scope: response.scope || GOOGLE_SCOPES, connectedAt: new Date().toISOString() };
+            await hydrateGoogleProfile(); persistSession(); renderGoogleStatus(); showToast('Compte Google connecte');
+          } catch (err) { showToast(err.message); }
+          finally { setButtonLoading('connectGoogleBtn', false); }
         },
       });
       tokenClient.requestAccessToken();
     }
-
-    async function hydrateGoogleProfile() {
-      const token = getGoogleAccessToken();
-      if (!token) return;
-      try {
-        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!response.ok) return;
-        const profile = await response.json();
-        State.google.email = profile.email || '';
-        State.google.name = profile.name || '';
-      } catch (err) {}
-    }
-
-    function disconnectGoogle() {
-      State.google = null;
-      persistSession();
-      renderGoogleStatus();
-      showToast('Compte Google deconnecte');
-    }
+    async function hydrateGoogleProfile() { const token = getGoogleAccessToken(); if (!token) return; try { const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${token}` } }); if (!response.ok) return; const profile = await response.json(); State.google.email = profile.email || ''; State.google.name = profile.name || ''; } catch (err) {} }
+    function disconnectGoogle() { State.google = null; persistSession(); renderGoogleStatus(); showToast('Compte Google deconnecte'); }
 
     function silentBusinessRefresh() {
       if (!State.businessEndpoint || State.syncingBusiness) return;
       State.syncingBusiness = true;
-      businessApi.request('bootstrap')
-        .then(data => {
-          State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
-          State.clients = data.clients || State.clients;
-          State.appointments = data.appointments || State.appointments;
-          State.revenue = data.revenue || State.revenue;
-          State.objectives = data.objectives || State.objectives;
-          State.portfolioHistory = data.portfolioHistory || State.portfolioHistory;
-          State.contracts = data.contracts || State.contracts;
-          renderAll();
-          persistSession();
-        })
-        .catch(() => {})
-        .finally(() => State.syncingBusiness = false);
+      businessApi.request('bootstrap').then(data => {
+        State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
+        State.clients = data.clients || []; State.appointments = data.appointments || [];
+        State.revenue = data.revenue || []; State.objectives = data.objectives || [];
+        State.portfolioHistory = data.portfolioHistory || []; State.contracts = data.contracts || [];
+        State.prestations = data.prestations || []; State.supplements = data.supplements || [];
+        State.devis = (data.devis && data.devis.devis) || data.devis || [];
+        State.devis_lignes = (data.devis && data.devis.lignes) || data.devis_lignes || [];
+        renderAll(); persistSession();
+      }).catch(() => {}).finally(() => State.syncingBusiness = false);
     }
 
     function startRealtimeSync() {
       clearInterval(startRealtimeSync.timer);
-      startRealtimeSync.timer = setInterval(() => {
-        if (State.token && State.user && document.visibilityState === 'visible') silentBusinessRefresh();
-      }, 15000);
+      startRealtimeSync.timer = setInterval(() => { if (State.token && State.user && document.visibilityState === 'visible') silentBusinessRefresh(); }, 15000);
     }
 
     function filterRevenue(rows) {
-      const start = $('filter_start')?.value || '';
-      const end = $('filter_end')?.value || '';
-      const clientId = $('filter_client')?.value || '';
-      const ownerId = $('filter_owner')?.value || '';
-      return rows.filter(item => {
-        if (start && item.date < start) return false;
-        if (end && item.date > end) return false;
-        if (clientId && item.client_id !== clientId) return false;
-        if (ownerId && item.owner_id !== ownerId) return false;
-        return true;
-      });
+      const start = $('filter_start')?.value || ''; const end = $('filter_end')?.value || '';
+      const clientId = $('filter_client')?.value || ''; const ownerId = $('filter_owner')?.value || '';
+      return rows.filter(item => { if (start && item.date < start) return false; if (end && item.date > end) return false; if (clientId && item.client_id !== clientId) return false; if (ownerId && item.owner_id !== ownerId) return false; return true; });
     }
-
-    function groupRevenueByClient(rows) {
-      const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
-      const grouped = new Map();
-      rows.forEach(item => {
-        const label = clientMap.get(item.client_id) || item.client_nom || 'Client';
-        grouped.set(label, (grouped.get(label) || 0) + Number(item.montant || 0));
-      });
-      return Array.from(grouped, ([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total);
-    }
-
-    function groupRevenueByMonth(rows) {
-      const grouped = new Map();
-      rows.forEach(item => {
-        const label = String(item.date || '').slice(0, 7) || 'Sans date';
-        grouped.set(label, (grouped.get(label) || 0) + Number(item.montant || 0));
-      });
-      return Array.from(grouped, ([label, total]) => ({ label, total })).sort((a, b) => a.label.localeCompare(b.label));
-    }
-
-    function groupRevenueByOwner(rows) {
-      const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
-      const grouped = new Map();
-      rows.forEach(item => {
-        const label = userMap.get(item.owner_id) || item.owner_id || 'Apporteur';
-        grouped.set(label, (grouped.get(label) || 0) + Number(item.montant || 0));
-      });
-      return Array.from(grouped, ([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total);
-    }
+    function groupRevenueByClient(rows) { const m = new Map(State.clients.map(c => [c.client_id, c.nom_entreprise])); const g = new Map(); rows.forEach(item => { const l = m.get(item.client_id) || item.client_nom || 'Client'; g.set(l, (g.get(l) || 0) + Number(item.montant || 0)); }); return Array.from(g, ([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total); }
+    function groupRevenueByMonth(rows) { const g = new Map(); rows.forEach(item => { const l = String(item.date || '').slice(0, 7) || 'Sans date'; g.set(l, (g.get(l) || 0) + Number(item.montant || 0)); }); return Array.from(g, ([label, total]) => ({ label, total })).sort((a, b) => a.label.localeCompare(b.label)); }
+    function groupRevenueByOwner(rows) { const m = new Map(State.users.map(u => [u.ID, u.Nom || u.ID])); const g = new Map(); rows.forEach(item => { const l = m.get(item.owner_id) || item.owner_id || 'Apporteur'; g.set(l, (g.get(l) || 0) + Number(item.montant || 0)); }); return Array.from(g, ([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total); }
 
     function progressLine(label, current, target, formatter) {
       const percent = target > 0 ? Math.min(100, Math.round(current / target * 100)) : 0;
-      return `
-        <div class="progress-line">
-          <div class="progress-meta">
-            <span>${escapeHtml(label)}</span>
-            <span>${escapeHtml(formatter(current))} / ${escapeHtml(target ? formatter(target) : 'Non defini')} (${percent}%)</span>
-          </div>
-          <div class="progress-track"><div class="progress-fill" style="width:${percent}%"></div></div>
-        </div>
-      `;
+      return `<div class="progress-line"><div class="progress-meta"><span>${escapeHtml(label)}</span><span>${escapeHtml(formatter(current))} / ${escapeHtml(target ? formatter(target) : 'Non defini')} (${percent}%)</span></div><div class="progress-track"><div class="progress-fill" style="width:${percent}%"></div></div></div>`;
     }
-
-    function sumField(rows, field) {
-      return rows.reduce((total, item) => total + Number(item[field] || 0), 0);
-    }
-
-    function formatMoney(value) {
-      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0));
-    }
-
-    function setButtonLoading(id, loading) {
-      const button = $(id);
-      button.disabled = loading;
-      button.classList.toggle('loading', loading);
-    }
-
-    function skeletonRows(cols, rows) {
-      return Array.from({ length: rows }).map(() => `
-        <tr class="skeleton-row">
-          ${Array.from({ length: cols }).map(() => '<td><div class="skeleton"></div></td>').join('')}
-        </tr>
-      `).join('');
-    }
-
-    function tempId(prefix) {
-      return `${prefix}_tmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-    }
-
-    function formatDate(value) {
-      if (!value) return '';
-      const date = new Date(value + 'T00:00:00');
-      if (isNaN(date.getTime())) return value;
-      return date.toLocaleDateString('fr-FR');
-    }
-
-    function formatDateTime(value) {
-      if (!value) return '';
-      const date = new Date(value);
-      if (isNaN(date.getTime())) return value;
-      return date.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
-    }
+    function sumField(rows, field) { return rows.reduce((total, item) => total + Number(item[field] || 0), 0); }
+    function formatMoney(value) { return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0)); }
+    function setButtonLoading(id, loading) { const b = $(id); b.disabled = loading; b.classList.toggle('loading', loading); }
+    function skeletonRows(cols, rows) { return Array.from({ length: rows }).map(() => `<tr class="skeleton-row">${Array.from({ length: cols }).map(() => '<td><div class="skeleton"></div></td>').join('')}</tr>`).join(''); }
+    function tempId(prefix) { return `${prefix}_tmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`; }
+    function formatDate(value) { if (!value) return ''; const d = new Date(value + 'T00:00:00'); if (isNaN(d.getTime())) return value; return d.toLocaleDateString('fr-FR'); }
+    function formatDateTime(value) { if (!value) return ''; const d = new Date(value); if (isNaN(d.getTime())) return value; return d.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }); }
 
     function readStoredSession() {
-      try {
-        const raw = localStorage.getItem('crm.session');
-        if (!raw) return null;
-        const session = JSON.parse(raw);
-        if (!session.savedAt || Date.now() - session.savedAt > FRONT_SESSION_TTL_MS) {
-          clearStoredSession();
-          return null;
-        }
-        return session;
-      } catch (err) {
-        clearStoredSession();
-        return null;
-      }
+      try { const raw = localStorage.getItem('crm.session'); if (!raw) return null; const s = JSON.parse(raw); if (!s.savedAt || Date.now() - s.savedAt > FRONT_SESSION_TTL_MS) { clearStoredSession(); return null; } return s; }
+      catch (err) { clearStoredSession(); return null; }
     }
 
     function persistSession() {
       if (!State.token || !State.user) return;
       localStorage.setItem('crm.session', JSON.stringify({
-        token: State.token,
-        user: State.user,
-        company: State.company,
-        businessEndpoint: State.businessEndpoint,
-        users: State.users,
-        clients: State.clients,
-        appointments: State.appointments,
-        revenue: State.revenue,
-        objectives: State.objectives,
-        portfolioHistory: State.portfolioHistory,
+        token: State.token, user: State.user, company: State.company, businessEndpoint: State.businessEndpoint,
+        users: State.users, clients: State.clients, appointments: State.appointments,
+        revenue: State.revenue, objectives: State.objectives, portfolioHistory: State.portfolioHistory,
         contracts: State.contracts,
-        google: State.google,
-        savedAt: Date.now(),
+        // CATALOGUE / DEVIS
+        prestations: State.prestations, supplements: State.supplements,
+        devis: State.devis, devis_lignes: State.devis_lignes,
+        google: State.google, savedAt: Date.now(),
       }));
     }
 
-    function clearStoredSession() {
-      localStorage.removeItem('crm.session');
-      localStorage.removeItem('crm.sessionToken');
-    }
-
-    function showLogin() {
-      $('bootScreen').style.display = 'none';
-      $('app').style.display = 'none';
-      $('loginScreen').style.display = 'grid';
-    }
+    function clearStoredSession() { localStorage.removeItem('crm.session'); localStorage.removeItem('crm.sessionToken'); }
+    function showLogin() { $('bootScreen').style.display = 'none'; $('app').style.display = 'none'; $('loginScreen').style.display = 'grid'; }
 
     async function startApp() {
-      if (!State.token) {
-        showLogin();
-        return;
-      }
+      if (!State.token) { showLogin(); return; }
       if (State.user) {
-        $('bootScreen').style.display = 'none';
-        $('loginScreen').style.display = 'none';
-        $('app').style.display = 'block';
-        renderAll();
-        silentRefresh({ onAuthFail: true });
-        return;
+        $('bootScreen').style.display = 'none'; $('loginScreen').style.display = 'none'; $('app').style.display = 'block';
+        renderAll(); silentRefresh({ onAuthFail: true }); return;
       }
-      $('bootScreen').style.display = 'grid';
-      $('loginScreen').style.display = 'none';
-      $('app').style.display = 'none';
-      try {
-        await bootstrapApp();
-      } catch (err) {
-        clearStoredSession();
-        State.token = '';
-        showLogin();
-      }
+      $('bootScreen').style.display = 'grid'; $('loginScreen').style.display = 'none'; $('app').style.display = 'none';
+      try { await bootstrapApp(); }
+      catch (err) { clearStoredSession(); State.token = ''; showLogin(); }
     }
 
+    // ===== Event listeners =====
     $('loginForm').addEventListener('submit', login);
     $('logoutBtn').addEventListener('click', logout);
     $('refreshBtn').addEventListener('click', () => refresh().then(() => showToast('Donnees actualisees')).catch(err => showToast(err.message)));
@@ -3202,45 +2666,62 @@
     $('disconnectGoogleBtn').addEventListener('click', disconnectGoogle);
     $('rdv_client').addEventListener('change', renderReferentOptions);
     $('revenue_client').addEventListener('change', syncRevenueOwnerFromClient);
-    $('objective_owner').addEventListener('change', () => {
-      fillObjectiveForm();
-      renderDashboardAnalytics();
-    });
-    ['filter_start', 'filter_end', 'filter_client', 'filter_owner'].forEach(id => {
-      $(id).addEventListener('change', () => {
-        renderStats();
-        renderRevenue();
-        renderDashboardAnalytics();
-        renderPortfolioHistory();
-        renderPersonStats();
-      });
-    });
-    $('clearFiltersBtn').addEventListener('click', () => {
-      ['filter_start', 'filter_end', 'filter_client', 'filter_owner'].forEach(id => $(id).value = '');
-      renderAll();
-    });
+    $('objective_owner').addEventListener('change', () => { fillObjectiveForm(); renderDashboardAnalytics(); });
+    ['filter_start','filter_end','filter_client','filter_owner'].forEach(id => { $(id).addEventListener('change', () => { renderStats(); renderRevenue(); renderDashboardAnalytics(); renderPortfolioHistory(); renderPersonStats(); }); });
+    $('clearFiltersBtn').addEventListener('click', () => { ['filter_start','filter_end','filter_client','filter_owner'].forEach(id => $(id).value = ''); renderAll(); });
+    // CATALOGUE / DEVIS
+    $('savePrestationBtn').addEventListener('click', savePrestationAction);
+    $('cancelPrestationBtn').addEventListener('click', () => { ['prs_nom','prs_categorie','prs_description','prs_conseille','prs_minimum','prs_vente','prs_commission_valeur'].forEach(id => $(id).value = ''); delete $('savePrestationBtn').dataset.editing; });
+    $('deletePrestationBtn').addEventListener('click', () => { const id = $('savePrestationBtn').dataset.editing; if (id) deletePrestationAction(id); });
+    $('saveSupplementBtn').addEventListener('click', saveSupplementAction);
+    $('cancelSupplementBtn').addEventListener('click', () => { ['sup_nom','sup_description','sup_min','sup_max','sup_precision'].forEach(id => $(id).value = ''); delete $('saveSupplementBtn').dataset.editing; });
+    $('deleteSupplementBtn').addEventListener('click', () => { const id = $('saveSupplementBtn').dataset.editing; if (id) deleteSupplementAction(id); });
+    $('saveDevisBtn').addEventListener('click', saveDevisFromDraft);
+    $('cancelDevisBtn').addEventListener('click', () => setView('dashboard'));
+    $('transformDevisBtn').addEventListener('click', () => transformDevisToContract($('devis_id').value));
+    $('addDevisLigneBtn').addEventListener('click', () => { const d = getDevisDraft(); d.lignes.push(makeEmptyLigneDraft(d.lignes.length + 1)); renderDevisLignes(); computeDevisTotalsUI(); });
+    $('refreshCatalogueBtn').addEventListener('click', () => silentBusinessRefresh());
+    $('refreshDevisBtn').addEventListener('click', () => silentBusinessRefresh());
+
     document.addEventListener('click', event => {
-      const reportBtn = event.target.closest('[data-report]');
-      if (reportBtn) openReport(reportBtn.dataset.report);
-      const deleteBtn = event.target.closest('[data-delete-rdv]');
-      if (deleteBtn) deleteAppointment(deleteBtn.dataset.deleteRdv);
-      const editUserBtn = event.target.closest('[data-edit-user]');
-      if (editUserBtn) openEditUser(editUserBtn.dataset.editUser);
-      const personStatsBtn = event.target.closest('[data-person-stats]');
-      if (personStatsBtn) openPersonStats(personStatsBtn.dataset.personStats);
-      const deleteUserBtn = event.target.closest('[data-delete-user]');
-      if (deleteUserBtn) deleteUser(deleteUserBtn.dataset.deleteUser);
-      const addReferentBtn = event.target.closest('[data-add-referent]');
-      if (addReferentBtn) openReferentForm(addReferentBtn.dataset.addReferent);
-      const editClientBtn = event.target.closest('[data-edit-client]');
-      if (editClientBtn) openEditClient(editClientBtn.dataset.editClient);
-      const deleteClientBtn = event.target.closest('[data-delete-client]');
-      if (deleteClientBtn) deleteClient(deleteClientBtn.dataset.deleteClient);
-      const editContractBtn = event.target.closest('[data-edit-contract]');
-      if (editContractBtn) openEditContract(editContractBtn.dataset.editContract);
-      const deleteContractBtn = event.target.closest('[data-delete-contract]');
-      if (deleteContractBtn) deleteContract(deleteContractBtn.dataset.deleteContract);
+      const t = event.target;
+      const tabBtn = t.closest('.tab-btn');
+      if (tabBtn) { switchTab(tabBtn.dataset.tab); return; }
+      const reportBtn = t.closest('[data-report]'); if (reportBtn) openReport(reportBtn.dataset.report);
+      const deleteBtn = t.closest('[data-delete-rdv]'); if (deleteBtn) deleteAppointment(deleteBtn.dataset.deleteRdv);
+      const editUserBtn = t.closest('[data-edit-user]'); if (editUserBtn) openEditUser(editUserBtn.dataset.editUser);
+      const personStatsBtn = t.closest('[data-person-stats]'); if (personStatsBtn) openPersonStats(personStatsBtn.dataset.personStats);
+      const deleteUserBtn = t.closest('[data-delete-user]'); if (deleteUserBtn) deleteUser(deleteUserBtn.dataset.deleteUser);
+      const addReferentBtn = t.closest('[data-add-referent]'); if (addReferentBtn) openReferentForm(addReferentBtn.dataset.addReferent);
+      const editClientBtn = t.closest('[data-edit-client]'); if (editClientBtn) openEditClient(editClientBtn.dataset.editClient);
+      const deleteClientBtn = t.closest('[data-delete-client]'); if (deleteClientBtn) deleteClient(deleteClientBtn.dataset.deleteClient);
+      const editContractBtn = t.closest('[data-edit-contract]'); if (editContractBtn) openEditContract(editContractBtn.dataset.editContract);
+      const deleteContractBtn = t.closest('[data-delete-contract]'); if (deleteContractBtn) deleteContract(deleteContractBtn.dataset.deleteContract);
+      // CATALOGUE / DEVIS
+      const ep = t.closest('[data-edit-prestation]'); if (ep) openEditPrestation(ep.dataset.editPrestation);
+      const dp = t.closest('[data-delete-prestation]'); if (dp) deletePrestationAction(dp.dataset.deletePrestation);
+      const tp = t.closest('[data-toggle-prestation]'); if (tp) togglePrestationAction(tp.dataset.togglePrestation);
+      const es = t.closest('[data-edit-supplement]'); if (es) openEditSupplement(es.dataset.editSupplement);
+      const ds = t.closest('[data-delete-supplement]'); if (ds) deleteSupplementAction(ds.dataset.deleteSupplement);
+      const ed = t.closest('[data-edit-devis]'); if (ed) openEditDevis(ed.dataset.editDevis);
+      const cd = t.closest('[data-transform-devis]'); if (cd) transformDevisToContract(cd.dataset.transformDevis);
+      const xd = t.closest('[data-delete-devis]'); if (xd) deleteDevisAction(xd.dataset.deleteDevis);
+      const oc = t.closest('[data-open-contract]'); if (oc) { setView('contracts'); openEditContract(oc.dataset.openContract); }
+      const rl = t.closest('[data-remove-ligne]'); if (rl) { const d = getDevisDraft(); d.lignes = d.lignes.filter(l => l.ligne_id !== rl.dataset.removeLigne); renderDevisLignes(); computeDevisTotalsUI(); }
+      const ndc = t.closest('[data-new-devis-from-client]'); if (ndc) { setView('devis'); resetDevisDraft({ client_id: ndc.dataset.newDevisFromClient }); }
+      const ndct = t.closest('[data-new-devis-from-contract]'); if (ndct) { const c = State.contracts.find(x => x.contract_id === ndct.dataset.newDevisFromContract); if (c) { setView('devis'); resetDevisDraft({ client_id: c.client_id, date: c.date_debut }); } }
     });
+
+    document.addEventListener('input', event => {
+      const t = event.target;
+      if (t.dataset && t.dataset.ligneId) onDevisLigneChange(t.dataset.ligneId, t.dataset.ligneField, t.value);
+      if (t.id === 'devis_remise_pct' || t.id === 'devis_remise_montant') computeDevisTotalsUI();
+    });
+    document.addEventListener('change', event => {
+      const t = event.target;
+      if (t.dataset && t.dataset.ligneId) onDevisLigneChange(t.dataset.ligneId, t.dataset.ligneField, t.value);
+    });
+
     document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
 
     startApp();
