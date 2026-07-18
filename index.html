@@ -945,9 +945,11 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
             <div class="stat"><div class="muted">Clients</div><div id="statClients" class="value">0</div></div>
             <div class="stat"><div class="muted">Rendez-vous</div><div id="statAppointments" class="value">0</div></div>
             <div class="stat"><div class="muted">CR en attente</div><div id="statPendingReports" class="value">0</div></div>
-            <div class="stat"><div class="muted">Chiffre d'affaires</div><div id="statRevenue" class="value">0 EUR</div></div>
+                        <div class="stat"><div class="muted">Chiffre d'affaires</div><div id="statRevenue" class="value">0 EUR</div></div>
+            <div class="stat"><div class="muted">Commissions</div><div id="statCommissions" class="value">0 EUR</div></div>
             <div class="stat"><div class="muted">Contrats</div><div id="statContracts" class="value">0</div></div>
           </div>
+
 
           <div class="dashboard-stack">
             <div class="panel">
@@ -1689,9 +1691,11 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
     function renderCatalogueAnalytics() {
       if (!$('statPrestationCount')) return;
       if (State.loading.catalogue || State.loading.devis) {
-        ['statPrestationCount','statSupplementCount','statCatalogueCa','statCatalogueCommission','statCatalogueMarge','statCatalogueRentabilite','analyticsCa','analyticsCommissions','analyticsMarge','analyticsRentabilite'].forEach(id => {
-          if ($(id)) $(id).innerHTML = '<div class="skeleton" style="height:22px"></div>';
-        });
+                ['statPrestationCount','statSupplementCount','statCatalogueCa','statCatalogueCommission','statCatalogueMarge','statCatalogueRentabilite','analyticsCa','analyticsCommissions','analyticsMarge','analyticsRentabilite','statCommissions'].forEach(id => {
+  if ($(id)) $(id).innerHTML = '<div class="skeleton" style="height:22px"></div>';
+});
+
+
         $('analyticsPrestationsRows').innerHTML = skeletonRows(5, 3);
         $('analyticsApporteursRows').innerHTML = skeletonRows(6, 3);
         return;
@@ -1705,6 +1709,10 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
       const rentabilite = ca > 0 ? Math.round(marge / ca * 100) : 0;
       $('statCatalogueCa').textContent = formatMoney(ca);
       $('statCatalogueCommission').textContent = formatMoney(commissions);
+      const sCommission = $('statCatalogueCommission');
+      const sDashboard = $('statCommissions');
+      if (sCommission && sDashboard) sDashboard.textContent = sCommission.textContent;
+
       $('statCatalogueMarge').textContent = formatMoney(marge);
       $('statCatalogueRentabilite').textContent = rentabilite + ' %';
       $('analyticsCa').textContent = formatMoney(ca);
@@ -2233,7 +2241,8 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
     // ============ Existing render functions ============
     function renderStats() {
       if (State.loading.clients || State.loading.appointments || State.loading.revenue) {
-        ['statClients','statAppointments','statPendingReports','statRevenue','statContracts'].forEach(id => { $(id).innerHTML = '<div class="skeleton" style="height:30px"></div>'; });
+                ['statClients','statAppointments','statPendingReports','statRevenue','statCommissions','statContracts'].forEach(id => { $(id).innerHTML = '<div class="skeleton" style="height:30px"></div>'; });
+
         return;
       }
       const filteredRevenue = filterRevenue(State.revenue);
