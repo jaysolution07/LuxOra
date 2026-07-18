@@ -912,8 +912,7 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
         <button class="btn nav-btn" data-view="catalogue">Catalogue</button>
         <button class="btn nav-btn" data-view="devis">Devis</button>
         <button class="btn nav-btn" data-view="contracts">Contrats</button>
-        <button class="btn nav-btn" data-view="revenue">CA</button>
-        <button class="btn nav-btn" data-view="settings">Paramètres</button>
+                <button class="btn nav-btn" data-view="settings">Paramètres</button>
       </aside>
 
       <main>
@@ -925,7 +924,7 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
           <button class="btn nav-btn" data-view="catalogue">Catalogue</button>
           <button class="btn nav-btn" data-view="devis">Devis</button>
           <button class="btn nav-btn" data-view="contracts">Contrats</button>
-          <button class="btn nav-btn" data-view="revenue">CA</button>
+          
           <button class="btn nav-btn" data-view="settings">Google</button>
         </nav>
 
@@ -976,8 +975,12 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
 
         <section id="users" class="view">
           <div class="toolbar"><div><div class="eyebrow">Comptes</div><h2>Utilisateurs de l'entreprise</h2><p class="muted" id="usersHelp"></p></div></div>
-          <div id="adminCreatePanel" class="panel" style="display:none">
+                    <div class="actions" style="justify-content:flex-start;margin-top:14px">
+            <button id="toggleUserFormBtn" class="btn btn-primary" type="button">+ Ajouter un utilisateur</button>
+          </div>
+          <div id="adminCreatePanel" class="panel" style="display:none;margin-top:14px">
             <h3>Nouvel utilisateur</h3>
+
             <p class="muted">Le compte sera automatiquement rattache a votre entreprise.</p>
             <div class="form-grid">
               <div><label for="full_name">Nom de la personne</label><input id="full_name"></div>
@@ -985,9 +988,13 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
               <div><label for="new_password">Mot de passe</label><input id="new_password" type="text" autocomplete="new-password"></div>
               <div><label for="role">Role</label><select id="role"><option value="apporteur">Apporteur d'affaires</option><option value="admin">Admin</option></select></div>
             </div>
-            <div class="actions"><button id="createUserBtn" class="btn btn-primary">Creer l'utilisateur</button></div>
+                        <div class="actions">
+              <button id="cancelUserFormBtn" class="btn btn-secondary" type="button">Annuler</button>
+              <button id="createUserBtn" class="btn btn-primary">Creer l'utilisateur</button>
+            </div>
           </div>
           <div id="adminEditPanel" class="panel" style="display:none;margin-top:14px">
+
             <h3>Modifier utilisateur</h3>
             <input id="edit_old_id" type="hidden">
             <div class="form-grid">
@@ -1010,26 +1017,66 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
               </table>
             </div>
           </div>
+                    <div class="actions" style="justify-content:flex-start;margin-top:14px">
+            <button id="toggleObjectiveFormBtn" class="btn btn-primary" type="button">+ Définir un objectif</button>
+          </div>
+          <div id="adminObjectivePanel" class="panel" style="display:none;margin-top:14px">
+            <h3>Objectifs apporteur</h3>
+
+            <div class="form-grid">
+              <div><label for="objective_owner">Apporteur</label><select id="objective_owner"></select></div>
+              <div><label for="objective_ca">Objectif CA</label><input id="objective_ca" type="number" min="0" step="0.01"></div>
+              <div><label for="objective_contracts">Objectif contrats</label><input id="objective_contracts" type="number" min="0" step="1"></div>
+              <div><label for="objective_start">Date de debut</label><input id="objective_start" type="date"></div>
+              <div><label for="objective_end">Date de fin</label><input id="objective_end" type="date"></div>
+            </div>
+                        <div class="actions">
+              <button id="cancelObjectiveFormBtn" class="btn btn-secondary" type="button">Annuler</button>
+              <button id="saveObjectiveBtn" class="btn btn-primary">Enregistrer l'objectif</button>
+            </div>
+          </div>
+          <div class="panel" style="margin-top:14px">
+            <h3>Récapitulatif des contrats signés</h3>
+
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Date</th><th>Client</th><th>Apporteur</th><th>Montant</th><th>Contrats</th><th>Commentaires</th></tr></thead>
+                <tbody id="revenueRows"></tbody>
+              </table>
+            </div>
+          </div>
+
         </section>
 
         <section id="clients" class="view">
           <div class="toolbar"><div><div class="eyebrow">Portefeuille</div><h2>Clients</h2><p class="muted" id="clientsHelp"></p></div></div>
-          <div class="panel">
+                    <div class="actions" style="justify-content:flex-start;margin-top:14px">
+            <button id="toggleClientFormBtn" class="btn btn-primary" type="button">+ Ajouter un client</button>
+          </div>
+          <div id="clientCreatePanel" class="panel" style="display:none;margin-top:14px">
             <h3>Nouveau client</h3>
             <div class="form-grid">
               <div><label for="client_name">Nom de l'entreprise</label><input id="client_name"></div>
               <div><label for="client_phone">Telephone</label><input id="client_phone"></div>
               <div><label for="client_site">Site internet</label><input id="client_site"></div>
               <div><label for="client_address">Adresse</label><input id="client_address"></div>
+              <div class="admin-only">
+                <label for="client_owner">Apporteur d'affaires</label>
+                <select id="client_owner"></select>
+              </div>
               <div><label for="ref_nom">Referent - Nom</label><input id="ref_nom"></div>
               <div><label for="ref_prenom">Referent - Prenom</label><input id="ref_prenom"></div>
-              <div><label for="ref_fonction">Referent - Fonction</label><input id="ref_fonction"></div>
+              <div><label for="ref_fonction">Referent - Fonction</label><input id="ref_fonction"></input></div>
               <div><label for="ref_email">Referent - Email</label><input id="ref_email"></div>
               <div><label for="ref_phone">Referent - Telephone</label><input id="ref_phone"></div>
               <div><label for="client_notes">Notes</label><input id="client_notes"></div>
             </div>
-            <div class="actions"><button id="createClientBtn" class="btn btn-primary">Creer le client</button></div>
+            <div class="actions">
+              <button id="cancelClientFormBtn" class="btn btn-secondary" type="button">Annuler</button>
+              <button id="createClientBtn" class="btn btn-primary">Creer le client</button>
+            </div>
           </div>
+
           <div id="referentPanel" class="panel" style="display:none;margin-top:14px">
             <h3>Ajouter un référent</h3>
             <p class="muted" id="referentClientName"></p>
@@ -1084,7 +1131,10 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
 
         <section id="appointments" class="view">
           <div class="toolbar"><div><div class="eyebrow">Activite</div><h2>Rendez-vous</h2><p class="muted">Les ajouts s'affichent immediatement puis se synchronisent avec le back-end et Google Agenda.</p></div></div>
-          <div class="panel">
+                    <div class="actions" style="justify-content:flex-start;margin-top:14px">
+            <button id="toggleAppointmentFormBtn" class="btn btn-primary" type="button">+ Ajouter un rendez-vous</button>
+          </div>
+          <div id="appointmentCreatePanel" class="panel" style="display:none;margin-top:14px">
             <h3>Nouveau rendez-vous</h3>
             <div class="form-grid">
               <div><label for="rdv_client">Client</label><select id="rdv_client"></select></div>
@@ -1095,8 +1145,12 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
               <div><label for="rdv_subject">Objet</label><input id="rdv_subject"></div>
               <div><label for="rdv_notes">Notes</label><input id="rdv_notes"></div>
             </div>
-            <div class="actions"><button id="createAppointmentBtn" class="btn btn-primary">Creer le rendez-vous</button></div>
+            <div class="actions">
+              <button id="cancelAppointmentFormBtn" class="btn btn-secondary" type="button">Annuler</button>
+              <button id="createAppointmentBtn" class="btn btn-primary">Creer le rendez-vous</button>
+            </div>
           </div>
+
           <div class="panel" style="margin-top:14px">
             <div class="table-wrap">
               <table>
@@ -1344,30 +1398,7 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
           </div>
         </section>
 
-        <section id="revenue" class="view">
-          <div class="toolbar"><div><div class="eyebrow">Performance</div><h2>Chiffre d'affaires et objectifs</h2><p class="muted" id="revenueHelp"></p></div></div>
-                    <div id="adminObjectivePanel" class="panel" style="display:none;margin-top:14px">
-            <h3>Objectifs apporteur</h3>
-            <div class="form-grid">
-              <div><label for="objective_owner">Apporteur</label><select id="objective_owner"></select></div>
-              <div><label for="objective_ca">Objectif CA</label><input id="objective_ca" type="number" min="0" step="0.01"></div>
-              <div><label for="objective_contracts">Objectif contrats</label><input id="objective_contracts" type="number" min="0" step="1"></div>
-              <div><label for="objective_start">Date de debut</label><input id="objective_start" type="date"></div>
-              <div><label for="objective_end">Date de fin</label><input id="objective_end" type="date"></div>
-            </div>
-            <div class="actions"><button id="saveObjectiveBtn" class="btn btn-primary">Enregistrer l'objectif</button></div>
-          </div>
-          <div class="panel" style="margin-top:14px">
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Date</th><th>Client</th><th>Apporteur</th><th>Montant</th><th>Contrats</th><th>Commentaires</th></tr></thead>
-                <tbody id="revenueRows"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="settings" class="view">
+                <section id="settings" class="view">
           <div class="toolbar"><div><div class="eyebrow">Compte</div><h2>Paramètres Google</h2><p class="muted">Associez votre propre compte Google pour Gmail, Google Agenda et Google Drive.</p></div></div>
           <div class="panel">
             <h3>Compte Google utilisateur</h3>
@@ -2227,11 +2258,11 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
       $('dashboardTitle').textContent = State.company?.entreprise || 'Tableau de bord';
       $('userLine').textContent = `${State.user?.Nom || ''} - ${roleLabel(State.user?.role)}`;
       $('usersHelp').textContent = isAdmin ? `Creation limitee a l'entreprise ${State.company?.entreprise || ''}.` : 'Votre compte apporteur.';
-      $('adminCreatePanel').style.display = isAdmin ? 'block' : 'none';
-      if (!isAdmin) $('adminEditPanel').style.display = 'none';
+            if (!isAdmin) $('adminEditPanel').style.display = 'none';
       $('clientsHelp').textContent = isAdmin ? 'Vue globale des clients de l entreprise.' : 'Votre portefeuille client.';
-      $('revenueHelp').textContent = isAdmin ? 'Pilotage des objectifs.' : 'Suivi automatique de votre CA, de vos contrats et de vos objectifs.';
-$('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
+      
+// $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
+
 
       $('catalogueHelp').textContent = isAdmin ? 'Gérez vos prestations, suppléments et la rentabilité.' : 'Consultez les prestations commercialisables par l\u2019entreprise.';
       renderStats();
@@ -2344,6 +2375,9 @@ $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
   else if (State.user?.ID) $('objective_owner').value = State.user.ID;
   if (currentFilterOwner) $('filter_owner').value = currentFilterOwner;
   if (currentEditOwner) $('edit_client_owner').value = currentEditOwner;
+$('client_owner').innerHTML = ownerOptions;
+if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.user.ID;
+
   fillObjectiveForm();
 }
 
@@ -2627,8 +2661,9 @@ $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
       try {
         const created = await masterApi.request('createUser', { full_name: $('full_name').value, login: $('new_login').value, password: $('new_password').value, role: $('role').value });
         Object.assign(optimisticUser, created, { _pending: false });
-        $('full_name').value = ''; $('new_login').value = ''; $('new_password').value = '';
-        renderAll(); silentRefresh(); showToast('Utilisateur cree dans votre entreprise');
+              closeUserForm();
+      renderAll(); silentRefresh(); showToast('Utilisateur cree dans votre entreprise');
+
       } catch (err) { State.users = State.users.filter(user => user !== optimisticUser); renderUsers(); showToast(err.message); }
       finally { setButtonLoading('createUserBtn', false); }
     }
@@ -2703,7 +2738,9 @@ $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
         const saved = await businessApi.request('saveObjective', optimisticObjective);
         Object.assign(optimisticObjective, saved, { _pending: false });
         confirmPendingUpsert('objectives', saved.objective_id, optimisticObjective);
-        renderAll(); silentRefresh(); showToast('Objectif enregistre');
+              closeObjectiveForm();
+      renderAll(); silentRefresh(); showToast('Objectif enregistre');
+
       } catch (err) { clearPendingOp('objectives', optimisticObjective.objective_id); State.objectives = previous; renderAll(); showToast(err.message); }
       finally { setButtonLoading('saveObjectiveBtn', false); }
     }
@@ -2784,8 +2821,11 @@ $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
         clearPendingOp('clients', optimisticClient.client_id);
         Object.assign(optimisticClient, created, { _pending: false });
         confirmPendingUpsert('clients', created.client_id, optimisticClient);
-        ['client_name','client_phone','client_site','client_address','client_notes','ref_nom','ref_prenom','ref_fonction','ref_email','ref_phone'].forEach(id => $(id).value = '');
-        renderAll(); silentRefresh(); showToast('Client cree');
+        ['client_name','client_owner','client_phone','client_site','client_address','client_notes','ref_nom','ref_prenom','ref_fonction','ref_email','ref_phone'].forEach(id => $(id).value = '');
+
+        renderAll(); silentRefresh(); 
+closeClientForm();
+showToast('Client cree');
       } catch (err) { clearPendingOp('clients', optimisticClient.client_id); State.clients = State.clients.filter(client => client !== optimisticClient); renderAll(); showToast(err.message); }
       finally { setButtonLoading('createClientBtn', false); }
     }
@@ -2804,6 +2844,80 @@ $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
     function closeEditClient() {
       $('clientEditPanel').style.display = 'none';
       ['edit_client_id','edit_client_name','edit_client_phone','edit_client_site','edit_client_address','edit_client_notes'].forEach(id => $(id).value = '');
+    }
+    function toggleClientForm() {
+      const panel = $('clientCreatePanel');
+      const btn = $('toggleClientFormBtn');
+      if (!panel) return;
+      const showing = panel.style.display === 'block';
+      panel.style.display = showing ? 'none' : 'block';
+      btn.textContent = showing ? '+ Ajouter un client' : '− Fermer le formulaire';
+      if (!showing) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeClientForm() {
+      const panel = $('clientCreatePanel');
+      const btn = $('toggleClientFormBtn');
+      if (!panel) return;
+      ['client_name','client_owner','client_phone','client_site','client_address','client_notes','ref_nom','ref_prenom','ref_fonction','ref_email','ref_phone'].forEach(id => { const el = $(id); if (el) el.value = ''; });
+      if (State.user?.role === 'admin') renderRevenueOptions();
+      panel.style.display = 'none';
+      if (btn) btn.textContent = '+ Ajouter un client';
+    }
+    function toggleUserForm() {
+      const panel = $('adminCreatePanel');
+      const btn = $('toggleUserFormBtn');
+      if (!panel) return;
+      const showing = panel.style.display === 'block';
+      panel.style.display = showing ? 'none' : 'block';
+      btn.textContent = showing ? '+ Ajouter un utilisateur' : '− Fermer le formulaire';
+      if (!showing) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeUserForm() {
+      const panel = $('adminCreatePanel');
+      const btn = $('toggleUserFormBtn');
+      if (panel) panel.style.display = 'none';
+      ['full_name','new_login','new_password'].forEach(id => { const el = $(id); if (el) el.value = ''; });
+      const role = $('role'); if (role) role.value = 'apporteur';
+      if (btn) btn.textContent = '+ Ajouter un utilisateur';
+    }
+
+    function toggleObjectiveForm() {
+      const panel = $('adminObjectivePanel');
+      const btn = $('toggleObjectiveFormBtn');
+      if (!panel) return;
+      const showing = panel.style.display === 'block';
+      panel.style.display = showing ? 'none' : 'block';
+      btn.textContent = showing ? '+ Définir un objectif' : '− Fermer le formulaire';
+      if (!showing) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeObjectiveForm() {
+      const panel = $('adminObjectivePanel');
+      const btn = $('toggleObjectiveFormBtn');
+      if (panel) panel.style.display = 'none';
+      ['objective_ca','objective_contracts','objective_start','objective_end'].forEach(id => { const el = $(id); if (el) el.value = ''; });
+      if (btn) btn.textContent = '+ Définir un objectif';
+      if (State.user?.ID) fillObjectiveForm();
+    }
+    function toggleAppointmentForm() {
+      const panel = $('appointmentCreatePanel');
+      const btn = $('toggleAppointmentFormBtn');
+      if (!panel) return;
+      const showing = panel.style.display === 'block';
+      panel.style.display = showing ? 'none' : 'block';
+      btn.textContent = showing ? '+ Ajouter un rendez-vous' : '− Fermer le formulaire';
+      if (!showing) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeAppointmentForm() {
+      const panel = $('appointmentCreatePanel');
+      const btn = $('toggleAppointmentFormBtn');
+      if (panel) panel.style.display = 'none';
+      ['rdv_date','rdv_time','rdv_address','rdv_subject','rdv_notes'].forEach(id => { const el = $(id); if (el) el.value = ''; });
+      const rdvClient = $('rdv_client'); if (rdvClient) rdvClient.value = '';
+      if (btn) btn.textContent = '+ Ajouter un rendez-vous';
     }
 
     async function updateClient() {
@@ -2889,7 +3003,8 @@ $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
         clearPendingOp('appointments', optimisticAppointment.appointment_id);
         Object.assign(optimisticAppointment, created, { _pending: false });
         confirmPendingUpsert('appointments', created.appointment_id, optimisticAppointment);
-        ['rdv_date','rdv_time','rdv_address','rdv_subject','rdv_notes'].forEach(id => $(id).value = '');
+         closeAppointmentForm();
+       ['rdv_date','rdv_time','rdv_address','rdv_subject','rdv_notes'].forEach(id => $(id).value = '');
         renderAll(); silentRefresh(); showToast('Rendez-vous cree');
       } catch (err) { clearPendingOp('appointments', optimisticAppointment.appointment_id); State.appointments = State.appointments.filter(item => item !== optimisticAppointment); renderAll(); showToast(err.message); }
       finally { setButtonLoading('createAppointmentBtn', false); }
@@ -2972,7 +3087,8 @@ $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
     function buildClientFromForm() {
       const referent = { referent_id: tempId('ref'), nom: $('ref_nom').value, prenom: $('ref_prenom').value, fonction: $('ref_fonction').value, email: $('ref_email').value, telephone: $('ref_phone').value };
       return {
-        client_id: tempId('cli'), owner_id: State.user?.ID || '', nom_entreprise: $('client_name').value,
+        client_id: tempId('cli'),     client_id: tempId('cli'), owner_id: (State.user.role === 'admin' && $('client_owner')) ? $('client_owner').value : (State.user?.ID || ''),
+ nom_entreprise: $('client_name').value,
         telephone: $('client_phone').value, site_internet: $('client_site').value, adresse: $('client_address').value,
         notes: $('client_notes').value, referents: Object.values(referent).some(Boolean) ? [referent] : [], _pending: true,
       };
@@ -3103,20 +3219,32 @@ async function refreshCatalogue() {
     $('logoutBtn').addEventListener('click', logout);
     $('refreshBtn').addEventListener('click', () => refresh().then(() => showToast('Donnees actualisees')).catch(err => showToast(err.message)));
     $('createUserBtn').addEventListener('click', createUser);
+    $('toggleUserFormBtn').addEventListener('click', toggleUserForm);
+    $('cancelUserFormBtn').addEventListener('click', closeUserForm);
+
     $('updateUserBtn').addEventListener('click', updateUser);
     $('deleteUserBtn').addEventListener('click', () => deleteUser($('edit_old_id').value));
     $('cancelEditUserBtn').addEventListener('click', closeEditUser);
     $('createClientBtn').addEventListener('click', createClient);
+    $('toggleClientFormBtn').addEventListener('click', toggleClientForm);
+    $('cancelClientFormBtn').addEventListener('click', closeClientForm);
+
     $('updateClientBtn').addEventListener('click', updateClient);
     $('deleteClientBtn').addEventListener('click', () => deleteClient($('edit_client_id').value));
     $('cancelEditClientBtn').addEventListener('click', closeEditClient);
     $('createReferentBtn').addEventListener('click', createReferent);
     $('cancelReferentBtn').addEventListener('click', closeReferentForm);
     $('createAppointmentBtn').addEventListener('click', createAppointment);
+    $('toggleAppointmentFormBtn').addEventListener('click', toggleAppointmentForm);
+    $('cancelAppointmentFormBtn').addEventListener('click', closeAppointmentForm);
+
     $('saveReportBtn').addEventListener('click', saveReport);
     
     $('saveObjectiveBtn').addEventListener('click', saveObjective);
-    $('openSelectedPersonBtn').addEventListener('click', () => openPersonStats($('filter_owner').value || State.user.ID));
+    $('toggleObjectiveFormBtn').addEventListener('click', toggleObjectiveForm);
+    $('cancelObjectiveFormBtn').addEventListener('click', closeObjectiveForm);
+
+   $('openSelectedPersonBtn').addEventListener('click', () => openPersonStats($('filter_owner').value || State.user.ID));
     $('saveContractBtn').addEventListener('click', saveContract);
     $('cancelContractEditBtn').addEventListener('click', resetContractForm);
     $('connectGoogleBtn').addEventListener('click', connectGoogle);
