@@ -704,89 +704,106 @@
       .person-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-/* ===== MOBILE FIRST POLISH ===== */
+/* ============================================================
+   GLOBAL — toujours (PC + mobile)
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: hidden; }
+
+main, .view, .panel, .grid, .form-grid, .table-wrap,
+.totaux, .filter-grid, .person-kpis { min-width: 0; }
+
+/* ============================================================
+   MOBILE — uniquement <=779px
+   ============================================================ */
 @media (max-width: 779px) {
-  html, body { overflow-x: hidden; }
+  /* Layout principal */
+  main { padding: 12px; padding-bottom: 110px; }
+  .panel { padding: 14px; }
+  .stat { padding: 10px 12px; }
 
-  main { padding: 14px; padding-bottom: 132px; }
+  /* Typo */
+  h2 { font-size: 20px; }
+  h3 { font-size: 15px; }
 
-  /* Boutons d'action : empilés, pleine largeur */
-  .actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .actions .btn { width: 100%; }
+  /* Form : 1 colonne */
+  .form-grid { grid-template-columns: 1fr; }
 
-  /* Inline-actions : idem */
-  .inline-actions { flex-direction: column; align-items: stretch; }
-  .inline-actions .btn { width: 100%; }
+  /* Boutons & toolbar empilés */
+  .actions, .inline-actions { flex-direction: column; align-items: stretch; }
+  .actions .btn, .inline-actions .btn, .toolbar .btn { width: 100%; }
+  .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
 
-  /* Toolbar : titre au-dessus, bouton en dessous */
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .toolbar .btn { width: 100%; }
-  .toolbar > div { max-width: 100%; }
-
-  /* Tabs : scroll horizontal dédié si trop longs */
-  .tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
-
-  /* Stats cards : 2 colonnes au lieu d'une */
+  /* Stats cards : 2 colonnes */
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .grid .stat .value { font-size: 18px; }
+  .grid .stat { min-width: 0; }
+  .grid .stat .value { font-size: 18px; line-height: 1.1; }
+  .grid .stat > div, .grid .stat > .muted {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-  /* Filtres : inputs en colonne */
+  /* Filtres / KPI / totaux */
   .filter-grid { grid-template-columns: 1fr; }
-
-  /* Titrages : un poil plus petits */
-  h2 { font-size: 22px; }
-  h3 { font-size: 16px; }
-  .eyebrow { font-size: 10px; }
-
-  /* Panel : padding réduit pour gagner de l'espace */
-  .panel { padding: 16px; }
-  .stat { padding: 12px 14px; }
-
-  /* Inputs : encore un poil plus gros pour le touch */
-  input, select { min-height: 46px; padding: 10px 12px; font-size: 16px; }
-
-  /* Tables : scroll contenu, sans déborder */
-  .table-wrap { -webkit-overflow-scrolling: touch; }
-  table { min-width: 560px; }
-
-  /* Planner : scroll interne ok (déjà .table-wrap) */
-  .planner { min-width: 600px; }
-
-  /* Totaux : 2 colonnes */
+  .person-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .totaux { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .totaux > div { padding: 8px 10px; }
   .totaux strong { font-size: 14px; }
 
-  /* Mobile-nav : encore plus collé au bas */
-  .mobile-nav { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
-  .mobile-nav .nav-btn { min-height: 40px; font-size: 10px; }
+  /* Inputs : 16px (évite zoom iOS) */
+  input, select, textarea {
+    width: 100%; max-width: 100%;
+    min-height: 46px;
+    font-size: 16px;
+  }
 
-  /* KPI cards personnelles en colonne */
-  .person-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Onglets Prestations/Suppléments/Rentabilité */
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs .tab-btn { flex: 0 0 auto; }
 
-  /* Catastrophe garde-fou : tout élément qui déborde est tronqué */
-  select, input, textarea, button { max-width: 100%; }
+  /* Tables : scroll interne */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 100%; font-size: 12px; }
+  th, td { padding: 8px 10px; white-space: nowrap; }
+  .planner { min-width: 560px; }
+
+  /* Mobile-nav : 1 rangée scrollable, conserve position:fixed
+     de l'original (ligne ~607) car on n'écrase que les
+     propriétés nécessaires */
+  .mobile-nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 6px 8px max(6px, env(safe-area-inset-bottom));
+  gap: 4px;
+}
+.mobile-nav .nav-btn {
+  min-height: 38px;
+  padding: 4px 6px;
+  font-size: 10px;
+  line-height: 1.15;
+  border-radius: 8px;
+  white-space: nowrap;
+  width: auto;     /* écrase le width:100% de l'original ligne 625 */
+  margin: 0;
 }
 
-/* Très petits écrans (<360px) : stats en 1 colonne */
-@media (max-width: 359px) {
-  .grid { grid-template-columns: 1fr; }
-  .person-kpis { grid-template-columns: 1fr; }
+/* ============================================================
+   TRÈS PETIT ÉCRAN — <380px
+   ============================================================ */
+@media (max-width: 379px) {
+  .grid, .person-kpis { grid-template-columns: 1fr; }
+  .totaux { grid-template-columns: 1fr 1fr; }
+  .mobile-nav .nav-btn { min-width: 54px; font-size: 10px; padding: 4px 6px; }
 }
 
+/* ============================================================
+   TABLETTE — 560-779px : form en 2 colonnes
+   ============================================================ */
+@media (min-width: 560px) and (max-width: 779px) {
+  .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
   </style>
 </head>
 <body>
