@@ -769,25 +769,27 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
   th, td { padding: 8px 10px; white-space: nowrap; }
   .planner { min-width: 560px; }
 
-  /* Mobile-nav : 1 rangée scrollable, conserve position:fixed
-     de l'original (ligne ~607) car on n'écrase que les
-     propriétés nécessaires */
+    /* Mobile-nav : 1 SEULE rangée avec 8 emojis */
   .mobile-nav {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  padding: 6px 8px max(6px, env(safe-area-inset-bottom));
-  gap: 4px;
-}
-.mobile-nav .nav-btn {
-  min-height: 38px;
-  padding: 4px 6px;
-  font-size: 10px;
-  line-height: 1.15;
-  border-radius: 8px;
-  white-space: nowrap;
-  width: auto;     /* écrase le width:100% de l'original ligne 625 */
-  margin: 0;
-}
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding: 6px 4px max(6px, env(safe-area-inset-bottom));
+    gap: 2px;
+    justify-content: space-between;
+  }
+  .mobile-nav .nav-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 50px;
+    padding: 4px 2px;
+    font-size: 22px;
+    line-height: 1;
+    border-radius: 8px;
+    width: auto;
+    margin: 0;
+  }
+
 
 /* ============================================================
    TRÈS PETIT ÉCRAN — <380px
@@ -916,16 +918,15 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
       </aside>
 
       <main>
-        <nav class="mobile-nav">
-          <button class="btn nav-btn active" data-view="dashboard">Tableau</button>
-          <button class="btn nav-btn" data-view="users">Comptes</button>
-          <button class="btn nav-btn" data-view="clients">Clients</button>
-          <button class="btn nav-btn" data-view="appointments">RDV</button>
-          <button class="btn nav-btn" data-view="catalogue">Catalogue</button>
-          <button class="btn nav-btn" data-view="devis">Devis</button>
-          <button class="btn nav-btn" data-view="contracts">Contrats</button>
-          
-          <button class="btn nav-btn" data-view="settings">Google</button>
+          <nav class="mobile-nav">
+          <button class="btn nav-btn active" data-view="dashboard">📊</button>
+          <button class="btn nav-btn" data-view="users">👥</button>
+          <button class="btn nav-btn" data-view="clients">🏢</button>
+          <button class="btn nav-btn" data-view="appointments">📅</button>
+          <button class="btn nav-btn" data-view="catalogue">📦</button>
+          <button class="btn nav-btn" data-view="devis">📝</button>
+          <button class="btn nav-btn" data-view="contracts">📜</button>
+          <button class="btn nav-btn" data-view="settings">⚙️</button>
         </nav>
 
         <section id="dashboard" class="view active">
