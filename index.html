@@ -704,6 +704,89 @@
       .person-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
+/* ===== MOBILE FIRST POLISH ===== */
+@media (max-width: 779px) {
+  html, body { overflow-x: hidden; }
+
+  main { padding: 14px; padding-bottom: 132px; }
+
+  /* Boutons d'action : empilés, pleine largeur */
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actions .btn { width: 100%; }
+
+  /* Inline-actions : idem */
+  .inline-actions { flex-direction: column; align-items: stretch; }
+  .inline-actions .btn { width: 100%; }
+
+  /* Toolbar : titre au-dessus, bouton en dessous */
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .toolbar .btn { width: 100%; }
+  .toolbar > div { max-width: 100%; }
+
+  /* Tabs : scroll horizontal dédié si trop longs */
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  /* Stats cards : 2 colonnes au lieu d'une */
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .grid .stat .value { font-size: 18px; }
+
+  /* Filtres : inputs en colonne */
+  .filter-grid { grid-template-columns: 1fr; }
+
+  /* Titrages : un poil plus petits */
+  h2 { font-size: 22px; }
+  h3 { font-size: 16px; }
+  .eyebrow { font-size: 10px; }
+
+  /* Panel : padding réduit pour gagner de l'espace */
+  .panel { padding: 16px; }
+  .stat { padding: 12px 14px; }
+
+  /* Inputs : encore un poil plus gros pour le touch */
+  input, select { min-height: 46px; padding: 10px 12px; font-size: 16px; }
+
+  /* Tables : scroll contenu, sans déborder */
+  .table-wrap { -webkit-overflow-scrolling: touch; }
+  table { min-width: 560px; }
+
+  /* Planner : scroll interne ok (déjà .table-wrap) */
+  .planner { min-width: 600px; }
+
+  /* Totaux : 2 colonnes */
+  .totaux { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .totaux > div { padding: 8px 10px; }
+  .totaux strong { font-size: 14px; }
+
+  /* Mobile-nav : encore plus collé au bas */
+  .mobile-nav { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  .mobile-nav .nav-btn { min-height: 40px; font-size: 10px; }
+
+  /* KPI cards personnelles en colonne */
+  .person-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* Catastrophe garde-fou : tout élément qui déborde est tronqué */
+  select, input, textarea, button { max-width: 100%; }
+}
+
+/* Très petits écrans (<360px) : stats en 1 colonne */
+@media (max-width: 359px) {
+  .grid { grid-template-columns: 1fr; }
+  .person-kpis { grid-template-columns: 1fr; }
+}
+
   </style>
 </head>
 <body>
@@ -1246,19 +1329,7 @@
 
         <section id="revenue" class="view">
           <div class="toolbar"><div><div class="eyebrow">Performance</div><h2>Chiffre d'affaires et objectifs</h2><p class="muted" id="revenueHelp"></p></div></div>
-          <div id="adminRevenuePanel" class="panel" style="display:none">
-            <h3>Nouveau contrat signe</h3>
-            <div class="form-grid">
-              <div><label for="revenue_client">Client</label><select id="revenue_client"></select></div>
-              <div><label for="revenue_owner">Apporteur concerne</label><select id="revenue_owner"></select></div>
-              <div><label for="revenue_date">Date</label><input id="revenue_date" type="date"></div>
-              <div><label for="revenue_amount">Montant du contrat</label><input id="revenue_amount" type="number" min="0" step="0.01"></div>
-              <div><label for="revenue_contracts">Nombre de contrats</label><input id="revenue_contracts" type="number" min="0" step="1" value="1"></div>
-              <div><label for="revenue_comments">Commentaires</label><input id="revenue_comments"></div>
-            </div>
-            <div class="actions"><button id="createRevenueBtn" class="btn btn-primary">Enregistrer le contrat</button></div>
-          </div>
-          <div id="adminObjectivePanel" class="panel" style="display:none;margin-top:14px">
+                    <div id="adminObjectivePanel" class="panel" style="display:none;margin-top:14px">
             <h3>Objectifs apporteur</h3>
             <div class="form-grid">
               <div><label for="objective_owner">Apporteur</label><select id="objective_owner"></select></div>
@@ -2142,9 +2213,9 @@
       $('adminCreatePanel').style.display = isAdmin ? 'block' : 'none';
       if (!isAdmin) $('adminEditPanel').style.display = 'none';
       $('clientsHelp').textContent = isAdmin ? 'Vue globale des clients de l entreprise.' : 'Votre portefeuille client.';
-      $('revenueHelp').textContent = isAdmin ? 'Saisie admin des contrats signes et pilotage des objectifs.' : 'Suivi automatique de votre CA, de vos contrats et de vos objectifs.';
-      $('adminRevenuePanel').style.display = isAdmin ? 'block' : 'none';
-      $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
+      $('revenueHelp').textContent = isAdmin ? 'Pilotage des objectifs.' : 'Suivi automatique de votre CA, de vos contrats et de vos objectifs.';
+$('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
+
       $('catalogueHelp').textContent = isAdmin ? 'Gérez vos prestations, suppléments et la rentabilité.' : 'Consultez les prestations commercialisables par l\u2019entreprise.';
       renderStats();
       renderUsers(); renderClients(); renderPortfolioHistory();
@@ -2240,30 +2311,25 @@
     }
 
     function renderRevenueOptions() {
-      const currentFilterClient = $('filter_client').value;
-      const currentRevenueClient = $('revenue_client').value;
-      const clientOptions = State.clients.map(client => `<option value="${escapeAttr(client.client_id)}">${escapeHtml(client.nom_entreprise)}</option>`).join('');
-      $('filter_client').innerHTML = `<option value="">Tous les clients</option>${clientOptions}`;
-      $('revenue_client').innerHTML = clientOptions;
-      if (currentFilterClient) $('filter_client').value = currentFilterClient;
-      if (currentRevenueClient) $('revenue_client').value = currentRevenueClient;
-      const apporteurs = getAssignableUsers();
-      const currentRevenueOwner = $('revenue_owner').value;
-      const currentObjectiveOwner = $('objective_owner').value;
-      const currentFilterOwner = $('filter_owner').value;
-      const currentEditOwner = $('edit_client_owner').value;
-      const ownerOptions = apporteurs.map(user => `<option value="${escapeAttr(user.ID)}">${escapeHtml(user.Nom || user.ID)}</option>`).join('');
-      $('revenue_owner').innerHTML = ownerOptions;
-      $('objective_owner').innerHTML = ownerOptions;
-      $('filter_owner').innerHTML = `<option value="">Moi / global</option>${ownerOptions}`;
-      $('edit_client_owner').innerHTML = ownerOptions;
-      if (currentRevenueOwner) $('revenue_owner').value = currentRevenueOwner;
-      if (currentObjectiveOwner) $('objective_owner').value = currentObjectiveOwner;
-      else if (State.user?.ID) $('objective_owner').value = State.user.ID;
-      if (currentFilterOwner) $('filter_owner').value = currentFilterOwner;
-      if (currentEditOwner) $('edit_client_owner').value = currentEditOwner;
-      fillObjectiveForm();
-    }
+  const currentFilterClient = $('filter_client').value;
+  const clientOptions = State.clients.map(client => `<option value="${escapeAttr(client.client_id)}">${escapeHtml(client.nom_entreprise)}</option>`).join('');
+  $('filter_client').innerHTML = `<option value="">Tous les clients</option>${clientOptions}`;
+  if (currentFilterClient) $('filter_client').value = currentFilterClient;
+  const apporteurs = getAssignableUsers();
+  const currentObjectiveOwner = $('objective_owner').value;
+  const currentFilterOwner = $('filter_owner').value;
+  const currentEditOwner = $('edit_client_owner').value;
+  const ownerOptions = apporteurs.map(user => `<option value="${escapeAttr(user.ID)}">${escapeHtml(user.Nom || user.ID)}</option>`).join('');
+  $('objective_owner').innerHTML = ownerOptions;
+  $('filter_owner').innerHTML = `<option value="">Moi / global</option>${ownerOptions}`;
+  $('edit_client_owner').innerHTML = ownerOptions;
+  if (currentObjectiveOwner) $('objective_owner').value = currentObjectiveOwner;
+  else if (State.user?.ID) $('objective_owner').value = State.user.ID;
+  if (currentFilterOwner) $('filter_owner').value = currentFilterOwner;
+  if (currentEditOwner) $('edit_client_owner').value = currentEditOwner;
+  fillObjectiveForm();
+}
+
 
     function renderPortfolioHistory() {
       if (!$('portfolioHistoryRows')) return;
@@ -2601,24 +2667,6 @@
       } catch (err) { State.users = previousUsers; State.clients = previousClients; State.portfolioHistory = previousHistory; renderAll(); showToast(err.message); }
     }
 
-    async function createRevenue() {
-      if (State.user.role !== 'admin') return;
-      const optimisticRevenue = buildRevenueFromForm();
-      if (!optimisticRevenue.client_id || !optimisticRevenue.owner_id || !optimisticRevenue.date) return showToast('Client, apporteur et date requis');
-      if (Number(optimisticRevenue.montant) <= 0 && Number(optimisticRevenue.nombre_contrats) <= 0) return showToast('Montant ou nombre de contrats requis');
-      markPendingUpsert('revenue', optimisticRevenue.revenue_id, optimisticRevenue);
-      State.revenue.unshift(optimisticRevenue); renderAll();
-      setButtonLoading('createRevenueBtn', true);
-      try {
-        const saved = await businessApi.request('createRevenue', optimisticRevenue);
-        clearPendingOp('revenue', optimisticRevenue.revenue_id);
-        Object.assign(optimisticRevenue, saved, { _pending: false });
-        confirmPendingUpsert('revenue', saved.revenue_id, optimisticRevenue);
-        ['revenue_amount','revenue_comments'].forEach(id => $(id).value = ''); $('revenue_contracts').value = '1';
-        renderAll(); silentRefresh(); showToast('Contrat enregistre');
-      } catch (err) { clearPendingOp('revenue', optimisticRevenue.revenue_id); State.revenue = State.revenue.filter(item => item !== optimisticRevenue); renderAll(); showToast(err.message); }
-      finally { setButtonLoading('createRevenueBtn', false); }
-    }
 
     async function saveObjective() {
       if (State.user.role !== 'admin') return;
@@ -2915,11 +2963,7 @@
     function buildAppointmentFromForm() {
       return { appointment_id: tempId('rdv'), owner_id: State.user?.ID || '', client_id: $('rdv_client').value, referent_id: $('rdv_referent').value, date: $('rdv_date').value, heure: $('rdv_time').value, adresse: $('rdv_address').value, objet: $('rdv_subject').value, notes: $('rdv_notes').value, statut: 'En attente de compte rendu', _pending: true };
     }
-    function buildRevenueFromForm() {
-      const client = State.clients.find(item => item.client_id === $('revenue_client').value);
-      return { revenue_id: tempId('ca'), client_id: $('revenue_client').value, owner_id: $('revenue_owner').value, date: $('revenue_date').value, montant: Number($('revenue_amount').value || 0), nombre_contrats: Number($('revenue_contracts').value || 0), commentaires: $('revenue_comments').value, client_nom: client?.nom_entreprise || '', _pending: true };
-    }
-    function buildContractFromForm() {
+        function buildContractFromForm() {
       const client = State.clients.find(item => item.client_id === $('contract_client').value);
       const contractId = $('contract_id').value || tempId('ctr');
       return { contract_id: contractId, owner_id: State.user?.ID || '', client_id: $('contract_client').value, client_nom: client?.nom_entreprise || '', date_debut: $('contract_start').value, date_fin: $('contract_end').value, statut: $('contract_status').value, montant: Number($('contract_amount').value || 0), notes: $('contract_notes').value, revenue_id: `ca_${contractId}`, _pending: true };
@@ -2932,7 +2976,7 @@
     function getAssignableUsers() { if (State.user?.role !== 'admin') return [State.user].filter(Boolean); return State.users.filter(user => user.role === 'apporteur' || user.role === 'admin'); }
     function getObjectiveFor(ownerId) { return State.objectives.find(item => String(item.owner_id).toLowerCase() === String(ownerId || '').toLowerCase()) || null; }
     function fillObjectiveForm() { if (!$('objective_owner') || State.user?.role !== 'admin') return; const o = getObjectiveFor($('objective_owner').value); $('objective_ca').value = o?.objectif_ca || ''; $('objective_contracts').value = o?.objectif_contrats || ''; $('objective_start').value = o?.date_debut || ''; $('objective_end').value = o?.date_fin || ''; }
-    function syncRevenueOwnerFromClient() { if (State.user?.role !== 'admin') return; const c = State.clients.find(item => item.client_id === $('revenue_client').value); if (c?.owner_id) $('revenue_owner').value = c.owner_id; }
+    
     function getGoogleAccessToken() { if (!State.google?.accessToken || !State.google?.expiresAt) return ''; if (Date.now() > State.google.expiresAt - 60000) return ''; return State.google.accessToken; }
     function hasGoogleToken() { return Boolean(getGoogleAccessToken()); }
     function connectGoogle() {
@@ -2963,7 +3007,20 @@
         renderAll(); persistSession();
       }).catch(() => {}).finally(() => State.syncingBusiness = false);
     }
-
+async function refreshCatalogue() {
+  if (!State.businessEndpoint) return showToast("Module catalogue non configuré");
+  setButtonLoading('refreshCatalogueBtn', true);
+  try {
+    const data = await businessApi.request('bootstrap');
+    applyBusinessBootstrapData(data);
+    renderAll(); persistSession();
+    showToast('Catalogue actualisé');
+  } catch (err) {
+    showToast(err.message || 'Actualisation impossible');
+  } finally {
+    setButtonLoading('refreshCatalogueBtn', false);
+  }
+}
     function startRealtimeSync() {
       clearInterval(startRealtimeSync.timer);
       startRealtimeSync.timer = setInterval(() => { if (State.token && State.user && document.visibilityState === 'visible') silentBusinessRefresh(); }, 15000);
@@ -3040,7 +3097,7 @@
     $('cancelReferentBtn').addEventListener('click', closeReferentForm);
     $('createAppointmentBtn').addEventListener('click', createAppointment);
     $('saveReportBtn').addEventListener('click', saveReport);
-    $('createRevenueBtn').addEventListener('click', createRevenue);
+    
     $('saveObjectiveBtn').addEventListener('click', saveObjective);
     $('openSelectedPersonBtn').addEventListener('click', () => openPersonStats($('filter_owner').value || State.user.ID));
     $('saveContractBtn').addEventListener('click', saveContract);
@@ -3048,8 +3105,7 @@
     $('connectGoogleBtn').addEventListener('click', connectGoogle);
     $('disconnectGoogleBtn').addEventListener('click', disconnectGoogle);
     $('rdv_client').addEventListener('change', renderReferentOptions);
-    $('revenue_client').addEventListener('change', syncRevenueOwnerFromClient);
-    $('objective_owner').addEventListener('change', () => { fillObjectiveForm(); renderDashboardAnalytics(); });
+        $('objective_owner').addEventListener('change', () => { fillObjectiveForm(); renderDashboardAnalytics(); });
     ['filter_start','filter_end','filter_client','filter_owner'].forEach(id => { $(id).addEventListener('change', () => { renderStats(); renderRevenue(); renderDashboardAnalytics(); renderPortfolioHistory(); renderPersonStats(); }); });
     $('clearFiltersBtn').addEventListener('click', () => { ['filter_start','filter_end','filter_client','filter_owner'].forEach(id => $(id).value = ''); renderAll(); });
     // CATALOGUE / DEVIS
@@ -3063,7 +3119,7 @@
     $('cancelDevisBtn').addEventListener('click', () => setView('dashboard'));
     $('transformDevisBtn').addEventListener('click', () => transformDevisToContract($('devis_id').value));
     $('addDevisLigneBtn').addEventListener('click', () => { const d = getDevisDraft(); d.lignes.push(makeEmptyLigneDraft(d.lignes.length + 1)); renderDevisLignes(); computeDevisTotalsUI(); });
-    $('refreshCatalogueBtn').addEventListener('click', () => silentBusinessRefresh());
+    $('refreshCatalogueBtn').addEventListener('click', refreshCatalogue);
     $('refreshDevisBtn').addEventListener('click', () => silentBusinessRefresh());
 
     document.addEventListener('click', event => {
