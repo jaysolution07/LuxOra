@@ -606,14 +606,51 @@
 
     .mobile-nav {
       display: grid;
-      grid-template-columns: repeat(9, minmax(0, 1fr));
-      gap: 8px;
-      padding: 10px;
-      border-bottom: 1px solid var(--line);
-      background: var(--panel);
-      position: sticky;
-      top: 64px;
-      z-index: 9;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 4px;
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, .94);
+      backdrop-filter: blur(14px);
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      box-shadow: 0 -10px 26px rgba(27, 26, 36, .08);
+    }
+
+    .mobile-nav .nav-btn {
+      min-height: 38px;
+      width: 100%;
+      margin: 0;
+      padding: 5px 3px;
+      justify-content: center;
+      text-align: center;
+      font-size: 10px;
+      line-height: 1.1;
+      white-space: normal;
+      border-radius: 9px;
+    }
+
+    @media (max-width: 779px) {
+      main {
+        padding-bottom: 128px;
+      }
+
+      .topbar {
+        padding: 0 12px;
+      }
+
+      .topbar #companyName {
+        display: none;
+      }
+
+      .topbar .btn {
+        padding: 8px 10px;
+        min-height: 38px;
+        font-size: 12px;
+      }
     }
     .sidebar {
       display: none;
@@ -1262,6 +1299,8 @@
   <script>
     const MASTER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwzO0Hel-tKYSclEggKCxlv7fA7zes0DfHOxNs-x0WUwdhKFT5pPH-EtTaBpzLjWd-K/exec';
     const FRONT_SESSION_TTL_MS = 60 * 60 * 1000;
+    const OPTIMISTIC_OP_TTL_MS = 2 * 60 * 1000;
+    const OPTIMISTIC_OP_GRACE_MS = 60 * 1000;
     const GOOGLE_SCOPES = [
       'https://www.googleapis.com/auth/calendar.events',
       'https://www.googleapis.com/auth/gmail.send',
@@ -1294,6 +1333,7 @@
       devis_lignes: StoredSession?.devis_lignes || [],
       prestations: StoredSession?.prestations || [],
       supplements: StoredSession?.supplements || [],
+      pendingOps: StoredSession?.pendingOps || {},
       catalogueAnalytics: null,
       currentDevisDraft: null,
       loading: {
@@ -1358,6 +1398,70 @@
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display = (p.id === tabId) ? 'block' : 'none');
     }
 
+    function pendingKey(collection, id) { return `${collection}:${id}`; }
+    function prunePendingOps() {
+      const now = Date.now();
+      Object.keys(State.pendingOps || {}).forEach(key => {
+        if (!State.pendingOps[key]?.expiresAt || State.pendingOps[key].expiresAt < now) delete State.pendingOps[key];
+      });
+    }
+    function markPendingDelete(collection, id) {
+      if (!id) return;
+      State.pendingOps[pendingKey(collection, id)] = { collection, id, action: 'delete', expiresAt: Date.now() + OPTIMISTIC_OP_TTL_MS };
+    }
+    function confirmPendingDelete(collection, id) {
+      if (!id) return;
+      State.pendingOps[pendingKey(collection, id)] = { collection, id, action: 'delete', expiresAt: Date.now() + OPTIMISTIC_OP_GRACE_MS };
+    }
+    function markPendingUpsert(collection, id, item) {
+      if (!id || !item) return;
+      State.pendingOps[pendingKey(collection, id)] = { collection, id, action: 'upsert', item: { ...item }, expiresAt: Date.now() + OPTIMISTIC_OP_TTL_MS };
+    }
+    function confirmPendingUpsert(collection, id, item) {
+      if (!id) return;
+      if (item) markPendingUpsert(collection, id, { ...item, _pending: false });
+      const key = pendingKey(collection, id);
+      if (State.pendingOps[key]) State.pendingOps[key].expiresAt = Date.now() + OPTIMISTIC_OP_GRACE_MS;
+    }
+    function clearPendingOp(collection, id) { if (id) delete State.pendingOps[pendingKey(collection, id)]; }
+    function isPendingDelete(collection, id) {
+      prunePendingOps();
+      return State.pendingOps[pendingKey(collection, id)]?.action === 'delete';
+    }
+    function pendingDeletedIds(collection) {
+      prunePendingOps();
+      return new Set(Object.values(State.pendingOps)
+        .filter(op => op.collection === collection && op.action === 'delete')
+        .map(op => op.id));
+    }
+    function applyPendingOps(collection, rows, idField) {
+      prunePendingOps();
+      const output = (Array.isArray(rows) ? rows : []).filter(row => !isPendingDelete(collection, row?.[idField]));
+      Object.values(State.pendingOps).forEach(op => {
+        if (op.collection !== collection || op.action !== 'upsert' || !op.item) return;
+        const index = output.findIndex(row => String(row?.[idField]) === String(op.id));
+        if (index >= 0) output[index] = { ...output[index], ...op.item };
+        else output.unshift(op.item);
+      });
+      return output;
+    }
+    function applyBusinessBootstrapData(data) {
+      const devisRows = (data.devis && data.devis.devis) || data.devis || [];
+      const devisLines = (data.devis && data.devis.lignes) || data.devis_lignes || [];
+      const deletedDevisIds = pendingDeletedIds('devis');
+      State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
+      State.clients = applyPendingOps('clients', data.clients || [], 'client_id');
+      State.appointments = applyPendingOps('appointments', data.appointments || [], 'appointment_id');
+      State.revenue = applyPendingOps('revenue', data.revenue || [], 'revenue_id');
+      State.objectives = applyPendingOps('objectives', data.objectives || [], 'objective_id');
+      State.portfolioHistory = data.portfolioHistory || [];
+      State.contracts = applyPendingOps('contracts', data.contracts || [], 'contract_id');
+      State.prestations = applyPendingOps('prestations', data.prestations || [], 'prestation_id');
+      State.supplements = applyPendingOps('supplements', data.supplements || [], 'supplement_id');
+      State.devis = applyPendingOps('devis', devisRows, 'devis_id');
+      State.devis_lignes = applyPendingOps('devis_lignes', devisLines.filter(line => !deletedDevisIds.has(line.devis_id)), 'ligne_id');
+    }
+
     async function login(event) {
       event.preventDefault();
       $('loginError').style.display = 'none';
@@ -1369,6 +1473,7 @@
         State.users = data.users || [State.user]; State.stats = data.stats || null;
         persistSession();
         $('loginScreen').style.display = 'none'; $('bootScreen').style.display = 'none'; $('app').style.display = 'block';
+        ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = true);
         renderAll();
         await loadBusinessBootstrap().catch(err => showToast(err.message));
         renderAll(); persistSession();
@@ -1379,6 +1484,7 @@
     async function bootstrapApp() {
       State.loading.clients = true; State.loading.appointments = true;
       State.loading.revenue = true; State.loading.contracts = true;
+      State.loading.catalogue = true; State.loading.devis = true;
       if (State.user) renderAll();
       const data = await masterApi.request('bootstrap');
       State.user = data.user; State.company = data.company;
@@ -1401,13 +1507,7 @@
       try {
         State.loading.catalogue = true; State.loading.devis = true;
         const data = await businessApi.request('bootstrap');
-        State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
-        State.clients = data.clients || []; State.appointments = data.appointments || [];
-        State.revenue = data.revenue || []; State.objectives = data.objectives || [];
-        State.portfolioHistory = data.portfolioHistory || []; State.contracts = data.contracts || [];
-        State.prestations = data.prestations || []; State.supplements = data.supplements || [];
-        State.devis = (data.devis && data.devis.devis) || data.devis || [];
-        State.devis_lignes = (data.devis && data.devis.lignes) || data.devis_lignes || [];
+        applyBusinessBootstrapData(data);
         persistSession();
       } finally {
         ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
@@ -1417,11 +1517,15 @@
     // ============ CATALOGUE - renders ============
     function renderPrestations() {
       if (!$('prestationsRows')) return;
+      if (State.loading.catalogue) {
+        $('prestationsRows').innerHTML = skeletonRows(7, 4);
+        return;
+      }
       const isAdmin = State.user.role === 'admin';
       $('prestationsRows').innerHTML = State.prestations.map(p => {
         const commissionLabel = p.commission_type === 'fixe'
           ? formatMoney(p.commission_valeur) : (Number(p.commission_valeur || 0) + ' %');
-        return `<tr>
+        return `<tr class="${p._pending ? 'row-pending' : ''}">
           <td><strong>${escapeHtml(p.nom)}</strong><div class="muted">${escapeHtml(p.description || '')}</div></td>
           <td>${escapeHtml(p.categorie || '')}</td>
           <td><strong>${formatMoney(p.tarif_vente)}</strong>
@@ -1442,8 +1546,12 @@
 
     function renderSupplements() {
       if (!$('supplementsRows')) return;
+      if (State.loading.catalogue) {
+        $('supplementsRows').innerHTML = skeletonRows(6, 3);
+        return;
+      }
       $('supplementsRows').innerHTML = State.supplements.map(s => `
-        <tr>
+        <tr class="${s._pending ? 'row-pending' : ''}">
           <td><strong>${escapeHtml(s.nom)}</strong><div class="muted">${escapeHtml(s.description || '')}</div></td>
           <td>${escapeHtml(s.mode_calcul)}</td>
           <td>${formatMoney(s.prix_min)}</td>
@@ -1460,6 +1568,14 @@
 
     function renderCatalogueAnalytics() {
       if (!$('statPrestationCount')) return;
+      if (State.loading.catalogue || State.loading.devis) {
+        ['statPrestationCount','statSupplementCount','statCatalogueCa','statCatalogueCommission','statCatalogueMarge','statCatalogueRentabilite','analyticsCa','analyticsCommissions','analyticsMarge','analyticsRentabilite'].forEach(id => {
+          if ($(id)) $(id).innerHTML = '<div class="skeleton" style="height:22px"></div>';
+        });
+        $('analyticsPrestationsRows').innerHTML = skeletonRows(5, 3);
+        $('analyticsApporteursRows').innerHTML = skeletonRows(6, 3);
+        return;
+      }
       $('statPrestationCount').textContent = State.prestations.filter(p => p.statut === 'Actif').length;
       $('statSupplementCount').textContent = State.supplements.filter(s => (s.statut || 'Actif') === 'Actif').length;
       const acc = State.devis.filter(d => d.statut === 'Accepte' || d.statut === 'Transforme');
@@ -1519,6 +1635,10 @@
 
     function renderDevisListe() {
       if (!$('devisRows')) return;
+      if (State.loading.devis) {
+        $('devisRows').innerHTML = skeletonRows(10, 4);
+        return;
+      }
       const userMap = new Map(State.users.map(u => [u.ID, u.Nom || u.ID]));
       $('devisRows').innerHTML = State.devis.slice().sort((a,b) => String(b.date).localeCompare(String(a.date))).map(d => `
         <tr class="${d._pending ? 'row-pending' : ''}">
@@ -1535,7 +1655,8 @@
             <div class="inline-actions">
               <button class="btn btn-secondary" data-edit-devis="${escapeAttr(d.devis_id)}">Modifier</button>
               ${d.statut !== 'Transforme' ? `<button class="btn btn-secondary" data-transform-devis="${escapeAttr(d.devis_id)}">Transformer</button>` : ''}
-              ${d.statut !== 'Transforme' ? `<button class="btn btn-secondary" data-delete-devis="${escapeAttr(d.devis_id)}">Supprimer</button>` : ''}
+              <button class="btn btn-secondary" data-delete-devis="${escapeAttr(d.devis_id)}">Supprimer</button>
+
             </div>
           </td>
         </tr>`).join('') || '<tr><td colspan="10" class="muted">Aucun devis.</td></tr>';
@@ -1663,6 +1784,33 @@
       $('devis_commission').textContent = formatMoney(commission);
       $('devis_marge').textContent = formatMoney(marge);
     }
+
+    function calculateDevisTotals(d) {
+      let total_ht = 0, total_tva = 0, total_ttc = 0, commission = 0;
+      (d.lignes || []).forEach(l => {
+        const ht = Number(l.quantite || 0) * Number(l.prix_unitaire || 0) * (1 - Number(l.remise_pct || 0) / 100);
+        const tva = ht * (Number(l.tva_pct || 0) / 100);
+        total_ht += ht;
+        total_tva += tva;
+        total_ttc += ht + tva;
+        commission += Number(l.commission_valeur || 0);
+      });
+      const factor = Math.max(0, 1 - Number(d.remise_pct || 0) / 100);
+      total_ht *= factor;
+      total_tva *= factor;
+      total_ttc *= factor;
+      commission *= factor;
+      total_ttc = Math.max(0, total_ttc - Number(d.remise_montant || 0));
+      const montant_entreprise = Math.max(0, total_ht - commission);
+      return {
+        total_ht: Math.round(total_ht * 100) / 100,
+        total_tva: Math.round(total_tva * 100) / 100,
+        total_ttc: Math.round(total_ttc * 100) / 100,
+        commission_apporteur: Math.round(commission * 100) / 100,
+        montant_entreprise: Math.round(montant_entreprise * 100) / 100,
+      };
+    }
+
     async function saveDevisFromDraft() {
       const d = getDevisDraft();
       d.client_id = $('devis_client').value;
@@ -1676,6 +1824,35 @@
         remise_pct: d.remise_pct, remise_montant: d.remise_montant,
         lignes: d.lignes.map(l => ({ type: l.type, ref_id: l.ref_id, nom: l.nom, quantite: l.quantite,
           prix_unitaire: l.prix_unitaire, remise_pct: l.remise_pct, tva_pct: l.tva_pct })) };
+      const previousDevis = State.devis.slice();
+      const previousLignes = State.devis_lignes.slice();
+      const devisId = d.devis_id || tempId('dev');
+      const totals = calculateDevisTotals(d);
+      const optimisticDevis = Object.assign({
+        devis_id: devisId,
+        owner_id: State.user?.ID || '',
+        client_id: d.client_id,
+        client_nom: getClientName(d.client_id),
+        date: d.date,
+        statut: d.statut,
+        notes: d.notes,
+        remise_pct: d.remise_pct,
+        remise_montant: d.remise_montant,
+        _pending: true,
+      }, totals);
+      const optimisticLines = d.lignes.map((l, index) => Object.assign({}, l, {
+        devis_id: devisId,
+        ligne_id: l.ligne_id || tempId('lig'),
+        position: index + 1,
+        _pending: true,
+      }));
+      if (d.devis_id) State.devis = State.devis.map(x => x.devis_id === d.devis_id ? optimisticDevis : x);
+      else State.devis.unshift(optimisticDevis);
+      State.devis_lignes = State.devis_lignes.filter(l => l.devis_id !== devisId).concat(optimisticLines);
+      markPendingUpsert('devis', devisId, optimisticDevis);
+      optimisticLines.forEach(line => markPendingUpsert('devis_lignes', line.ligne_id, line));
+      switchTab('devisListe');
+      renderDevisListe(); renderCatalogueAnalytics(); persistSession();
       setButtonLoading('saveDevisBtn', true);
       try {
         let saved;
@@ -1683,44 +1860,112 @@
           saved = await businessApi.request('updateDevis', Object.assign({ devis_id: d.devis_id }, payload));
           State.devis = State.devis.map(x => x.devis_id === saved.devis.devis_id ? saved.devis : x);
           State.devis_lignes = State.devis_lignes.filter(l => l.devis_id !== saved.devis.devis_id).concat(saved.lignes);
+          confirmPendingUpsert('devis', saved.devis.devis_id, saved.devis);
           showToast('Devis modifié');
         } else {
           saved = await businessApi.request('createDevis', payload);
-          State.devis.unshift(saved.devis);
-          State.devis_lignes = State.devis_lignes.concat(saved.lignes);
+          clearPendingOp('devis', devisId);
+          State.devis = State.devis.map(x => x.devis_id === devisId ? saved.devis : x);
+          State.devis_lignes = State.devis_lignes.filter(l => l.devis_id !== devisId).concat(saved.lignes);
+          confirmPendingUpsert('devis', saved.devis.devis_id, saved.devis);
           showToast('Devis créé');
         }
+        optimisticLines.forEach(line => clearPendingOp('devis_lignes', line.ligne_id));
+        (saved.lignes || []).forEach(line => confirmPendingUpsert('devis_lignes', line.ligne_id, line));
         renderAll(); persistSession();
-      } catch (err) { showToast(err.message); }
+      } catch (err) {
+        clearPendingOp('devis', devisId);
+        optimisticLines.forEach(line => clearPendingOp('devis_lignes', line.ligne_id));
+        State.devis = previousDevis;
+        State.devis_lignes = previousLignes;
+        renderAll();
+        showToast(err.message);
+      }
       finally { setButtonLoading('saveDevisBtn', false); }
     }
     async function transformDevisToContract(devisId) {
       const d = State.devis.find(x => x.devis_id === devisId);
-      if (!d) return;
+      if (!d) return showToast('Devis introuvable');
+      const dateDebut = (function (s) {
+        const m = String(s || '').match(/(\d{4})-(\d{2})-(\d{2})/);
+        return m ? (m[1] + '-' + m[2] + '-' + m[3]) : null;
+      })(d.date);
+      if (!dateDebut) return showToast('Date du devis invalide : ' + d.date);
+      const dateFin = addOneYear(dateDebut);
+      if (!dateFin) return showToast('Impossible de calculer la date de fin');
       if (!confirm('Transformer ce devis en contrat signé ? Cette action est définitive.')) return;
+      const previousDevis = State.devis.slice();
+      const previousContracts = State.contracts.slice();
+      const target = State.devis.find(x => x.devis_id === devisId);
+      const optimisticContract = {
+        contract_id: tempId('ctr'),
+        owner_id: d.owner_id || State.user?.ID || '',
+        client_id: d.client_id,
+        client_nom: d.client_nom || getClientName(d.client_id),
+        date_debut: dateDebut,
+        date_fin: dateFin,
+        statut: 'Signe',
+        montant: Number(d.total_ht || 0),
+        notes: `Transforme depuis devis ${d.devis_id}`,
+        _pending: true,
+      };
+      if (target) { target.statut = 'Transforme'; target.contrat_id = optimisticContract.contract_id; target._pending = true; }
+      State.contracts.unshift(optimisticContract);
+      renderAll(); persistSession();
       try {
-        const res = await businessApi.request('transformerEnContrat', { devis_id: devisId, date_debut: d.date, date_fin: addOneYear(d.date) });
+        const res = await businessApi.request('transformerEnContrat', {
+          devis_id: devisId,
+          date_debut: dateDebut,
+          date_fin: dateFin,
+        });
         showToast('Devis transformé en contrat');
-        const target = State.devis.find(x => x.devis_id === devisId);
-        if (target) { target.statut = 'Transforme'; target.contrat_id = res.contrat.contract_id; }
-        State.contracts.unshift(res.contrat);
+        const confirmed = State.devis.find(x => x.devis_id === devisId);
+        if (confirmed) { confirmed.statut = 'Transforme'; confirmed.contrat_id = res.contrat.contract_id; confirmed._pending = false; }
+        State.contracts = State.contracts.map(c => c === optimisticContract || c.contract_id === optimisticContract.contract_id ? res.contrat : c);
         renderAll(); persistSession();
-      } catch (err) { showToast(err.message); }
+      } catch (err) {
+        State.devis = previousDevis;
+        State.contracts = previousContracts;
+        renderAll();
+        console.error('transformDevisToContract error:', err);
+        showToast('Erreur: ' + (err.message || 'inconnue'));
+      }
     }
-    async function deleteDevisAction(devisId) {
-      if (!confirm('Supprimer ce devis ?')) return;
+
+
+       async function deleteDevisAction(devisId) {
+      const d = State.devis.find(x => x.devis_id === devisId);
+      if (!d) return;
+      const isTransformed = d.statut === 'Transforme';
+      const msg = isTransformed
+        ? 'Ce devis a deja ete transforme en contrat signe. Supprimer uniquement le devis (le contrat reste en place) ?'
+        : 'Supprimer ce devis ?';
+      if (!confirm(msg)) return;
       try {
         await businessApi.request('deleteDevis', { devis_id: devisId });
-        State.devis = State.devis.filter(d => d.devis_id !== devisId);
+        State.devis = State.devis.filter(x => x.devis_id !== devisId);
         State.devis_lignes = State.devis_lignes.filter(l => l.devis_id !== devisId);
-        showToast('Devis supprimé');
-        renderDevisListe(); renderCatalogueAnalytics();
-      } catch (err) { showToast(err.message); }
+        showToast(isTransformed ? 'Devis supprime (contrat preserve)' : 'Devis supprime');
+        renderDevisListe(); renderCatalogueAnalytics(); persistSession();
+      } catch (err) {
+        showToast('Erreur: ' + (err.message || 'inconnue'));
+      }
     }
-    function addOneYear(dateStr) {
-      const d = new Date(dateStr + 'T00:00:00'); d.setFullYear(d.getFullYear() + 1);
+
+            function addOneYear(dateStr) {
+      if (!dateStr) return dateStr;
+      // Extrait YYYY-MM-DD quelle que soit la forme de la date
+      const s = String(dateStr);
+      const m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) return null;
+      const iso = m[1] + '-' + m[2] + '-' + m[3];
+      const d = new Date(iso + 'T00:00:00');
+      if (isNaN(d.getTime())) return null;
+      d.setFullYear(d.getFullYear() + 1);
       return d.toISOString().slice(0, 10);
     }
+
+
     function openEditDevis(id) {
       const d = State.devis.find(x => x.devis_id === id); if (!d) return;
       const lignes = State.devis_lignes.filter(l => l.devis_id === id).sort((a,b) => Number(a.position) - Number(b.position));
@@ -1746,33 +1991,66 @@
         statut: $('prs_statut').value,
       };
       if (!payload.nom) return showToast('Nom requis');
+      const previous = State.prestations.slice();
+      const optimistic = Object.assign({ prestation_id: editing || tempId('prs'), _pending: true }, payload);
+      if (editing) State.prestations = State.prestations.map(p => p.prestation_id === editing ? optimistic : p);
+      else State.prestations.unshift(optimistic);
+      markPendingUpsert('prestations', optimistic.prestation_id, optimistic);
+      renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes(); persistSession();
+      setButtonLoading('savePrestationBtn', true);
       try {
         const saved = editing
           ? await businessApi.request('updatePrestation', Object.assign({ prestation_id: editing }, payload))
           : await businessApi.request('createPrestation', payload);
+        if (!editing) clearPendingOp('prestations', optimistic.prestation_id);
         if (editing) State.prestations = State.prestations.map(p => p.prestation_id === editing ? saved : p);
-        else State.prestations.unshift(saved);
+        else State.prestations = State.prestations.map(p => p === optimistic || p.prestation_id === optimistic.prestation_id ? saved : p);
+        confirmPendingUpsert('prestations', saved.prestation_id, saved);
         showToast('Prestation enregistrée');
         ['prs_nom','prs_categorie','prs_description','prs_conseille','prs_minimum','prs_vente','prs_commission_valeur'].forEach(id => $(id).value = '');
         delete $('savePrestationBtn').dataset.editing;
         renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes(); persistSession();
-      } catch (err) { showToast(err.message); }
+      } catch (err) {
+        clearPendingOp('prestations', optimistic.prestation_id);
+        State.prestations = previous;
+        renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes();
+        showToast(err.message);
+      } finally { setButtonLoading('savePrestationBtn', false); }
     }
     async function togglePrestationAction(id) {
+      const previous = State.prestations.slice();
+      State.prestations = State.prestations.map(p => p.prestation_id === id ? Object.assign({}, p, { statut: p.statut === 'Actif' ? 'Inactif' : 'Actif', _pending: true }) : p);
+      markPendingUpsert('prestations', id, State.prestations.find(p => p.prestation_id === id));
+      renderPrestations(); renderCatalogueAnalytics(); persistSession();
       try {
         const saved = await businessApi.request('togglePrestation', { prestation_id: id });
         State.prestations = State.prestations.map(p => p.prestation_id === id ? saved : p);
+        confirmPendingUpsert('prestations', id, saved);
         renderPrestations(); renderCatalogueAnalytics(); persistSession();
-      } catch (err) { showToast(err.message); }
+      } catch (err) {
+        clearPendingOp('prestations', id);
+        State.prestations = previous;
+        renderPrestations(); renderCatalogueAnalytics();
+        showToast(err.message);
+      }
     }
     async function deletePrestationAction(id) {
       if (!confirm('Supprimer cette prestation ?')) return;
+      const previous = State.prestations.slice();
+      markPendingDelete('prestations', id);
+      State.prestations = State.prestations.filter(p => p.prestation_id !== id);
+      renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes(); persistSession();
       try {
         await businessApi.request('deletePrestation', { prestation_id: id });
-        State.prestations = State.prestations.filter(p => p.prestation_id !== id);
+        confirmPendingDelete('prestations', id);
         showToast('Prestation supprimée');
         renderPrestations(); renderCatalogueAnalytics(); persistSession();
-      } catch (err) { showToast(err.message); }
+      } catch (err) {
+        clearPendingOp('prestations', id);
+        State.prestations = previous;
+        renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes();
+        showToast(err.message);
+      }
     }
     function openEditSupplement(id) {
       const s = State.supplements.find(x => x.supplement_id === id); if (!s) return;
@@ -1788,25 +2066,48 @@
         mode_calcul: $('sup_mode').value, precision: $('sup_precision').value,
         statut: $('sup_statut').value };
       if (!payload.nom) return showToast('Nom requis');
+      const previous = State.supplements.slice();
+      const optimistic = Object.assign({ supplement_id: editing || tempId('sup'), _pending: true }, payload);
+      if (editing) State.supplements = State.supplements.map(s => s.supplement_id === editing ? optimistic : s);
+      else State.supplements.unshift(optimistic);
+      markPendingUpsert('supplements', optimistic.supplement_id, optimistic);
+      renderSupplements(); renderDevisLignes(); persistSession();
+      setButtonLoading('saveSupplementBtn', true);
       try {
         const saved = editing
           ? await businessApi.request('updateSupplement', Object.assign({ supplement_id: editing }, payload))
           : await businessApi.request('createSupplement', payload);
+        if (!editing) clearPendingOp('supplements', optimistic.supplement_id);
         if (editing) State.supplements = State.supplements.map(s => s.supplement_id === editing ? saved : s);
-        else State.supplements.unshift(saved);
+        else State.supplements = State.supplements.map(s => s === optimistic || s.supplement_id === optimistic.supplement_id ? saved : s);
+        confirmPendingUpsert('supplements', saved.supplement_id, saved);
         showToast('Supplément enregistré');
         ['sup_nom','sup_description','sup_min','sup_max','sup_precision'].forEach(id => $(id).value = '');
         delete $('saveSupplementBtn').dataset.editing;
         renderSupplements(); persistSession();
-      } catch (err) { showToast(err.message); }
+      } catch (err) {
+        clearPendingOp('supplements', optimistic.supplement_id);
+        State.supplements = previous;
+        renderSupplements(); renderDevisLignes();
+        showToast(err.message);
+      } finally { setButtonLoading('saveSupplementBtn', false); }
     }
     async function deleteSupplementAction(id) {
       if (!confirm('Supprimer ce supplément ?')) return;
+      const previous = State.supplements.slice();
+      markPendingDelete('supplements', id);
+      State.supplements = State.supplements.filter(s => s.supplement_id !== id);
+      renderSupplements(); renderDevisLignes(); persistSession();
       try {
         await businessApi.request('deleteSupplement', { supplement_id: id });
-        State.supplements = State.supplements.filter(s => s.supplement_id !== id);
+        confirmPendingDelete('supplements', id);
         showToast('Supplément supprimé'); renderSupplements(); persistSession();
-      } catch (err) { showToast(err.message); }
+      } catch (err) {
+        clearPendingOp('supplements', id);
+        State.supplements = previous;
+        renderSupplements(); renderDevisLignes();
+        showToast(err.message);
+      }
     }
 
     // ============ Existing render functions ============
@@ -1982,7 +2283,7 @@
         </tr>`).join('') || `<tr><td colspan="5" class="muted">Aucun historique.</td></tr>`;
     }
 
-    function renderRevenue() {
+        function renderRevenue() {
       if (State.loading.revenue) {
         $('revenueRows').innerHTML = skeletonRows(6, 4);
         $('objectiveProgress').innerHTML = '<div class="skeleton" style="height:52px"></div>';
@@ -1991,17 +2292,27 @@
       }
       const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
       const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
+
+      // Affiche "Bottle Fabien" si owner_id = "admin" littéral, sinon le nom trouvé dans userMap
+      const displayOwner = (oid) => {
+        if (!oid) return '';
+        if (userMap.has(oid)) return userMap.get(oid);
+        if (String(oid).toLowerCase() === 'admin') return State.user.Nom || State.user.ID || 'Admin';
+        return oid;
+      };
+
       const rows = filterRevenue(State.revenue).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
       $('revenueRows').innerHTML = rows.map(item => `
         <tr class="${item._pending ? 'row-pending' : ''}">
           <td>${escapeHtml(formatDate(item.date))}</td>
           <td>${escapeHtml(clientMap.get(item.client_id) || item.client_nom || 'Client')}</td>
-          <td>${escapeHtml(userMap.get(item.owner_id) || item.owner_id || '')}</td>
+          <td>${escapeHtml(displayOwner(item.owner_id))}</td>
           <td><strong>${escapeHtml(formatMoney(item.montant))}</strong></td>
           <td>${escapeHtml(item.nombre_contrats || 0)}</td>
           <td>${escapeHtml(item.commentaires || '')}</td>
         </tr>`).join('') || `<tr><td colspan="6" class="muted">Aucun contrat enregistre.</td></tr>`;
     }
+
 
     function renderContractOptions() {
       if (!$('contract_client')) return;
@@ -2111,67 +2422,118 @@
       return `<div><h3 style="margin-top:0">${escapeHtml(title)}</h3>${rows}</div>`;
     }
 
-    function openPersonStats(ownerId) {
-      const id = ownerId || $('filter_owner').value || State.user.ID;
-      if ($('filter_owner')) $('filter_owner').value = id;
-      setView('dashboard'); renderStats(); renderRevenue(); renderDashboardAnalytics(); renderPortfolioHistory(); renderPersonStats();
+       function openPersonStats(ownerId) {
+      const filterVal = $('filter_owner')?.value || '';
+      // Si l'utilisateur clique sans sélection, on garde la sélection actuelle (ou mode global)
+      if (!ownerId && filterVal) ownerId = filterVal;
+      // Sinon on ne touche pas le filtre
+      setView('dashboard');
+      renderStats(); renderRevenue(); renderDashboardAnalytics();
+      renderPortfolioHistory(); renderPersonStats();
       $('personStatsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function renderPersonStats() {
-      if (!$('personStatsPanel') || State.user.role !== 'admin') return;
-      if (State.loading.clients || State.loading.revenue || State.loading.appointments) {
-        $('personStatsHelp').textContent = 'Chargement des donnees.';
-        $('personStatsPanel').innerHTML = '<div class="skeleton" style="height:120px"></div>';
-        return;
+
+               function renderPersonStats() {
+      try {
+        if (!$('personStatsPanel') || !State.user || State.user.role !== 'admin') return;
+        if (State.loading.clients || State.loading.revenue || State.loading.appointments) {
+          $('personStatsHelp').textContent = 'Chargement des donnees.';
+          $('personStatsPanel').innerHTML = '<div class="skeleton" style="height:120px"></div>';
+          return;
+        }
+        const safeStr = (v) => String(v == null ? '' : v).trim();
+        const filterVal = $('filter_owner')?.value || '';
+        const isGlobal = filterVal === '';
+        const person = isGlobal
+          ? { ID: '__global__', Nom: 'Vue globale', role: 'Admin' }
+          : (State.users.find(u => u.ID === filterVal) || State.user);
+
+        const personRole = safeStr(person.role).toLowerCase();
+        const personIsAdmin = personRole.indexOf('admin') !== -1;
+        const personNameLower = safeStr(person.Nom).toLowerCase();
+        const filterLower = safeStr(filterVal).toLowerCase();
+
+        const matchesOwner = (ownerId) => {
+          if (isGlobal) return true;
+          const oid = safeStr(ownerId).toLowerCase();
+          if (!oid) return false;
+          if (oid === filterLower) return true;
+          if (personNameLower && oid === personNameLower) return true;
+          if (oid === 'admin' && personIsAdmin) return true;
+          return false;
+        };
+
+        const start = $('filter_start')?.value || '';
+        const end = $('filter_end')?.value || '';
+        const clientId = $('filter_client')?.value || '';
+
+        const clients = isGlobal
+          ? State.clients.slice()
+          : State.clients.filter(c => matchesOwner(c.owner_id));
+        const revenueRows = State.revenue
+          .filter(r => matchesOwner(r.owner_id))
+          .filter(r => {
+            if (start && r.date < start) return false;
+            if (end && r.date > end) return false;
+            if (clientId && r.client_id !== clientId) return false;
+            return true;
+          })
+          .slice()
+          .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+        const appointments = isGlobal
+          ? State.appointments.slice()
+          : State.appointments.filter(a => matchesOwner(a.owner_id));
+        const objective = isGlobal ? null : getObjectiveFor(filterVal);
+
+        const totalCa = sumField(revenueRows, 'montant');
+        const totalContracts = sumField(revenueRows, 'nombre_contrats');
+        const clientMap = new Map(State.clients.map(c => [c.client_id, c.nom_entreprise]));
+
+        $('personStatsHelp').textContent = isGlobal
+          ? 'Vue globale de l entreprise'
+          : (person.Nom || person.ID) + ' - ' + roleLabel(person.role);
+        $('personStatsPanel').innerHTML = `
+          <div class="person-kpis">
+            <div class="person-kpi"><span class="muted">Clients</span><strong>${clients.length}</strong></div>
+            <div class="person-kpi"><span class="muted">CA realise</span><strong>${escapeHtml(formatMoney(totalCa))}</strong></div>
+            <div class="person-kpi"><span class="muted">Contrats</span><strong>${totalContracts}</strong></div>
+            <div class="person-kpi"><span class="muted">Rendez-vous</span><strong>${appointments.length}</strong></div>
+          </div>
+          <div class="progress-block">
+            ${isGlobal
+              ? '<p class="muted">Selectionnez un apporteur pour voir ses objectifs.</p>'
+              : progressLine("Objectif CA", totalCa, Number(objective && objective.objectif_ca || 0), formatMoney)
+                + progressLine("Objectif contrats", totalContracts, Number(objective && objective.objectif_contrats || 0), v => String(v))}
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Client</th><th>Montant</th><th>Contrats</th><th>Commentaire</th></tr></thead>
+              <tbody>
+                ${revenueRows.map(r => `
+                  <tr>
+                    <td>${escapeHtml(formatDate(r.date))}</td>
+                    <td>${escapeHtml(clientMap.get(r.client_id) || r.client_nom || 'Client')}</td>
+                    <td><strong>${escapeHtml(formatMoney(r.montant))}</strong></td>
+                    <td>${escapeHtml(r.nombre_contrats || 0)}</td>
+                    <td>${escapeHtml(r.commentaires || '')}</td>
+                  </tr>`).join('') || '<tr><td colspan="5" class="muted">Aucun chiffre enregistre pour cette selection.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3>${isGlobal ? 'Tous les clients de l entreprise' : 'Clients du portefeuille'}</h3>
+            <p class="muted">${clients.map(c => escapeHtml(c.nom_entreprise)).join(' - ') || (isGlobal ? 'Aucun client enregistre.' : 'Aucun client attribue.')}</p>
+          </div>`;
+      } catch (err) {
+        console.error('renderPersonStats crashed:', err);
+        if ($('personStatsPanel')) {
+          $('personStatsHelp').textContent = "Erreur d'affichage";
+          $('personStatsPanel').innerHTML = '<p class="muted"><strong>Erreur :</strong> ' + escapeHtml(err && err.message ? err.message : String(err)) + '</p>';
+        }
       }
-      const ownerId = $('filter_owner').value || State.user.ID;
-      const person = State.users.find(user => user.ID === ownerId) || State.user;
-      const clients = State.clients.filter(client => client.owner_id === ownerId);
-      const revenueRows = State.revenue.filter(item => item.owner_id === ownerId)
-        .filter(item => {
-          const start = $('filter_start')?.value || '';
-          const end = $('filter_end')?.value || '';
-          const clientId = $('filter_client')?.value || '';
-          if (start && item.date < start) return false;
-          if (end && item.date > end) return false;
-          if (clientId && item.client_id !== clientId) return false;
-          return true;
-        }).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
-      const appointments = State.appointments.filter(item => item.owner_id === ownerId);
-      const objective = getObjectiveFor(ownerId);
-      const totalCa = sumField(revenueRows, 'montant');
-      const totalContracts = sumField(revenueRows, 'nombre_contrats');
-      const clientMap = new Map(State.clients.map(client => [client.client_id, client.nom_entreprise]));
-      $('personStatsHelp').textContent = `${person.Nom || person.ID} - ${roleLabel(person.role)}`;
-      $('personStatsPanel').innerHTML = `
-        <div class="person-kpis">
-          <div class="person-kpi"><span class="muted">Clients</span><strong>${clients.length}</strong></div>
-          <div class="person-kpi"><span class="muted">CA realise</span><strong>${escapeHtml(formatMoney(totalCa))}</strong></div>
-          <div class="person-kpi"><span class="muted">Contrats</span><strong>${totalContracts}</strong></div>
-          <div class="person-kpi"><span class="muted">Rendez-vous</span><strong>${appointments.length}</strong></div>
-        </div>
-        <div class="progress-block">
-          ${progressLine("Objectif CA", totalCa, Number(objective?.objectif_ca || 0), formatMoney)}
-          ${progressLine("Objectif contrats", totalContracts, Number(objective?.objectif_contrats || 0), value => String(value))}
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Date</th><th>Client</th><th>Montant</th><th>Contrats</th><th>Commentaire</th></tr></thead>
-            <tbody>
-              ${revenueRows.map(item => `
-                <tr>
-                  <td>${escapeHtml(formatDate(item.date))}</td>
-                  <td>${escapeHtml(clientMap.get(item.client_id) || item.client_nom || 'Client')}</td>
-                  <td><strong>${escapeHtml(formatMoney(item.montant))}</strong></td>
-                  <td>${escapeHtml(item.nombre_contrats || 0)}</td>
-                  <td>${escapeHtml(item.commentaires || '')}</td>
-                </tr>`).join('') || '<tr><td colspan="5" class="muted">Aucun chiffre enregistre pour cette selection.</td></tr>'}
-            </tbody>
-          </table>
-        </div>
-        <div><h3>Clients du portefeuille</h3><p class="muted">${clients.map(client => escapeHtml(client.nom_entreprise)).join(' - ') || 'Aucun client attribue.'}</p></div>`;
     }
+
 
     // CRUD fonctions (existantes + ajustées) :
     async function createUser() {
@@ -2244,14 +2606,17 @@
       const optimisticRevenue = buildRevenueFromForm();
       if (!optimisticRevenue.client_id || !optimisticRevenue.owner_id || !optimisticRevenue.date) return showToast('Client, apporteur et date requis');
       if (Number(optimisticRevenue.montant) <= 0 && Number(optimisticRevenue.nombre_contrats) <= 0) return showToast('Montant ou nombre de contrats requis');
+      markPendingUpsert('revenue', optimisticRevenue.revenue_id, optimisticRevenue);
       State.revenue.unshift(optimisticRevenue); renderAll();
       setButtonLoading('createRevenueBtn', true);
       try {
         const saved = await businessApi.request('createRevenue', optimisticRevenue);
+        clearPendingOp('revenue', optimisticRevenue.revenue_id);
         Object.assign(optimisticRevenue, saved, { _pending: false });
+        confirmPendingUpsert('revenue', saved.revenue_id, optimisticRevenue);
         ['revenue_amount','revenue_comments'].forEach(id => $(id).value = ''); $('revenue_contracts').value = '1';
         renderAll(); silentRefresh(); showToast('Contrat enregistre');
-      } catch (err) { State.revenue = State.revenue.filter(item => item !== optimisticRevenue); renderAll(); showToast(err.message); }
+      } catch (err) { clearPendingOp('revenue', optimisticRevenue.revenue_id); State.revenue = State.revenue.filter(item => item !== optimisticRevenue); renderAll(); showToast(err.message); }
       finally { setButtonLoading('createRevenueBtn', false); }
     }
 
@@ -2266,13 +2631,15 @@
         date_debut: $('objective_start').value, date_fin: $('objective_end').value, _pending: true,
       };
       State.objectives = State.objectives.filter(item => item.owner_id !== ownerId);
+      markPendingUpsert('objectives', optimisticObjective.objective_id, optimisticObjective);
       State.objectives.unshift(optimisticObjective); renderAll();
       setButtonLoading('saveObjectiveBtn', true);
       try {
         const saved = await businessApi.request('saveObjective', optimisticObjective);
         Object.assign(optimisticObjective, saved, { _pending: false });
+        confirmPendingUpsert('objectives', saved.objective_id, optimisticObjective);
         renderAll(); silentRefresh(); showToast('Objectif enregistre');
-      } catch (err) { State.objectives = previous; renderAll(); showToast(err.message); }
+      } catch (err) { clearPendingOp('objectives', optimisticObjective.objective_id); State.objectives = previous; renderAll(); showToast(err.message); }
       finally { setButtonLoading('saveObjectiveBtn', false); }
     }
 
@@ -2286,14 +2653,20 @@
       if (existing) Object.assign(existing, contract, { _pending: true }); else State.contracts.unshift(contract);
       State.revenue = State.revenue.filter(item => item.revenue_id !== optimisticRevenue.revenue_id);
       if (Number(contract.montant) > 0) State.revenue.unshift(optimisticRevenue);
+      markPendingUpsert('contracts', contract.contract_id, contract);
+      if (Number(contract.montant) > 0) markPendingUpsert('revenue', optimisticRevenue.revenue_id, optimisticRevenue);
+      else markPendingDelete('revenue', optimisticRevenue.revenue_id);
       renderAll(); persistSession();
       setButtonLoading('saveContractBtn', true);
       try {
         const saved = await businessApi.request(existing ? 'updateContract' : 'createContract', contract);
         const target = State.contracts.find(item => item.contract_id === contract.contract_id);
         if (target) Object.assign(target, saved, { _pending: false });
+        confirmPendingUpsert('contracts', contract.contract_id, saved);
+        if (Number(saved.montant || 0) > 0) confirmPendingUpsert('revenue', `ca_${saved.contract_id}`, buildRevenueFromContract(saved));
+        else confirmPendingDelete('revenue', `ca_${saved.contract_id}`);
         resetContractForm(); renderAll(); silentBusinessRefresh(); showToast(existing ? 'Contrat modifie' : 'Contrat cree');
-      } catch (err) { State.contracts = previousContracts; State.revenue = previousRevenue; renderAll(); showToast(err.message); }
+      } catch (err) { clearPendingOp('contracts', contract.contract_id); clearPendingOp('revenue', optimisticRevenue.revenue_id); State.contracts = previousContracts; State.revenue = previousRevenue; renderAll(); showToast(err.message); }
       finally { setButtonLoading('saveContractBtn', false); }
     }
 
@@ -2317,18 +2690,23 @@
       const removed = State.contracts.find(item => item.contract_id === contractId); if (!removed) return;
       const previousContracts = State.contracts.slice();
       const previousRevenue = State.revenue.slice();
+      markPendingDelete('contracts', contractId);
+      markPendingDelete('revenue', `ca_${contractId}`);
       State.contracts = State.contracts.filter(item => item.contract_id !== contractId);
       State.revenue = State.revenue.filter(item => item.revenue_id !== `ca_${contractId}`);
       renderAll(); persistSession();
       try {
         await businessApi.request('deleteContract', { contract_id: contractId });
+        confirmPendingDelete('contracts', contractId);
+        confirmPendingDelete('revenue', `ca_${contractId}`);
         silentBusinessRefresh(); showToast('Contrat supprime');
-      } catch (err) { State.contracts = previousContracts; State.revenue = previousRevenue; renderAll(); showToast(err.message); }
+      } catch (err) { clearPendingOp('contracts', contractId); clearPendingOp('revenue', `ca_${contractId}`); State.contracts = previousContracts; State.revenue = previousRevenue; renderAll(); showToast(err.message); }
     }
 
     async function createClient() {
       const optimisticClient = buildClientFromForm();
       if (!optimisticClient.nom_entreprise) return showToast('Nom du client requis');
+      markPendingUpsert('clients', optimisticClient.client_id, optimisticClient);
       State.clients.unshift(optimisticClient); renderStats(); renderClients(); renderAppointmentClientOptions();
       setButtonLoading('createClientBtn', true);
       try {
@@ -2338,10 +2716,12 @@
           adresse: $('client_address').value, notes: $('client_notes').value,
           referent: { nom: $('ref_nom').value, prenom: $('ref_prenom').value, fonction: $('ref_fonction').value, email: $('ref_email').value, telephone: $('ref_phone').value },
         });
+        clearPendingOp('clients', optimisticClient.client_id);
         Object.assign(optimisticClient, created, { _pending: false });
+        confirmPendingUpsert('clients', created.client_id, optimisticClient);
         ['client_name','client_phone','client_site','client_address','client_notes','ref_nom','ref_prenom','ref_fonction','ref_email','ref_phone'].forEach(id => $(id).value = '');
         renderAll(); silentRefresh(); showToast('Client cree');
-      } catch (err) { State.clients = State.clients.filter(client => client !== optimisticClient); renderAll(); showToast(err.message); }
+      } catch (err) { clearPendingOp('clients', optimisticClient.client_id); State.clients = State.clients.filter(client => client !== optimisticClient); renderAll(); showToast(err.message); }
       finally { setButtonLoading('createClientBtn', false); }
     }
 
@@ -2377,6 +2757,7 @@
         optimisticHistory = { history_id: tempId('hist'), client_id: clientId, client_nom: current.nom_entreprise, from_owner_id: previous.owner_id, to_owner_id: nextOwner, action: 'transfert', created_at: new Date().toISOString(), _pending: true };
         State.portfolioHistory.unshift(optimisticHistory);
       }
+      markPendingUpsert('clients', clientId, current);
       renderAll(); persistSession();
       setButtonLoading('updateClientBtn', true);
       try {
@@ -2386,7 +2767,8 @@
           if (optimisticHistory) optimisticHistory._pending = false;
         }
         Object.assign(current, saved, { _pending: false }); closeEditClient(); renderAll(); silentRefresh(); showToast('Client modifie');
-      } catch (err) { Object.assign(current, previous, { _pending: false }); State.portfolioHistory = previousHistory; renderAll(); showToast(err.message); }
+        confirmPendingUpsert('clients', clientId, current);
+      } catch (err) { clearPendingOp('clients', clientId); Object.assign(current, previous, { _pending: false }); State.portfolioHistory = previousHistory; renderAll(); showToast(err.message); }
       finally { setButtonLoading('updateClientBtn', false); }
     }
 
@@ -2394,13 +2776,15 @@
       const removed = State.clients.find(item => item.client_id === clientId); if (!removed) return;
       const previousClients = State.clients.slice();
       const previousHistory = State.portfolioHistory.slice();
+      markPendingDelete('clients', clientId);
       State.clients = State.clients.filter(item => item.client_id !== clientId);
       State.portfolioHistory.unshift({ history_id: tempId('hist'), client_id: clientId, client_nom: removed.nom_entreprise, from_owner_id: removed.owner_id, to_owner_id: '', action: 'suppression', created_at: new Date().toISOString() });
       renderAll(); persistSession();
       try {
         await businessApi.request('deleteClient', { client_id: clientId });
+        confirmPendingDelete('clients', clientId);
         closeEditClient(); silentRefresh(); showToast('Client supprime');
-      } catch (err) { State.clients = previousClients; State.portfolioHistory = previousHistory; renderAll(); showToast(err.message); }
+      } catch (err) { clearPendingOp('clients', clientId); State.clients = previousClients; State.portfolioHistory = previousHistory; renderAll(); showToast(err.message); }
     }
 
     function openReferentForm(clientId) {
@@ -2431,23 +2815,27 @@
       const optimisticAppointment = buildAppointmentFromForm();
       if (!optimisticAppointment.client_id || !optimisticAppointment.date || !optimisticAppointment.heure) return showToast('Client, date et heure requis');
       if (!hasGoogleToken()) showToast('Compte Google non connecte: le rendez-vous ne sera pas encore ajoute a votre Agenda');
+      markPendingUpsert('appointments', optimisticAppointment.appointment_id, optimisticAppointment);
       State.appointments.unshift(optimisticAppointment); renderStats(); renderAppointments();
       setButtonLoading('createAppointmentBtn', true);
       try {
         if (!State.businessEndpoint) throw new Error('Module rendez-vous non configure');
         const created = await businessApi.request('createAppointment', optimisticAppointment);
+        clearPendingOp('appointments', optimisticAppointment.appointment_id);
         Object.assign(optimisticAppointment, created, { _pending: false });
+        confirmPendingUpsert('appointments', created.appointment_id, optimisticAppointment);
         ['rdv_date','rdv_time','rdv_address','rdv_subject','rdv_notes'].forEach(id => $(id).value = '');
         renderAll(); silentRefresh(); showToast('Rendez-vous cree');
-      } catch (err) { State.appointments = State.appointments.filter(item => item !== optimisticAppointment); renderAll(); showToast(err.message); }
+      } catch (err) { clearPendingOp('appointments', optimisticAppointment.appointment_id); State.appointments = State.appointments.filter(item => item !== optimisticAppointment); renderAll(); showToast(err.message); }
       finally { setButtonLoading('createAppointmentBtn', false); }
     }
 
     async function deleteAppointment(appointmentId) {
       const removed = State.appointments.find(item => item.appointment_id === appointmentId);
+      markPendingDelete('appointments', appointmentId);
       State.appointments = State.appointments.filter(item => item.appointment_id !== appointmentId); renderAll();
-      try { await businessApi.request('deleteAppointment', { appointment_id: appointmentId }); silentRefresh(); }
-      catch (err) { if (removed) State.appointments.unshift(removed); renderAll(); showToast(err.message); }
+      try { await businessApi.request('deleteAppointment', { appointment_id: appointmentId }); confirmPendingDelete('appointments', appointmentId); silentRefresh(); persistSession(); }
+      catch (err) { clearPendingOp('appointments', appointmentId); if (removed) State.appointments.unshift(removed); renderAll(); showToast(err.message); }
     }
 
     function openReport(appointmentId) {
@@ -2485,7 +2873,7 @@
     async function refresh() {
       setButtonLoading('refreshBtn', true);
       try {
-        State.loading.clients = true; State.loading.appointments = true; State.loading.revenue = true;
+        ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = true);
         renderAll();
         const data = await masterApi.request('bootstrap');
         State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
@@ -2571,13 +2959,7 @@
       if (!State.businessEndpoint || State.syncingBusiness) return;
       State.syncingBusiness = true;
       businessApi.request('bootstrap').then(data => {
-        State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
-        State.clients = data.clients || []; State.appointments = data.appointments || [];
-        State.revenue = data.revenue || []; State.objectives = data.objectives || [];
-        State.portfolioHistory = data.portfolioHistory || []; State.contracts = data.contracts || [];
-        State.prestations = data.prestations || []; State.supplements = data.supplements || [];
-        State.devis = (data.devis && data.devis.devis) || data.devis || [];
-        State.devis_lignes = (data.devis && data.devis.lignes) || data.devis_lignes || [];
+        applyBusinessBootstrapData(data);
         renderAll(); persistSession();
       }).catch(() => {}).finally(() => State.syncingBusiness = false);
     }
@@ -2623,6 +3005,7 @@
         // CATALOGUE / DEVIS
         prestations: State.prestations, supplements: State.supplements,
         devis: State.devis, devis_lignes: State.devis_lignes,
+        pendingOps: State.pendingOps,
         google: State.google, savedAt: Date.now(),
       }));
     }
