@@ -635,6 +635,7 @@
       border-radius: 9px;
     }
 
+
     @media (max-width: 779px) {
       main {
         padding-bottom: 128px;
@@ -795,7 +796,7 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
     width: auto;
     margin: 0;
   }
-
+}
 
 /* ============================================================
    TRÈS PETIT ÉCRAN — <380px
@@ -812,128 +813,146 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
 @media (min-width: 560px) and (max-width: 779px) {
   .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-               /* === DASHBOARD : cartes KPI (version finale unifiée) === */
-    body .dashboard-stats {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)) !important;
-      gap: 16px !important;
-      max-width: 1200px !important;
-      align-items: stretch !important;
-    }
+               /* === DASHBOARD CARTES KPI — verrouillage par ID (1,1) spécificité === */
+#dashboard .dashboard-stats {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;   /* ← ici */
+  gap: 14px !important;
+  max-width: 1120px !important;                                    /* et là */
+  align-items: stretch !important;
+  width: auto !important;
+}
 
-    body .dashboard-stats > .stat {
-      background: #fff !important;
-      border: 1px solid var(--line) !important;
-      border-radius: var(--radius-lg) !important;
-      box-shadow: var(--shadow-sm) !important;
-      position: relative !important;
-      padding: 18px 18px 16px !important;
-      overflow: hidden !important;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 14px !important;
-      min-width: 0 !important;
-      transition: transform .2s ease, box-shadow .2s ease;
-    }
-    body .dashboard-stats > .stat:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow) !important;
-    }
+#dashboard .dashboard-stats > .stat {
+  background: #fff !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  position: relative !important;
+  padding: 18px 18px 16px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  text-align: left !important;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+#dashboard .dashboard-stats > .stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow) !important;
+}
+#dashboard .dashboard-stats > .stat::before,
+#dashboard .dashboard-stats > .stat::after {
+  content: none !important;
+  display: none !important;
+}
+#dashboard .dashboard-stats > .stat::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 0 auto 0 !important;
+  width: 100% !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, var(--gold), var(--brand)) !important;
+  border-radius: 0 !important;
+  pointer-events: none !important;
+}
+#dashboard .dashboard-stats > .stat:nth-child(2)::before { background: linear-gradient(90deg, var(--accent), #b89cd9) !important; }
+#dashboard .dashboard-stats > .stat:nth-child(3)::before { background: linear-gradient(90deg, var(--ok), #56b487) !important; }
+#dashboard .dashboard-stats > .stat::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  top: -40px !important;
+  right: -40px !important;
+  width: 130px !important;
+  height: 130px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, rgba(201,162,75,.13), rgba(201,162,75,0) 70%) !important;
+  pointer-events: none !important;
+}
+#dashboard .dashboard-stats .stat-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  color: var(--brand) !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .14em !important;
+  margin: 4px 0 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  font-family: Inter, sans-serif !important;
+  line-height: 1.2 !important;
+}
+#dashboard .dashboard-stats > .stat:nth-child(2) .stat-head { color: var(--accent) !important; }
+#dashboard .dashboard-stats > .stat:nth-child(3) .stat-head { color: var(--ok) !important; }
+#dashboard .dashboard-stats .stat-head svg {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  max-width: 26px !important;
+  padding: 6px !important;
+  flex-shrink: 0 !important;
+  border-radius: 999px !important;
+  background: var(--brand-light) !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
+  fill: none !important;
+  display: block !important;
+  margin: 0 !important;
+}
+#dashboard .dashboard-stats > .stat:nth-child(2) .stat-head svg { background: #ece3f5 !important; }
+#dashboard .dashboard-stats > .stat:nth-child(3) .stat-head svg { background: #def4e9 !important; }
+#dashboard .dashboard-stats .stat-group {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px 22px !important;
+  width: 100% !important;
+}
+#dashboard .dashboard-stats .stat-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  padding: 4px 0 8px !important;
+  border-top: none !important;
+  border-bottom: 1px dashed var(--line) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+#dashboard .dashboard-stats .stat-item:nth-last-child(-n+2) { border-bottom: none !important; }
+#dashboard .dashboard-stats .stat-label {
+  color: var(--muted) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+#dashboard .dashboard-stats .stat-value {
+  font-family: var(--font-display) !important;
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  text-align: left !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+  display: block !important;
+}
+#dashboard .dashboard-stats > .stat:nth-child(3) .stat-item:nth-child(3) {
+  grid-column: 1 / -1 !important;
+}
 
-    /* Bandeau couleur en haut — écrase l'ancien halo .stat::before global */
-    body .dashboard-stats > .stat::before {
-      content: '' !important;
-      position: absolute !important;
-      inset: 0 0 auto 0 !important;
-      width: 100% !important;
-      height: 3px !important;
-      background: linear-gradient(90deg, var(--gold), var(--brand)) !important;
-    }
-    body .dashboard-stats > .stat:nth-child(2)::before { background: linear-gradient(90deg, var(--accent), #b89cd9) !important; }
-    body .dashboard-stats > .stat:nth-child(3)::before { background: linear-gradient(90deg, var(--ok), #56b487) !important; }
-
-    /* Halo or discret en coin haut-droite */
-    body .dashboard-stats > .stat::after {
-      content: '' !important;
-      position: absolute !important;
-      top: -40px !important; right: -40px !important;
-      width: 130px !important; height: 130px !important;
-      border-radius: 50% !important;
-      background: radial-gradient(circle, rgba(201,162,75,.13), rgba(201,162,75,0) 70%) !important;
-      pointer-events: none !important;
-    }
-
-    /* En-tête : icône pastille + titre MAJUSCULE coloré */
-    body .dashboard-stats .stat-head {
-      display: flex !important;
-      align-items: center !important;
-      gap: 10px !important;
-      color: var(--brand) !important;
-      font-weight: 700 !important;
-      font-size: 12px !important;
-      text-transform: uppercase !important;
-      letter-spacing: .14em !important;
-      margin: 4px 0 0 !important;
-    }
-    body .dashboard-stats > .stat:nth-child(2) .stat-head { color: var(--accent) !important; }
-    body .dashboard-stats > .stat:nth-child(3) .stat-head { color: var(--ok) !important; }
-
-    body .dashboard-stats .stat-head svg {
-      width: 26px !important;
-      height: 26px !important;
-      min-width: 26px !important;
-      max-width: 26px !important;
-      padding: 6px !important;
-      flex-shrink: 0 !important;
-      border-radius: 999px !important;
-      background: var(--brand-light) !important;
-      color: currentColor !important;
-      stroke: currentColor !important;
-      display: block !important;
-    }
-    body .dashboard-stats > .stat:nth-child(2) .stat-head svg { background: #ece3f5 !important; }
-    body .dashboard-stats > .stat:nth-child(3) .stat-head svg { background: #def4e9 !important; }
-
-    /* Tuiles 2 colonnes à l'intérieur */
-    body .dashboard-stats .stat-group {
-      display: grid !important;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 12px 22px !important;
-    }
-    body .dashboard-stats .stat-item {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      justify-content: flex-start !important;
-      gap: 4px !important;
-      padding: 4px 0 8px !important;
-      border-top: none !important;
-      min-height: 0 !important;
-      border-bottom: 1px dashed var(--line) !important;
-    }
-    body .dashboard-stats .stat-item:nth-last-child(-n+2) { border-bottom: none !important; }
-
-    body .dashboard-stats .stat-label {
-      color: var(--muted) !important;
-      font-size: 11.5px !important;
-      font-weight: 600 !important;
-      letter-spacing: .04em !important;
-      text-transform: uppercase !important;
-      flex-shrink: 0 !important;
-    }
-    body .dashboard-stats .stat-value {
-      font-family: var(--font-display) !important;
-      font-size: 24px !important;
-      font-weight: 600 !important;
-      color: var(--ink) !important;
-      text-align: left !important;
-      margin-left: 0 !important;
-      line-height: 1.1 !important;
-    }
-    /* "Contrats" dans Performance : pleine largeur */
-    body .dashboard-stats > .stat:nth-child(3) .stat-item:nth-child(3) {
-      grid-column: 1 / -1 !important;
-    }
 
   </style>
 </head>
