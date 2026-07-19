@@ -910,21 +910,30 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
 #dashboard .dashboard-stats > .stat:nth-child(3) .stat-head svg { background: #def4e9 !important; }
 #dashboard .dashboard-stats .stat-group {
   display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+
   gap: 12px 22px !important;
   width: 100% !important;
 }
+@media (max-width: 559px) {
+  #dashboard .dashboard-stats {
+    grid-template-columns: 1fr !important;
+    max-width: none !important;
+  }
+}
+
 #dashboard .dashboard-stats .stat-item {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
-  justify-content: flex-start !important;
-  gap: 4px !important;
-  padding: 4px 0 8px !important;
+  gap: 12px !important;
+  padding: 6px 0 12px !important;
+
   border-top: none !important;
   border-bottom: 1px dashed var(--line) !important;
   min-height: 0 !important;
-  margin: 0 !important;
+    margin: 2px 0 0 !important;
+
   background: transparent !important;
 }
 #dashboard .dashboard-stats .stat-item:nth-last-child(-n+2) { border-bottom: none !important; }
