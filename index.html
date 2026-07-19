@@ -497,15 +497,17 @@
     .status-termine { color: #7c611f; background: #fffaeb; }
     .status-annule { color: var(--danger); background: #fff1f0; }
 
-    .stat, .panel {
-      padding: 20px;
-      box-shadow: none;
-    }
+    .panel{
+    padding:20px;
+}
 
-    .stat {
-      position: relative;
-      overflow: hidden;
-    }
+
+    .stat{
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
 
     .stat::before {
       content: '';
@@ -699,7 +701,8 @@
       .sidebar { display: block; }
       .mobile-nav { display: none; }
       main { padding: 28px; }
-      .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+                        .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+                          
       .filter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .person-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -735,9 +738,12 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
   .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
 
   /* Stats cards : 2 colonnes */
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .grid .stat { min-width: 0; }
   .grid .stat .value { font-size: 18px; line-height: 1.1; }
+        .dashboard-stats { grid-template-columns: 1fr 1fr !important; gap: 14px !important; }
+  .dashboard-stats > .stat:last-child { grid-column: auto !important; }
+
   .grid .stat > div, .grid .stat > .muted {
     font-size: 11px;
     white-space: nowrap;
@@ -806,6 +812,129 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
 @media (min-width: 560px) and (max-width: 779px) {
   .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+               /* === DASHBOARD : cartes KPI (version finale unifiée) === */
+    body .dashboard-stats {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)) !important;
+      gap: 16px !important;
+      max-width: 1200px !important;
+      align-items: stretch !important;
+    }
+
+    body .dashboard-stats > .stat {
+      background: #fff !important;
+      border: 1px solid var(--line) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow: var(--shadow-sm) !important;
+      position: relative !important;
+      padding: 18px 18px 16px !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 14px !important;
+      min-width: 0 !important;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    body .dashboard-stats > .stat:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow) !important;
+    }
+
+    /* Bandeau couleur en haut — écrase l'ancien halo .stat::before global */
+    body .dashboard-stats > .stat::before {
+      content: '' !important;
+      position: absolute !important;
+      inset: 0 0 auto 0 !important;
+      width: 100% !important;
+      height: 3px !important;
+      background: linear-gradient(90deg, var(--gold), var(--brand)) !important;
+    }
+    body .dashboard-stats > .stat:nth-child(2)::before { background: linear-gradient(90deg, var(--accent), #b89cd9) !important; }
+    body .dashboard-stats > .stat:nth-child(3)::before { background: linear-gradient(90deg, var(--ok), #56b487) !important; }
+
+    /* Halo or discret en coin haut-droite */
+    body .dashboard-stats > .stat::after {
+      content: '' !important;
+      position: absolute !important;
+      top: -40px !important; right: -40px !important;
+      width: 130px !important; height: 130px !important;
+      border-radius: 50% !important;
+      background: radial-gradient(circle, rgba(201,162,75,.13), rgba(201,162,75,0) 70%) !important;
+      pointer-events: none !important;
+    }
+
+    /* En-tête : icône pastille + titre MAJUSCULE coloré */
+    body .dashboard-stats .stat-head {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      color: var(--brand) !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      text-transform: uppercase !important;
+      letter-spacing: .14em !important;
+      margin: 4px 0 0 !important;
+    }
+    body .dashboard-stats > .stat:nth-child(2) .stat-head { color: var(--accent) !important; }
+    body .dashboard-stats > .stat:nth-child(3) .stat-head { color: var(--ok) !important; }
+
+    body .dashboard-stats .stat-head svg {
+      width: 26px !important;
+      height: 26px !important;
+      min-width: 26px !important;
+      max-width: 26px !important;
+      padding: 6px !important;
+      flex-shrink: 0 !important;
+      border-radius: 999px !important;
+      background: var(--brand-light) !important;
+      color: currentColor !important;
+      stroke: currentColor !important;
+      display: block !important;
+    }
+    body .dashboard-stats > .stat:nth-child(2) .stat-head svg { background: #ece3f5 !important; }
+    body .dashboard-stats > .stat:nth-child(3) .stat-head svg { background: #def4e9 !important; }
+
+    /* Tuiles 2 colonnes à l'intérieur */
+    body .dashboard-stats .stat-group {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 12px 22px !important;
+    }
+    body .dashboard-stats .stat-item {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      justify-content: flex-start !important;
+      gap: 4px !important;
+      padding: 4px 0 8px !important;
+      border-top: none !important;
+      min-height: 0 !important;
+      border-bottom: 1px dashed var(--line) !important;
+    }
+    body .dashboard-stats .stat-item:nth-last-child(-n+2) { border-bottom: none !important; }
+
+    body .dashboard-stats .stat-label {
+      color: var(--muted) !important;
+      font-size: 11.5px !important;
+      font-weight: 600 !important;
+      letter-spacing: .04em !important;
+      text-transform: uppercase !important;
+      flex-shrink: 0 !important;
+    }
+    body .dashboard-stats .stat-value {
+      font-family: var(--font-display) !important;
+      font-size: 24px !important;
+      font-weight: 600 !important;
+      color: var(--ink) !important;
+      text-align: left !important;
+      margin-left: 0 !important;
+      line-height: 1.1 !important;
+    }
+    /* "Contrats" dans Performance : pleine largeur */
+    body .dashboard-stats > .stat:nth-child(3) .stat-item:nth-child(3) {
+      grid-column: 1 / -1 !important;
+    }
+
   </style>
 </head>
 <body>
@@ -938,16 +1067,50 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
             </div>
             <button class="btn btn-secondary" id="refreshBtn">Actualiser</button>
           </div>
-          <div class="grid">
-            <div class="stat admin-stat"><div class="muted">Utilisateurs</div><div id="statUsers" class="value">0</div></div>
-            <div class="stat admin-stat"><div class="muted">Admins</div><div id="statAdmins" class="value">0</div></div>
-            <div class="stat admin-stat"><div class="muted">Apporteurs</div><div id="statApporteurs" class="value">0</div></div>
-            <div class="stat"><div class="muted">Clients</div><div id="statClients" class="value">0</div></div>
-            <div class="stat"><div class="muted">Rendez-vous</div><div id="statAppointments" class="value">0</div></div>
-            <div class="stat"><div class="muted">CR en attente</div><div id="statPendingReports" class="value">0</div></div>
-                        <div class="stat"><div class="muted">Chiffre d'affaires</div><div id="statRevenue" class="value">0 EUR</div></div>
-            <div class="stat"><div class="muted">Commissions</div><div id="statCommissions" class="value">0 EUR</div></div>
-            <div class="stat"><div class="muted">Contrats</div><div id="statContracts" class="value">0</div></div>
+          <div class="grid dashboard-stats">
+            <div class="stat admin-stat">
+              <div class="stat-head">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                Personnes
+              </div>
+              <div class="stat-group">
+                <div class="stat-item"><span class="stat-label">Utilisateurs</span><span id="statUsers" class="stat-value">0</span></div>
+                <div class="stat-item"><span class="stat-label">Admins</span><span id="statAdmins" class="stat-value">0</span></div>
+                <div class="stat-item"><span class="stat-label">Apporteurs</span><span id="statApporteurs" class="stat-value">0</span></div>
+                <div class="stat-item"><span class="stat-label">Clients</span><span id="statClients" class="stat-value">0</span></div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="stat-head">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Activité
+              </div>
+              <div class="stat-group">
+                <div class="stat-item"><span class="stat-label">Rendez-vous</span><span id="statAppointments" class="stat-value">0</span></div>
+                <div class="stat-item"><span class="stat-label">CR en attente</span><span id="statPendingReports" class="stat-value">0</span></div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="stat-head">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                Performance
+              </div>
+              <div class="stat-group">
+                <div class="stat-item"><span class="stat-label">CA</span><span id="statRevenue" class="stat-value">0 €</span></div>
+                <div class="stat-item"><span class="stat-label">Commissions</span><span id="statCommissions" class="stat-value">0 €</span></div>
+                <div class="stat-item"><span class="stat-label">Contrats</span><span id="statContracts" class="stat-value">0</span></div>
+              </div>
+            </div>
           </div>
 
 
@@ -3118,7 +3281,17 @@ showToast('Client cree');
     function contractStatusClass(status) { const v = String(status || '').toLowerCase(); if (v.includes('signe')) return 'status-signe'; if (v.includes('termine')) return 'status-termine'; if (v.includes('annule')) return 'status-annule'; return 'status-negociation'; }
     function getAssignableUsers() { if (State.user?.role !== 'admin') return [State.user].filter(Boolean); return State.users.filter(user => user.role === 'apporteur' || user.role === 'admin'); }
     function getObjectiveFor(ownerId) { return State.objectives.find(item => String(item.owner_id).toLowerCase() === String(ownerId || '').toLowerCase()) || null; }
-    function fillObjectiveForm() { if (!$('objective_owner') || State.user?.role !== 'admin') return; const o = getObjectiveFor($('objective_owner').value); $('objective_ca').value = o?.objectif_ca || ''; $('objective_contracts').value = o?.objectif_contrats || ''; $('objective_start').value = o?.date_debut || ''; $('objective_end').value = o?.date_fin || ''; }
+    function fillObjectiveForm() {
+  if (!$('objective_owner') || State.user?.role !== 'admin') return;
+  const o = getObjectiveFor($('objective_owner').value);
+  // ⚠️ Ne pas écraser si le user a déjà tapé quelque chose
+  const setIfEmpty = (id, val) => { const el = $(id); if (el && !el.value) el.value = val || ''; };
+  setIfEmpty('objective_ca', o?.objectif_ca);
+  setIfEmpty('objective_contracts', o?.objectif_contrats);
+  setIfEmpty('objective_start', o?.date_debut);
+  setIfEmpty('objective_end', o?.date_fin);
+}
+
     
     function getGoogleAccessToken() { if (!State.google?.accessToken || !State.google?.expiresAt) return ''; if (Date.now() > State.google.expiresAt - 60000) return ''; return State.google.accessToken; }
     function hasGoogleToken() { return Boolean(getGoogleAccessToken()); }
