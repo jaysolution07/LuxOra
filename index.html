@@ -963,6 +963,101 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
 #dashboard .dashboard-stats > .stat:nth-child(3) .stat-item:nth-child(3) {
   grid-column: 1 / -1 !important;
 }
+/* === CATALOGUE : cartes harmonisées (même langage visuel que le dashboard) === */
+body .catalogue-stats { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important; gap: 14px !important; }
+body .catalogue-stats > .stat {
+  background: #fff !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  position: relative !important;
+  padding: 14px 16px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  text-align: left !important;
+}
+body .catalogue-stats > .stat::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 0 auto 0 !important;
+  width: 100% !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, var(--gold), var(--brand)) !important;
+}
+body .catalogue-stats > .stat:nth-child(2)::before { background: linear-gradient(90deg, var(--accent), #b89cd9) !important; }
+body .catalogue-stats > .stat:nth-child(3)::before { background: linear-gradient(90deg, var(--ok), #56b487) !important; }
+body .catalogue-stats > .stat:nth-child(4)::before { background: linear-gradient(90deg, var(--accent), #b89cd9) !important; }
+body .catalogue-stats > .stat:nth-child(5)::before { background: linear-gradient(90deg, var(--ok), #56b487) !important; }
+body .catalogue-stats > .stat:nth-child(6)::before { background: linear-gradient(90deg, var(--gold), var(--brand)) !important; }
+body .catalogue-stats .stat-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  color: var(--brand) !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .14em !important;
+  margin: 4px 0 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  font-family: Inter, sans-serif !important;
+  line-height: 1.2 !important;
+}
+body .catalogue-stats > .stat:nth-child(2) .stat-head { color: var(--accent) !important; }
+body .catalogue-stats > .stat:nth-child(3) .stat-head { color: var(--ok) !important; }
+body .catalogue-stats > .stat:nth-child(4) .stat-head { color: var(--accent) !important; }
+body .catalogue-stats > .stat:nth-child(5) .stat-head { color: var(--ok) !important; }
+body .catalogue-stats > .stat:nth-child(6) .stat-head { color: var(--brand) !important; }
+body .catalogue-stats .stat-head svg {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  padding: 5px !important;
+  border-radius: 999px !important;
+  background: var(--brand-light) !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
+  fill: none !important;
+  display: block !important;
+}
+body .catalogue-stats > .stat:nth-child(2) .stat-head svg { background: #ece3f5 !important; }
+body .catalogue-stats > .stat:nth-child(3) .stat-head svg { background: #def4e9 !important; }
+body .catalogue-stats > .stat:nth-child(4) .stat-head svg { background: #ece3f5 !important; }
+body .catalogue-stats > .stat:nth-child(5) .stat-head svg { background: #def4e9 !important; }
+body .catalogue-stats .stat-value {
+  font-family: var(--font-display) !important;
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  text-align: left !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+  display: block !important;
+}
+body .catalogue-stats .stat-label {
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+body .catalogue-stats .stat-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 2px !important;
+  padding: 4px 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
 
 
   </style>
@@ -1383,14 +1478,75 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
             <button class="btn btn-secondary" id="refreshCatalogueBtn">Actualiser</button>
           </div>
 
-          <div class="grid" style="margin-top:14px">
-            <div class="stat"><div class="muted">Prestations actives</div><strong id="statPrestationCount" class="value">0</strong></div>
-            <div class="stat"><div class="muted">Suppléments dispos</div><strong id="statSupplementCount" class="value">0</strong></div>
-            <div class="stat"><div class="muted">CA vendu (catalogue)</div><strong id="statCatalogueCa" class="value">0 EUR</strong></div>
-            <div class="stat"><div class="muted">Commissions catalogue</div><strong id="statCatalogueCommission" class="value">0 EUR</strong></div>
-            <div class="stat"><div class="muted">Marge brute</div><strong id="statCatalogueMarge" class="value">0 EUR</strong></div>
-            <div class="stat"><div class="muted">Rentabilité moyenne</div><strong id="statCatalogueRentabilite" class="value">0 %</strong></div>
-          </div>
+          <div class="grid catalogue-stats" style="margin-top:14px">
+  <div class="stat">
+    <div class="stat-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="9" r="2"/><circle cx="9" cy="15" r="2"/><circle cx="15" cy="15" r="2"/>
+      </svg>
+      Prestations
+    </div>
+    <div class="stat-group">
+      <div class="stat-item"><span class="stat-label">Actives</span><span id="statPrestationCount" class="stat-value">0</span></div>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      Suppléments
+    </div>
+    <div class="stat-group">
+      <div class="stat-item"><span class="stat-label">Disponibles</span><span id="statSupplementCount" class="stat-value">0</span></div>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      CA catalogue
+    </div>
+    <div class="stat-group">
+      <div class="stat-item"><span class="stat-label">Total HT</span><span id="statCatalogueCa" class="stat-value">0 €</span></div>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/>
+      </svg>
+      Commissions
+    </div>
+    <div class="stat-group">
+      <div class="stat-item"><span class="stat-label">Catalogue</span><span id="statCatalogueCommission" class="stat-value">0 €</span></div>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/>
+      </svg>
+      Marge brute
+    </div>
+    <div class="stat-group">
+      <div class="stat-item"><span class="stat-label">Bénéfice</span><span id="statCatalogueMarge" class="stat-value">0 €</span></div>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Rentabilité
+    </div>
+    <div class="stat-group">
+      <div class="stat-item"><span class="stat-label">Moyenne</span><span id="statCatalogueRentabilite" class="stat-value">0 %</span></div>
+    </div>
+  </div>
+</div>
+
 
           <div class="tabs">
             <button class="btn btn-secondary tab-btn active" data-tab="cataloguePrestations">Prestations</button>
