@@ -493,6 +493,7 @@
     }
 
     .status-signe { color: var(--ok); background: #ecfdf3; }
+    .status-paye { color: #027a48; background: #d1fadf; }
     .status-negociation { color: #175cd3; background: #eff8ff; }
     .status-termine { color: #7c611f; background: #fffaeb; }
     .status-annule { color: var(--danger); background: #fff1f0; }
@@ -686,6 +687,8 @@
     .tab-btn.active { background: var(--brand); color:#fff; border-color: var(--brand-dark); }
     .admin-only { display:none; }
     body.is-admin .admin-only { display:block; }
+    .admin-stat { display:none !important; }
+    body.is-admin .admin-stat { display:flex !important; }
     .admin-col { display:none; }
     body.is-admin .admin-col { display:table-cell; }
     .totaux { display:grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap:8px; }
@@ -693,6 +696,18 @@
     .totaux span { display:block; font-size:12px; color: var(--muted); }
     .totaux strong { font-size:16px; }
     .devis-ligne-row select, .devis-ligne-row input { width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:8px; }
+    .catalogue-preview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fafafa;
+    }
+    .catalogue-preview > div { display: flex; flex-direction: column; gap: 4px; }
+    .catalogue-preview span { color: var(--muted); font-size: 12px; }
     @media (max-width:880px) { .totaux { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 
     @media (min-width: 780px) {
@@ -841,6 +856,15 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
   margin: 0 !important;
   text-align: left !important;
   transition: transform .2s ease, box-shadow .2s ease;
+}
+#dashboard .dashboard-stats > .stat.admin-stat {
+  display: none !important;
+}
+body.is-admin #dashboard .dashboard-stats > .stat.admin-stat {
+  display: flex !important;
+}
+body:not(.is-admin) #dashboard .dashboard-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 #dashboard .dashboard-stats > .stat:hover {
   transform: translateY(-2px);
@@ -1207,7 +1231,6 @@ body .catalogue-stats .stat-item {
                 <div class="stat-item"><span class="stat-label">Utilisateurs</span><span id="statUsers" class="stat-value">0</span></div>
                 <div class="stat-item"><span class="stat-label">Admins</span><span id="statAdmins" class="stat-value">0</span></div>
                 <div class="stat-item"><span class="stat-label">Apporteurs</span><span id="statApporteurs" class="stat-value">0</span></div>
-                <div class="stat-item"><span class="stat-label">Clients</span><span id="statClients" class="stat-value">0</span></div>
               </div>
             </div>
 
@@ -1220,6 +1243,7 @@ body .catalogue-stats .stat-item {
                 Activité
               </div>
               <div class="stat-group">
+                <div class="stat-item"><span class="stat-label">Clients</span><span id="statClients" class="stat-value">0</span></div>
                 <div class="stat-item"><span class="stat-label">Rendez-vous</span><span id="statAppointments" class="stat-value">0</span></div>
                 <div class="stat-item"><span class="stat-label">CR en attente</span><span id="statPendingReports" class="stat-value">0</span></div>
               </div>
@@ -1577,6 +1601,13 @@ body .catalogue-stats .stat-item {
                 <div><label>TVA (%)</label><input id="prs_tva" type="number" step="0.01" value="20"></div>
                 <div><label>Statut</label><select id="prs_statut"><option value="Actif">Actif</option><option value="Inactif">Inactif</option></select></div>
               </div>
+              <div class="catalogue-preview" id="prestationPreview">
+                <div><span>Montant HT</span><strong id="prs_preview_ht">0 €</strong></div>
+                <div><span>TVA</span><strong id="prs_preview_tva">0 €</strong></div>
+                <div><span>Montant TTC</span><strong id="prs_preview_ttc">0 €</strong></div>
+                <div><span>Commission apporteur</span><strong id="prs_preview_commission">0 €</strong></div>
+                <div><span>Part entreprise</span><strong id="prs_preview_marge">0 €</strong></div>
+              </div>
               <div class="actions">
                 <button id="cancelPrestationBtn" class="btn btn-secondary">Annuler</button>
                 <button id="deletePrestationBtn" class="btn btn-secondary">Supprimer</button>
@@ -1587,7 +1618,7 @@ body .catalogue-stats .stat-item {
             <div class="panel" style="margin-top:14px">
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>Prestation</th><th>Catégorie</th><th>Tarif</th><th>Commission</th><th>TVA</th><th>Statut</th><th class="admin-col">Actions</th></tr></thead>
+                  <thead><tr><th>Prestation</th><th>Catégorie</th><th>Montant HT</th><th>TVA</th><th>Montant TTC</th><th>Commission</th><th>Part entreprise</th><th>Statut</th><th class="admin-col">Actions</th></tr></thead>
                   <tbody id="prestationsRows"></tbody>
                 </table>
               </div>
@@ -1603,12 +1634,22 @@ body .catalogue-stats .stat-item {
 
               <div class="form-grid">
                 <div><label>Nom</label><input id="sup_nom"></div>
+                <div><label>Catégorie</label><input id="sup_categorie" placeholder="Creation, Option, Diffusion..."></div>
                 <div><label>Description</label><input id="sup_description"></div>
-                <div><label>Min (€ ou %)</label><input id="sup_min" type="number" step="0.01"></div>
-                <div><label>Max (€ ou %)</label><input id="sup_max" type="number" step="0.01"></div>
-                <div><label>Mode</label><select id="sup_mode"><option value="fixe">€ fixe</option><option value="pourcentage">%</option></select></div>
-                <div><label>Précision</label><input id="sup_precision"></div>
+                <div><label>Tarif conseillé (€)</label><input id="sup_conseille" type="number" step="0.01"></div>
+                <div><label>Tarif minimum (€)</label><input id="sup_minimum" type="number" step="0.01"></div>
+                <div><label>Tarif de vente (€)</label><input id="sup_vente" type="number" step="0.01"></div>
+                <div><label>Commission apporteur</label><select id="sup_commission_type"><option value="pourcentage">%</option><option value="fixe">€ fixe</option></select></div>
+                <div><label>Valeur commission</label><input id="sup_commission_valeur" type="number" step="0.01" value="15"></div>
+                <div><label>TVA (%)</label><input id="sup_tva" type="number" step="0.01" value="20"></div>
                 <div><label>Statut</label><select id="sup_statut"><option value="Actif">Actif</option><option value="Inactif">Inactif</option></select></div>
+              </div>
+              <div class="catalogue-preview" id="supplementPreview">
+                <div><span>Montant HT</span><strong id="sup_preview_ht">0 €</strong></div>
+                <div><span>TVA</span><strong id="sup_preview_tva">0 €</strong></div>
+                <div><span>Montant TTC</span><strong id="sup_preview_ttc">0 €</strong></div>
+                <div><span>Commission apporteur</span><strong id="sup_preview_commission">0 €</strong></div>
+                <div><span>Part entreprise</span><strong id="sup_preview_marge">0 €</strong></div>
               </div>
               <div class="actions">
                 <button id="cancelSupplementBtn" class="btn btn-secondary">Annuler</button>
@@ -1619,7 +1660,7 @@ body .catalogue-stats .stat-item {
             <div class="panel" style="margin-top:14px">
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>Supplément</th><th>Mode</th><th>Min</th><th>Max</th><th>Précision</th><th class="admin-col">Actions</th></tr></thead>
+                  <thead><tr><th>Supplément</th><th>Catégorie</th><th>Montant HT</th><th>TVA</th><th>Montant TTC</th><th>Commission</th><th>Part entreprise</th><th>Statut</th><th class="admin-col">Actions</th></tr></thead>
                   <tbody id="supplementsRows"></tbody>
                 </table>
               </div>
@@ -1628,10 +1669,10 @@ body .catalogue-stats .stat-item {
 
           <div id="catalogueAnalytics" class="tab-panel" style="display:none">
             <div class="panel" style="margin-top:14px">
-              <h3>Marge par prestation</h3>
+              <h3>Marge par prestation / supplément</h3>
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>Prestation</th><th>Quantité</th><th>CA</th><th>Commissions</th><th>Marge</th></tr></thead>
+                  <thead><tr><th>Article</th><th>Quantité</th><th>CA</th><th>Commissions</th><th>Marge</th></tr></thead>
                   <tbody id="analyticsPrestationsRows"></tbody>
                 </table>
               </div>
@@ -1735,7 +1776,7 @@ body .catalogue-stats .stat-item {
             <input id="contract_id" type="hidden">
             <div class="form-grid">
               <div><label for="contract_client">Marque / client</label><select id="contract_client"></select></div>
-              <div><label for="contract_status">Statut</label><select id="contract_status"><option value="En negociation">En négociation</option><option value="Signe">Signé</option><option value="Termine">Terminé</option><option value="Annule">Annulé</option></select></div>
+              <div><label for="contract_status">Statut</label><select id="contract_status"><option value="En negociation">En négociation</option><option value="Signe">Signé</option><option value="Termine">Terminé</option><option value="Annule">Annulé</option><option value="Paye" class="admin-only-option">Payé</option></select></div>
               <div><label for="contract_start">Date de debut</label><input id="contract_start" type="date"></div>
               <div><label for="contract_end">Date de fin</label><input id="contract_end" type="date"></div>
               <div><label for="contract_amount">Montant</label><input id="contract_amount" type="number" min="0" step="0.01"></div>
@@ -1823,7 +1864,12 @@ body .catalogue-stats .stat-item {
         clients: false, appointments: false, revenue: false,
         contracts: false, catalogue: false, devis: false,
       },
+      syncingRefresh: false,
+      syncingBusiness: false,
+      dashboardSynced: false,
     };
+
+    document.body.classList.toggle('is-admin', State.user?.role === 'admin');
 
     class ApiClient {
       constructor(getUrl, getBasePayload) {
@@ -1971,29 +2017,164 @@ function toggleCatalogueTab(tabId) {
         State.token = data.token; State.user = data.user; State.company = data.company;
         State.businessEndpoint = data.company?.business_endpoint || '';
         State.users = data.users || [State.user]; State.stats = data.stats || null;
+        resetBusinessCache();
         persistSession();
-        $('loginScreen').style.display = 'none'; $('bootScreen').style.display = 'none'; $('app').style.display = 'block';
-        ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = true);
-        renderAll();
-        await loadBusinessBootstrap().catch(err => showToast(err.message));
-        renderAll(); persistSession();
+        showAppShell();
+        beginDashboardSync();
+        loadBusinessBootstrap().then(() => {
+          finishDashboardSync();
+          scheduleSecondaryRender();
+        }).catch(err => {
+          finishDashboardSync();
+          showToast(err.message);
+        });
       } catch (err) { $('loginError').textContent = err.message; $('loginError').style.display = 'block'; }
       finally { setButtonLoading('loginBtn', false); }
     }
 
     async function bootstrapApp() {
-      State.loading.clients = true; State.loading.appointments = true;
-      State.loading.revenue = true; State.loading.contracts = true;
-      State.loading.catalogue = true; State.loading.devis = true;
-      if (State.user) renderAll();
-      const data = await masterApi.request('bootstrap');
-      State.user = data.user; State.company = data.company;
-      State.businessEndpoint = data.company?.business_endpoint || '';
-      State.stats = data.stats; State.users = data.users || [State.user];
-      await loadBusinessBootstrap();
-      renderAll();
-      $('loginScreen').style.display = 'none'; $('bootScreen').style.display = 'none'; $('app').style.display = 'block';
-      persistSession();
+      showAppShell();
+      beginDashboardSync();
+      try {
+        const businessPromise = State.businessEndpoint ? loadBusinessBootstrap() : null;
+        const data = await masterApi.request('bootstrap');
+        State.user = data.user; State.company = data.company;
+        State.businessEndpoint = data.company?.business_endpoint || '';
+        State.stats = data.stats; State.users = data.users || [State.user];
+        renderDashboard();
+        if (businessPromise) {
+          await businessPromise;
+        } else if (State.businessEndpoint) {
+          await loadBusinessBootstrap();
+        } else {
+          ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
+        }
+        finishDashboardSync();
+        scheduleSecondaryRender();
+        persistSession();
+      } catch (err) {
+        clearStoredSession();
+        State.token = '';
+        showLogin();
+        throw err;
+      }
+    }
+
+    function resetBusinessCache() {
+      State.clients = [];
+      State.appointments = [];
+      State.revenue = [];
+      State.objectives = [];
+      State.portfolioHistory = [];
+      State.contracts = [];
+      State.prestations = [];
+      State.supplements = [];
+      State.devis = [];
+      State.devis_lignes = [];
+    }
+
+    function beginDashboardSync() {
+      State.dashboardSynced = false;
+      setDashboardLoading(true);
+      renderDashboard();
+    }
+
+    function finishDashboardSync() {
+      State.dashboardSynced = true;
+      setDashboardLoading(false);
+      renderDashboard();
+    }
+
+    function showAppShell() {
+      $('loginScreen').style.display = 'none';
+      $('bootScreen').style.display = 'none';
+      $('app').style.display = 'block';
+      if (State.user) applyAdminVisibility();
+    }
+
+    function setDashboardLoading(loading) {
+      ['clients','appointments','revenue','devis'].forEach(k => { State.loading[k] = loading; });
+    }
+
+    const DASHBOARD_STAT_IDS = ['statUsers','statAdmins','statApporteurs','statClients','statAppointments','statPendingReports','statRevenue','statCommissions','statContracts'];
+
+    function setDashboardSkeletons() {
+      DASHBOARD_STAT_IDS.forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        if (['statUsers','statAdmins','statApporteurs'].includes(id) && State.user?.role !== 'admin') return;
+        el.innerHTML = '<div class="skeleton" style="height:30px"></div>';
+      });
+      if ($('objectiveProgress')) {
+        $('objectiveProgress').innerHTML = '<div class="skeleton" style="height:62px"></div><div class="skeleton" style="height:62px"></div>';
+      }
+      if ($('revenueBars')) {
+        $('revenueBars').innerHTML = '<div class="skeleton" style="height:120px"></div>';
+      }
+      if ($('personStatsPanel') && State.user?.role === 'admin') {
+        $('personStatsPanel').innerHTML = '<div class="skeleton" style="height:120px"></div>';
+      }
+    }
+
+    function isDashboardLoading() {
+      return !State.dashboardSynced || State.loading.clients || State.loading.appointments || State.loading.revenue || State.loading.devis;
+    }
+
+    function applyAdminVisibility() {
+      const isAdmin = State.user?.role === 'admin';
+      document.body.classList.toggle('is-admin', !!isAdmin);
+      document.querySelectorAll('[data-view="users"]').forEach(btn => { btn.style.display = isAdmin ? 'inline-flex' : 'none'; });
+      document.querySelectorAll('.admin-user-col').forEach(el => { el.style.display = isAdmin ? 'table-cell' : 'none'; });
+      document.querySelectorAll('.admin-filter').forEach(el => { el.style.display = isAdmin ? 'block' : 'none'; });
+      if (!isAdmin && document.getElementById('users')?.classList.contains('active')) setView('dashboard');
+    }
+
+    function renderDashboard() {
+      applyAdminVisibility();
+      $('companyName').textContent = State.company?.entreprise || '';
+      $('dashboardTitle').textContent = State.company?.entreprise || 'Tableau de bord';
+      $('userLine').textContent = `${State.user?.Nom || ''} - ${roleLabel(State.user?.role)}`;
+      renderStats();
+      renderRevenueOptions();
+      renderDashboardAnalytics();
+      renderPersonStats();
+    }
+
+    function scheduleSecondaryRender() {
+      const run = () => {
+        renderSecondaryViews();
+        persistSession();
+      };
+      if (typeof requestIdleCallback === 'function') requestIdleCallback(run, { timeout: 1200 });
+      else setTimeout(run, 0);
+    }
+
+    function renderSecondaryViews() {
+      $('usersHelp').textContent = State.user?.role === 'admin'
+        ? `Creation limitee a l'entreprise ${State.company?.entreprise || ''}.`
+        : 'Votre compte apporteur.';
+      if (State.user?.role !== 'admin') $('adminEditPanel').style.display = 'none';
+      $('clientsHelp').textContent = State.user?.role === 'admin'
+        ? 'Vue globale des clients de l entreprise.'
+        : 'Votre portefeuille client.';
+      $('catalogueHelp').textContent = State.user?.role === 'admin'
+        ? 'Gérez vos prestations, suppléments et la rentabilité.'
+        : 'Consultez les prestations commercialisables par l\u2019entreprise.';
+      renderUsers();
+      renderClients();
+      renderPortfolioHistory();
+      renderAppointmentClientOptions();
+      renderAppointments();
+      renderRevenue();
+      renderContractOptions();
+      renderContracts();
+      renderGoogleStatus();
+      renderPrestations();
+      renderSupplements();
+      renderCatalogueAnalytics();
+      renderDevisOptions();
+      renderDevisListe();
+      renderContractStatusOptions($('contract_status')?.value || 'En negociation');
     }
 
     async function loadBusinessBootstrap() {
@@ -2004,66 +2185,165 @@ function toggleCatalogueTab(tabId) {
         ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
         return;
       }
+      State.loading.clients = true;
+      State.loading.appointments = true;
+      State.loading.revenue = true;
+      State.loading.devis = true;
+      State.loading.contracts = true;
+      State.loading.catalogue = true;
       try {
-        State.loading.catalogue = true; State.loading.devis = true;
         const data = await businessApi.request('bootstrap');
         applyBusinessBootstrapData(data);
-        persistSession();
+        if (data.stats) State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
       } finally {
         ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
       }
     }
 
     // ============ CATALOGUE - renders ============
+    function roundCatalogueAmount(value) {
+      return Math.round(Number(value || 0) * 100) / 100;
+    }
+
+    function normalizeCatalogueItem(item) {
+      const source = item || {};
+      const prixMin = Number(source.prix_min || 0);
+      const prixMax = Number(source.prix_max || 0);
+      const tarifVente = Number(source.tarif_vente != null ? source.tarif_vente : (prixMax || prixMin || 0));
+      return {
+        nom: source.nom || '',
+        categorie: source.categorie || (source.prix_min != null || source.prix_max != null ? 'Supplement' : ''),
+        description: source.description || '',
+        tarif_conseille: Number(source.tarif_conseille != null ? source.tarif_conseille : tarifVente),
+        tarif_minimum: Number(source.tarif_minimum != null ? source.tarif_minimum : (prixMin || tarifVente)),
+        tarif_vente: tarifVente,
+        commission_type: source.commission_type === 'fixe' ? 'fixe' : 'pourcentage',
+        commission_valeur: Number(source.commission_valeur != null ? source.commission_valeur : 15),
+        tva: Number(source.tva != null ? source.tva : 20),
+        statut: source.statut || 'Actif',
+      };
+    }
+
+    function computeCatalogueFinancials(item) {
+      const normalized = normalizeCatalogueItem(item);
+      const ht = roundCatalogueAmount(normalized.tarif_vente);
+      const tvaPct = normalized.tva;
+      const tvaAmount = roundCatalogueAmount(ht * tvaPct / 100);
+      const ttc = roundCatalogueAmount(ht + tvaAmount);
+      const commission = normalized.commission_type === 'fixe'
+        ? roundCatalogueAmount(normalized.commission_valeur)
+        : roundCatalogueAmount(ht * normalized.commission_valeur / 100);
+      const marge = roundCatalogueAmount(Math.max(0, ht - commission));
+      return Object.assign({}, normalized, { ht, tvaPct, tvaAmount, ttc, commission, marge });
+    }
+
+    function buildCataloguePayloadFromForm(prefix) {
+      return {
+        nom: $(prefix + '_nom').value,
+        categorie: $(prefix + '_categorie').value,
+        description: $(prefix + '_description').value,
+        tarif_conseille: Number($(prefix + '_conseille').value || 0),
+        tarif_minimum: Number($(prefix + '_minimum').value || 0),
+        tarif_vente: Number($(prefix + '_vente').value || 0),
+        commission_type: $(prefix + '_commission_type').value,
+        commission_valeur: Number($(prefix + '_commission_valeur').value || 0),
+        tva: Number($(prefix + '_tva').value || 20),
+        statut: $(prefix + '_statut').value,
+      };
+    }
+
+    function fillCatalogueForm(prefix, item) {
+      const normalized = normalizeCatalogueItem(item);
+      $(prefix + '_nom').value = normalized.nom;
+      $(prefix + '_categorie').value = normalized.categorie;
+      $(prefix + '_description').value = normalized.description;
+      $(prefix + '_conseille').value = normalized.tarif_conseille;
+      $(prefix + '_minimum').value = normalized.tarif_minimum;
+      $(prefix + '_vente').value = normalized.tarif_vente;
+      $(prefix + '_commission_type').value = normalized.commission_type;
+      $(prefix + '_commission_valeur').value = normalized.commission_valeur;
+      $(prefix + '_tva').value = normalized.tva;
+      $(prefix + '_statut').value = normalized.statut;
+      updateCataloguePreview(prefix);
+    }
+
+    function clearCatalogueForm(prefix) {
+      [prefix + '_nom', prefix + '_categorie', prefix + '_description', prefix + '_conseille', prefix + '_minimum', prefix + '_vente', prefix + '_commission_valeur'].forEach(id => {
+        const el = $(id);
+        if (el) el.value = '';
+      });
+      const commissionType = $(prefix + '_commission_type');
+      if (commissionType) commissionType.value = 'pourcentage';
+      const tva = $(prefix + '_tva');
+      if (tva) tva.value = '20';
+      const statut = $(prefix + '_statut');
+      if (statut) statut.value = 'Actif';
+      updateCataloguePreview(prefix);
+    }
+
+    function updateCataloguePreview(prefix) {
+      const financials = computeCatalogueFinancials(buildCataloguePayloadFromForm(prefix));
+      const map = {
+        ht: formatMoney(financials.ht),
+        tva: `${formatMoney(financials.tvaAmount)} (${financials.tvaPct} %)`,
+        ttc: formatMoney(financials.ttc),
+        commission: formatMoney(financials.commission),
+        marge: formatMoney(financials.marge),
+      };
+      Object.keys(map).forEach(key => {
+        const el = $(prefix + '_preview_' + key);
+        if (el) el.textContent = map[key];
+      });
+    }
+
+    function renderCatalogueItemRow(item, options) {
+      const financials = computeCatalogueFinancials(item);
+      const commissionLabel = financials.commission_type === 'fixe'
+        ? formatMoney(financials.commission_valeur) + ' fixe'
+        : `${Number(financials.commission_valeur || 0)} %`;
+      const isAdmin = State.user.role === 'admin';
+      return `<tr class="${item._pending ? 'row-pending' : ''}">
+        <td><strong>${escapeHtml(financials.nom)}</strong><div class="muted">${escapeHtml(financials.description || '')}</div>
+          <div class="muted">conseillé: ${formatMoney(financials.tarif_conseille)} / plancher: ${formatMoney(financials.tarif_minimum)}</div></td>
+        <td>${escapeHtml(financials.categorie || '')}</td>
+        <td><strong>${formatMoney(financials.ht)}</strong></td>
+        <td>${formatMoney(financials.tvaAmount)}<div class="muted">${financials.tvaPct} %</div></td>
+        <td><strong>${formatMoney(financials.ttc)}</strong></td>
+        <td><strong>${formatMoney(financials.commission)}</strong><div class="muted">${escapeHtml(commissionLabel)}</div></td>
+        <td><strong>${formatMoney(financials.marge)}</strong></td>
+        <td><span class="badge ${financials.statut === 'Actif' ? 'ok' : 'pending'}">${escapeHtml(financials.statut)}</span></td>
+        <td class="admin-col">
+          <div class="inline-actions">
+            ${isAdmin ? `<button class="btn btn-secondary" data-edit-${options.kind}="${escapeAttr(item[options.idField])}">Modifier</button>` : ''}
+            ${isAdmin ? `<button class="btn btn-secondary" data-toggle-${options.kind}="${escapeAttr(item[options.idField])}">${financials.statut === 'Actif' ? 'Désactiver' : 'Activer'}</button>` : ''}
+            ${isAdmin ? `<button class="btn btn-secondary" data-delete-${options.kind}="${escapeAttr(item[options.idField])}">Supprimer</button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+    }
+
     function renderPrestations() {
       if (!$('prestationsRows')) return;
       if (State.loading.catalogue) {
-        $('prestationsRows').innerHTML = skeletonRows(7, 4);
+        $('prestationsRows').innerHTML = skeletonRows(9, 4);
         return;
       }
-      const isAdmin = State.user.role === 'admin';
-      $('prestationsRows').innerHTML = State.prestations.map(p => {
-        const commissionLabel = p.commission_type === 'fixe'
-          ? formatMoney(p.commission_valeur) : (Number(p.commission_valeur || 0) + ' %');
-        return `<tr class="${p._pending ? 'row-pending' : ''}">
-          <td><strong>${escapeHtml(p.nom)}</strong><div class="muted">${escapeHtml(p.description || '')}</div></td>
-          <td>${escapeHtml(p.categorie || '')}</td>
-          <td><strong>${formatMoney(p.tarif_vente)}</strong>
-            <div class="muted">conseillé: ${formatMoney(p.tarif_conseille)} / plancher: ${formatMoney(p.tarif_minimum)}</div></td>
-          <td>${escapeHtml(commissionLabel)}</td>
-          <td>${Number(p.tva || 0)} %</td>
-          <td><span class="badge ${p.statut === 'Actif' ? 'ok' : 'pending'}">${escapeHtml(p.statut)}</span></td>
-          <td class="admin-col">
-            <div class="inline-actions">
-              ${isAdmin ? `<button class="btn btn-secondary" data-edit-prestation="${escapeAttr(p.prestation_id)}">Modifier</button>` : ''}
-              ${isAdmin ? `<button class="btn btn-secondary" data-toggle-prestation="${escapeAttr(p.prestation_id)}">${p.statut === 'Actif' ? 'Désactiver' : 'Activer'}</button>` : ''}
-              ${isAdmin ? `<button class="btn btn-secondary" data-delete-prestation="${escapeAttr(p.prestation_id)}">Supprimer</button>` : ''}
-            </div>
-          </td>
-        </tr>`;
-      }).join('') || `<tr><td colspan="7" class="muted">Aucune prestation dans le catalogue.</td></tr>`;
+      $('prestationsRows').innerHTML = State.prestations.map(p => renderCatalogueItemRow(p, {
+        kind: 'prestation',
+        idField: 'prestation_id',
+      })).join('') || `<tr><td colspan="9" class="muted">Aucune prestation dans le catalogue.</td></tr>`;
     }
 
     function renderSupplements() {
       if (!$('supplementsRows')) return;
       if (State.loading.catalogue) {
-        $('supplementsRows').innerHTML = skeletonRows(6, 3);
+        $('supplementsRows').innerHTML = skeletonRows(9, 4);
         return;
       }
-      $('supplementsRows').innerHTML = State.supplements.map(s => `
-        <tr class="${s._pending ? 'row-pending' : ''}">
-          <td><strong>${escapeHtml(s.nom)}</strong><div class="muted">${escapeHtml(s.description || '')}</div></td>
-          <td>${escapeHtml(s.mode_calcul)}</td>
-          <td>${formatMoney(s.prix_min)}</td>
-          <td>${formatMoney(s.prix_max)}</td>
-          <td>${escapeHtml(s.precision || '')}</td>
-          <td class="admin-col">
-            <div class="inline-actions">
-              <button class="btn btn-secondary" data-edit-supplement="${escapeAttr(s.supplement_id)}">Modifier</button>
-              <button class="btn btn-secondary" data-delete-supplement="${escapeAttr(s.supplement_id)}">Supprimer</button>
-            </div>
-          </td>
-        </tr>`).join('') || `<tr><td colspan="6" class="muted">Aucun supplément.</td></tr>`;
+      $('supplementsRows').innerHTML = State.supplements.map(s => renderCatalogueItemRow(s, {
+        kind: 'supplement',
+        idField: 'supplement_id',
+      })).join('') || `<tr><td colspan="9" class="muted">Aucun supplément.</td></tr>`;
     }
 
     function renderCatalogueAnalytics() {
@@ -2106,9 +2386,11 @@ function toggleCatalogueTab(tabId) {
         const ls = mp.get(d.devis_id) || [];
         const sumHt = ls.reduce((s, l) => s + Number(l.total_ht || 0), 0) || 1;
         ls.forEach(l => {
-          if (l.type === 'prestation') {
-            const ref = State.prestations.find(p => p.prestation_id === l.ref_id);
-            const key = ref ? ref.nom : (l.nom || 'Prestation');
+          if (l.type === 'prestation' || l.type === 'supplement') {
+            const ref = l.type === 'prestation'
+              ? State.prestations.find(p => p.prestation_id === l.ref_id)
+              : State.supplements.find(s => s.supplement_id === l.ref_id);
+            const key = ref ? ref.nom : (l.nom || (l.type === 'prestation' ? 'Prestation' : 'Supplement'));
             if (!statsP[key]) statsP[key] = { nom: key, quantite:0, ca:0, commission:0, marge:0 };
             statsP[key].quantite += Number(l.quantite || 0);
             statsP[key].ca += Number(l.total_ht || 0);
@@ -2138,13 +2420,15 @@ function toggleCatalogueTab(tabId) {
       if (cur) $('devis_client').value = cur;
     }
 
+    function isAdminUser() { return State.user?.role === 'admin'; }
+
     function renderDevisListe() {
       if (!$('devisRows')) return;
       if (State.loading.devis) {
         $('devisRows').innerHTML = skeletonRows(10, 4);
         return;
       }
-      const userMap = new Map(State.users.map(u => [u.ID, u.Nom || u.ID]));
+      const isAdmin = isAdminUser();
       $('devisRows').innerHTML = State.devis.slice().sort((a,b) => String(b.date).localeCompare(String(a.date))).map(d => `
         <tr class="${d._pending ? 'row-pending' : ''}">
           <td>${formatDate(d.date)}</td>
@@ -2158,9 +2442,9 @@ function toggleCatalogueTab(tabId) {
           <td>${d.contrat_id ? `<a href="#" data-open-contract="${escapeAttr(d.contrat_id)}">Contrat</a>` : ''}</td>
           <td>
             <div class="inline-actions">
-              <button class="btn btn-secondary" data-edit-devis="${escapeAttr(d.devis_id)}">Modifier</button>
+              ${isAdmin ? `<button class="btn btn-secondary" data-edit-devis="${escapeAttr(d.devis_id)}">Modifier</button>` : ''}
               ${d.statut !== 'Transforme' ? `<button class="btn btn-secondary" data-transform-devis="${escapeAttr(d.devis_id)}">Transformer</button>` : ''}
-              <button class="btn btn-secondary" data-delete-devis="${escapeAttr(d.devis_id)}">Supprimer</button>
+              ${isAdmin ? `<button class="btn btn-secondary" data-delete-devis="${escapeAttr(d.devis_id)}">Supprimer</button>` : ''}
 
             </div>
           </td>
@@ -2190,7 +2474,9 @@ function toggleCatalogueTab(tabId) {
     }
     function renderDevisForm() {
       const d = getDevisDraft();
-      $('devisFormTitle').textContent = d.devis_id ? 'Modifier devis' : 'Nouveau devis';
+      const isAdmin = isAdminUser();
+      const isEdit = Boolean(d.devis_id);
+      $('devisFormTitle').textContent = isEdit ? 'Modifier devis' : 'Nouveau devis';
       $('devis_id').value = d.devis_id || '';
       $('devis_client').value = d.client_id || '';
       $('devis_date').value = d.date || '';
@@ -2198,7 +2484,17 @@ function toggleCatalogueTab(tabId) {
       $('devis_notes').value = d.notes || '';
       $('devis_remise_pct').value = d.remise_pct || 0;
       $('devis_remise_montant').value = d.remise_montant || 0;
-      $('transformDevisBtn').style.display = d.devis_id ? 'inline-flex' : 'none';
+      $('transformDevisBtn').style.display = isEdit && isAdmin ? 'inline-flex' : 'none';
+      const readOnlyEdit = isEdit && !isAdmin;
+      ['devis_client', 'devis_date', 'devis_statut', 'devis_notes'].forEach(id => {
+        const el = $(id);
+        if (el) el.disabled = readOnlyEdit;
+      });
+      if ($('addDevisLigneBtn')) $('addDevisLigneBtn').style.display = readOnlyEdit ? 'none' : 'inline-flex';
+      if ($('saveDevisBtn')) {
+        $('saveDevisBtn').style.display = readOnlyEdit ? 'none' : 'inline-flex';
+        $('saveDevisBtn').textContent = isEdit ? 'Enregistrer le devis' : 'Enregistrer le devis';
+      }
       renderDevisLignes();
     }
     function renderDevisLignes() {
@@ -2207,7 +2503,7 @@ function toggleCatalogueTab(tabId) {
         if (selectedType === 'prestation') {
           return '<option value=""></option>' + State.prestations.filter(p => p.statut === 'Actif').map(p => `<option value="${escapeAttr(p.prestation_id)}">${escapeHtml(p.nom)} - ${formatMoney(p.tarif_vente)}</option>`).join('');
         }
-        return '<option value=""></option>' + State.supplements.filter(s => (s.statut || 'Actif') === 'Actif').map(s => `<option value="${escapeAttr(s.supplement_id)}">${escapeHtml(s.nom)}</option>`).join('');
+        return '<option value=""></option>' + State.supplements.filter(s => (s.statut || 'Actif') === 'Actif').map(s => `<option value="${escapeAttr(s.supplement_id)}">${escapeHtml(s.nom)} - ${formatMoney(normalizeCatalogueItem(s).tarif_vente)}</option>`).join('');
       };
       $('devisLignesRows').innerHTML = d.lignes.map((l) => `
         <tr class="devis-ligne-row">
@@ -2244,7 +2540,12 @@ function toggleCatalogueTab(tabId) {
           if (p) { l.nom = p.nom; l.prix_unitaire = Number(p.tarif_vente || 0); l.tva_pct = Number(p.tva || 20); }
         } else {
           const s = State.supplements.find(x => x.supplement_id === value);
-          if (s) { l.nom = s.nom; l.prix_unitaire = Number(s.prix_max || s.prix_min || 0); l.tva_pct = 20; }
+          if (s) {
+            const normalized = normalizeCatalogueItem(s);
+            l.nom = normalized.nom;
+            l.prix_unitaire = Number(normalized.tarif_vente || 0);
+            l.tva_pct = Number(normalized.tva || 20);
+          }
         }
         renderDevisLignes();
       }
@@ -2267,7 +2568,15 @@ function toggleCatalogueTab(tabId) {
               ? Math.round(ht * (Number(p.commission_valeur || 0) / 100) * 100) / 100
               : Math.round(Number(l.quantite || 0) * Number(p.commission_valeur || 0) * 100) / 100;
           } else { l.commission_valeur = 0; }
-        } else { l.commission_valeur = 0; }
+        } else {
+          const s = State.supplements.find(x => x.supplement_id === l.ref_id);
+          if (s) {
+            const normalized = normalizeCatalogueItem(s);
+            l.commission_valeur = normalized.commission_type === 'pourcentage'
+              ? Math.round(ht * (Number(normalized.commission_valeur || 0) / 100) * 100) / 100
+              : Math.round(Number(l.quantite || 0) * Number(normalized.commission_valeur || 0) * 100) / 100;
+          } else { l.commission_valeur = 0; }
+        }
         const tvaL = ht * (Number(l.tva_pct || 0) / 100);
         total_ht += ht; total_tva += tvaL; total_ttc += ht + tvaL;
         commission += Number(l.commission_valeur || 0);
@@ -2318,6 +2627,7 @@ function toggleCatalogueTab(tabId) {
 
     async function saveDevisFromDraft() {
       const d = getDevisDraft();
+      if (d.devis_id && !isAdminUser()) return showToast('Action reservee aux administrateurs');
       d.client_id = $('devis_client').value;
       d.date = $('devis_date').value;
       d.statut = $('devis_statut').value;
@@ -2439,6 +2749,7 @@ function toggleCatalogueTab(tabId) {
 
 
        async function deleteDevisAction(devisId) {
+      if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const d = State.devis.find(x => x.devis_id === devisId);
       if (!d) return;
       const isTransformed = d.statut === 'Transforme';
@@ -2472,6 +2783,7 @@ function toggleCatalogueTab(tabId) {
 
 
     function openEditDevis(id) {
+      if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const d = State.devis.find(x => x.devis_id === id); if (!d) return;
       const lignes = State.devis_lignes.filter(l => l.devis_id === id).sort((a,b) => Number(a.position) - Number(b.position));
       State.currentDevisDraft = Object.assign({}, d, { lignes: lignes.length ? lignes : buildEmptyDevisDraft() });
@@ -2479,22 +2791,13 @@ function toggleCatalogueTab(tabId) {
     }
     function openEditPrestation(id) {
       const p = State.prestations.find(x => x.prestation_id === id); if (!p) return;
-      $('prs_nom').value = p.nom; $('prs_categorie').value = p.categorie; $('prs_description').value = p.description;
-      $('prs_conseille').value = p.tarif_conseille; $('prs_minimum').value = p.tarif_minimum; $('prs_vente').value = p.tarif_vente;
-      $('prs_commission_type').value = p.commission_type; $('prs_commission_valeur').value = p.commission_valeur;
-      $('prs_tva').value = p.tva; $('prs_statut').value = p.statut;
+      fillCatalogueForm('prs', p);
       $('savePrestationBtn').dataset.editing = id;
       $('adminPrestationPanel').scrollIntoView({ behavior: 'smooth' });
     }
     async function savePrestationAction() {
       const editing = $('savePrestationBtn').dataset.editing;
-      const payload = {
-        nom: $('prs_nom').value, categorie: $('prs_categorie').value, description: $('prs_description').value,
-        tarif_conseille: Number($('prs_conseille').value || 0), tarif_minimum: Number($('prs_minimum').value || 0),
-        tarif_vente: Number($('prs_vente').value || 0), commission_type: $('prs_commission_type').value,
-        commission_valeur: Number($('prs_commission_valeur').value || 0), tva: Number($('prs_tva').value || 20),
-        statut: $('prs_statut').value,
-      };
+      const payload = buildCataloguePayloadFromForm('prs');
       if (!payload.nom) return showToast('Nom requis');
       const previous = State.prestations.slice();
       const optimistic = Object.assign({ prestation_id: editing || tempId('prs'), _pending: true }, payload);
@@ -2512,7 +2815,7 @@ function toggleCatalogueTab(tabId) {
         else State.prestations = State.prestations.map(p => p === optimistic || p.prestation_id === optimistic.prestation_id ? saved : p);
         confirmPendingUpsert('prestations', saved.prestation_id, saved);
         showToast('Prestation enregistrée');
-        ['prs_nom','prs_categorie','prs_description','prs_conseille','prs_minimum','prs_vente','prs_commission_valeur'].forEach(id => $(id).value = '');
+        clearCatalogueForm('prs');
         delete $('savePrestationBtn').dataset.editing;
         renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes(); persistSession();
       } catch (err) {
@@ -2559,17 +2862,13 @@ function toggleCatalogueTab(tabId) {
     }
     function openEditSupplement(id) {
       const s = State.supplements.find(x => x.supplement_id === id); if (!s) return;
-      $('sup_nom').value = s.nom; $('sup_description').value = s.description;
-      $('sup_min').value = s.prix_min; $('sup_max').value = s.prix_max;
-      $('sup_mode').value = s.mode_calcul; $('sup_precision').value = s.precision; $('sup_statut').value = s.statut || 'Actif';
+      fillCatalogueForm('sup', s);
       $('saveSupplementBtn').dataset.editing = id;
+      $('adminSupplementPanel').scrollIntoView({ behavior: 'smooth' });
     }
     async function saveSupplementAction() {
       const editing = $('saveSupplementBtn').dataset.editing;
-      const payload = { nom: $('sup_nom').value, description: $('sup_description').value,
-        prix_min: Number($('sup_min').value || 0), prix_max: Number($('sup_max').value || 0),
-        mode_calcul: $('sup_mode').value, precision: $('sup_precision').value,
-        statut: $('sup_statut').value };
+      const payload = buildCataloguePayloadFromForm('sup');
       if (!payload.nom) return showToast('Nom requis');
       const previous = State.supplements.slice();
       const optimistic = Object.assign({ supplement_id: editing || tempId('sup'), _pending: true }, payload);
@@ -2587,7 +2886,7 @@ function toggleCatalogueTab(tabId) {
         else State.supplements = State.supplements.map(s => s === optimistic || s.supplement_id === optimistic.supplement_id ? saved : s);
         confirmPendingUpsert('supplements', saved.supplement_id, saved);
         showToast('Supplément enregistré');
-        ['sup_nom','sup_description','sup_min','sup_max','sup_precision'].forEach(id => $(id).value = '');
+        clearCatalogueForm('sup');
         delete $('saveSupplementBtn').dataset.editing;
         renderSupplements(); persistSession();
       } catch (err) {
@@ -2615,22 +2914,41 @@ function toggleCatalogueTab(tabId) {
       }
     }
 
+    async function toggleSupplementAction(id) {
+      const previous = State.supplements.slice();
+      State.supplements = State.supplements.map(s => s.supplement_id === id ? Object.assign({}, s, { statut: (s.statut || 'Actif') === 'Actif' ? 'Inactif' : 'Actif', _pending: true }) : s);
+      markPendingUpsert('supplements', id, State.supplements.find(s => s.supplement_id === id));
+      renderSupplements(); renderDevisLignes(); persistSession();
+      try {
+        const saved = await businessApi.request('toggleSupplement', { supplement_id: id });
+        State.supplements = State.supplements.map(s => s.supplement_id === id ? saved : s);
+        confirmPendingUpsert('supplements', id, saved);
+        renderSupplements(); renderDevisLignes(); persistSession();
+      } catch (err) {
+        clearPendingOp('supplements', id);
+        State.supplements = previous;
+        renderSupplements(); renderDevisLignes();
+        showToast(err.message);
+      }
+    }
+
     // ============ Existing render functions ============
     function renderStats() {
-      if (State.loading.clients || State.loading.appointments || State.loading.revenue) {
-                ['statClients','statAppointments','statPendingReports','statRevenue','statCommissions','statContracts'].forEach(id => { $(id).innerHTML = '<div class="skeleton" style="height:30px"></div>'; });
-
+      if (isDashboardLoading()) {
+        setDashboardSkeletons();
         return;
       }
       const filteredRevenue = filterRevenue(State.revenue);
-      $('statUsers').textContent = State.stats?.users || State.users.length || 0;
-      $('statAdmins').textContent = State.stats?.admins || State.users.filter(user => user.role === 'admin').length || 0;
-      $('statApporteurs').textContent = State.stats?.apporteurs || State.users.filter(user => user.role === 'apporteur').length || 0;
-      $('statClients').textContent = State.clients.length || 0;
-      $('statAppointments').textContent = State.appointments.length || 0;
-      $('statPendingReports').textContent = State.appointments.filter(item => item.statut === 'En attente de compte rendu').length || 0;
-                        $('statRevenue').textContent = formatMoney(sumField(filteredRevenue, 'montant'));
-      // Commission : on filtre directement State.devis sur les mêmes critères que filterRevenue
+      const isAdmin = State.user?.role === 'admin';
+      if (isAdmin) {
+        $('statUsers').textContent = State.stats?.users || State.users.length || 0;
+        $('statAdmins').textContent = State.stats?.admins || State.users.filter(user => user.role === 'admin').length || 0;
+        $('statApporteurs').textContent = State.stats?.apporteurs || State.users.filter(user => user.role === 'apporteur').length || 0;
+      }
+      $('statClients').textContent = State.stats?.clients ?? State.clients.length ?? 0;
+      $('statAppointments').textContent = State.stats?.appointments ?? State.appointments.length ?? 0;
+      $('statPendingReports').textContent = State.stats?.pending_reports ?? State.appointments.filter(item => item.statut === 'En attente de compte rendu').length ?? 0;
+      $('statRevenue').textContent = formatMoney(sumField(filteredRevenue, 'montant'));
       const start = $('filter_start')?.value || '';
       const end = $('filter_end')?.value || '';
       const clientId = $('filter_client')?.value || '';
@@ -2643,37 +2961,12 @@ function toggleCatalogueTab(tabId) {
         return d.statut === 'Accepte' || d.statut === 'Transforme';
       });
       $('statCommissions').textContent = formatMoney(sumField(filteredDevis, 'commission_apporteur'));
-
       $('statContracts').textContent = sumField(filteredRevenue, 'nombre_contrats');
-}
+    }
 
     function renderAll() {
-      const isAdmin = State.user?.role === 'admin';
-      document.body.classList.toggle('is-admin', !!isAdmin);
-      document.querySelectorAll('[data-view="users"]').forEach(btn => { btn.style.display = isAdmin ? 'inline-flex' : 'none'; });
-      document.querySelectorAll('.admin-stat').forEach(el => { el.style.display = isAdmin ? 'block' : 'none'; });
-      document.querySelectorAll('.admin-user-col').forEach(el => { el.style.display = isAdmin ? 'table-cell' : 'none'; });
-      document.querySelectorAll('.admin-filter').forEach(el => { el.style.display = isAdmin ? 'block' : 'none'; });
-      if (!isAdmin && document.getElementById('users').classList.contains('active')) setView('dashboard');
-      $('companyName').textContent = State.company?.entreprise || '';
-      $('dashboardTitle').textContent = State.company?.entreprise || 'Tableau de bord';
-      $('userLine').textContent = `${State.user?.Nom || ''} - ${roleLabel(State.user?.role)}`;
-      $('usersHelp').textContent = isAdmin ? `Creation limitee a l'entreprise ${State.company?.entreprise || ''}.` : 'Votre compte apporteur.';
-            if (!isAdmin) $('adminEditPanel').style.display = 'none';
-      $('clientsHelp').textContent = isAdmin ? 'Vue globale des clients de l entreprise.' : 'Votre portefeuille client.';
-      
-// $('adminObjectivePanel').style.display = isAdmin ? 'block' : 'none';
-
-
-      $('catalogueHelp').textContent = isAdmin ? 'Gérez vos prestations, suppléments et la rentabilité.' : 'Consultez les prestations commercialisables par l\u2019entreprise.';
-      renderStats();
-      renderUsers(); renderClients(); renderPortfolioHistory();
-      renderAppointmentClientOptions(); renderAppointments();
-      renderRevenueOptions(); renderRevenue(); renderDashboardAnalytics();
-      renderPersonStats(); renderContractOptions(); renderContracts(); renderGoogleStatus();
-      // CATALOGUE / DEVIS
-      renderPrestations(); renderSupplements(); renderCatalogueAnalytics();
-      renderDevisOptions(); renderDevisListe();
+      renderDashboard();
+      renderSecondaryViews();
     }
 
     function renderUsers() {
@@ -2848,20 +3141,22 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
       }
       const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
       const rows = State.contracts.slice().sort((a, b) => String(a.date_debut).localeCompare(String(b.date_debut)));
+      const isAdmin = isAdminUser();
       $('contractsRows').innerHTML = rows.map(contract => {
-        const canManage = State.user.role === 'admin' || contract.owner_id === State.user.ID;
+        const canManageContract = isAdmin;
+        const canCreateDevis = isAdmin || contract.owner_id === State.user.ID;
         return `
           <tr class="${contract._pending ? 'row-pending' : ''}">
             <td><strong>${escapeHtml(contract.client_nom || getClientName(contract.client_id))}</strong><div class="muted">${escapeHtml(contract.notes || '')}</div></td>
             <td>${escapeHtml(userMap.get(contract.owner_id) || contract.owner_id || '')}</td>
             <td>${escapeHtml(formatDate(contract.date_debut))} - ${escapeHtml(formatDate(contract.date_fin))}</td>
-            <td><span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(contract._pending ? 'Synchronisation' : contract.statut)}</span></td>
+            <td><span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(contract._pending ? 'Synchronisation' : formatContractStatus(contract.statut))}</span></td>
             <td>${escapeHtml(formatMoney(contract.montant))}</td>
             <td>
               <div class="inline-actions">
-                ${canManage ? `<button class="btn btn-secondary" data-edit-contract="${escapeAttr(contract.contract_id)}">Modifier</button>` : ''}
-                ${canManage ? `<button class="btn btn-secondary" data-new-devis-from-contract="${escapeAttr(contract.contract_id)}">Devis</button>` : ''}
-                ${canManage ? `<button class="btn btn-secondary" data-delete-contract="${escapeAttr(contract.contract_id)}">Supprimer</button>` : ''}
+                ${canManageContract ? `<button class="btn btn-secondary" data-edit-contract="${escapeAttr(contract.contract_id)}">Modifier</button>` : ''}
+                ${canCreateDevis ? `<button class="btn btn-secondary" data-new-devis-from-contract="${escapeAttr(contract.contract_id)}">Devis</button>` : ''}
+                ${canManageContract ? `<button class="btn btn-secondary" data-delete-contract="${escapeAttr(contract.contract_id)}">Supprimer</button>` : ''}
               </div>
             </td>
           </tr>`;
@@ -2886,7 +3181,7 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
           <div class="planner-row">
             <div><strong>${escapeHtml(contract.client_nom || getClientName(contract.client_id))}</strong><div class="muted">${escapeHtml(formatDate(contract.date_debut))} -> ${escapeHtml(formatDate(contract.date_fin))}</div></div>
             <div class="planner-track"><div class="planner-bar" style="left:${left}%;width:${width}%;background:linear-gradient(90deg,hsl(${hue} 62% 42%),hsl(${hue + 28} 64% 48%))"></div></div>
-            <span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(contract.statut)}</span>
+            <span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(formatContractStatus(contract.statut))}</span>
           </div>`;
       }).join('');
     }
@@ -2902,9 +3197,13 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
     }
 
     function renderDashboardAnalytics() {
-      if (State.loading.revenue) {
-        $('objectiveProgress').innerHTML = '<div class="skeleton" style="height:62px"></div><div class="skeleton" style="height:62px"></div>';
-        $('revenueBars').innerHTML = '<div class="skeleton" style="height:120px"></div>';
+      if (isDashboardLoading()) {
+        if ($('objectiveProgress')) {
+          $('objectiveProgress').innerHTML = '<div class="skeleton" style="height:62px"></div><div class="skeleton" style="height:62px"></div>';
+        }
+        if ($('revenueBars')) {
+          $('revenueBars').innerHTML = '<div class="skeleton" style="height:120px"></div>';
+        }
         return;
       }
       const rows = filterRevenue(State.revenue);
@@ -2955,7 +3254,7 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
                function renderPersonStats() {
       try {
         if (!$('personStatsPanel') || !State.user || State.user.role !== 'admin') return;
-        if (State.loading.clients || State.loading.revenue || State.loading.appointments) {
+        if (isDashboardLoading()) {
           $('personStatsHelp').textContent = 'Chargement des donnees.';
           $('personStatsPanel').innerHTML = '<div class="skeleton" style="height:120px"></div>';
           return;
@@ -3150,6 +3449,9 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
       const contract = buildContractFromForm();
       if (!contract.client_id || !contract.date_debut || !contract.date_fin) return showToast('Client, date de debut et date de fin requis');
       const existing = State.contracts.find(item => item.contract_id === contract.contract_id);
+      if (existing && !isAdminUser()) return showToast('Action reservee aux administrateurs');
+      if (!isAdminUser() && isPaidContractStatus(contract.statut)) return showToast('Seul un administrateur peut definir le statut Paye');
+      if (existing && isPaidContractStatus(existing.statut) && !isAdminUser()) return showToast('Seul un administrateur peut modifier le statut Paye');
       const previousContracts = State.contracts.slice();
       const previousRevenue = State.revenue.slice();
       const optimisticRevenue = buildRevenueFromContract(contract);
@@ -3174,10 +3476,11 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
     }
 
     function openEditContract(contractId) {
+      if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const contract = State.contracts.find(item => item.contract_id === contractId); if (!contract) return;
       $('contractFormTitle').textContent = 'Modifier contrat';
       $('contract_id').value = contract.contract_id; $('contract_client').value = contract.client_id;
-      $('contract_status').value = contract.statut || 'En negociation';
+      renderContractStatusOptions(contract.statut || 'En negociation');
       $('contract_start').value = contract.date_debut || ''; $('contract_end').value = contract.date_fin || '';
       $('contract_amount').value = contract.montant || ''; $('contract_notes').value = contract.notes || '';
       setView('contracts'); $('contractFormTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3186,10 +3489,11 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
     function resetContractForm() {
       $('contractFormTitle').textContent = 'Nouveau contrat';
       ['contract_id','contract_start','contract_end','contract_amount','contract_notes'].forEach(id => $(id).value = '');
-      $('contract_status').value = 'En negociation';
+      renderContractStatusOptions('En negociation');
     }
 
     async function deleteContract(contractId) {
+      if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const removed = State.contracts.find(item => item.contract_id === contractId); if (!removed) return;
       const previousContracts = State.contracts.slice();
       const previousRevenue = State.revenue.slice();
@@ -3454,24 +3758,44 @@ showToast('Client cree');
     async function refresh() {
       setButtonLoading('refreshBtn', true);
       try {
-        ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = true);
-        renderAll();
+        beginDashboardSync();
         const data = await masterApi.request('bootstrap');
         State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
         State.stats = data.stats; State.users = data.users || [State.user];
-        await loadBusinessBootstrap(); renderAll(); persistSession();
+        await loadBusinessBootstrap();
+        finishDashboardSync();
+        renderAll();
+        persistSession();
       } finally { setButtonLoading('refreshBtn', false); }
     }
 
     function silentRefresh(options = {}) {
+      if (State.syncingRefresh) return;
+      State.syncingRefresh = true;
+      beginDashboardSync();
       (async () => {
-        const data = await masterApi.request('bootstrap');
-        State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
-        State.stats = data.stats; State.users = data.users || [State.user];
-        await loadBusinessBootstrap(); renderAll(); persistSession();
-      })().catch(() => {
-        if (options.onAuthFail) { clearStoredSession(); State.token = ''; State.user = null; State.company = null; State.businessEndpoint = ''; showLogin(); }
-      });
+        try {
+          const data = await masterApi.request('bootstrap');
+          State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
+          State.stats = data.stats; State.users = data.users || [State.user];
+          await loadBusinessBootstrap();
+          finishDashboardSync();
+          renderAll();
+          persistSession();
+        } catch (err) {
+          finishDashboardSync();
+          if (options.onAuthFail) {
+            clearStoredSession();
+            State.token = '';
+            State.user = null;
+            State.company = null;
+            State.businessEndpoint = '';
+            showLogin();
+          }
+        } finally {
+          State.syncingRefresh = false;
+        }
+      })();
     }
 
     async function logout() {
@@ -3506,7 +3830,47 @@ showToast('Client cree');
       return { revenue_id: `ca_${contract.contract_id}`, client_id: contract.client_id, owner_id: contract.owner_id, date: contract.date_debut, montant: Number(contract.montant || 0), nombre_contrats: Number(contract.montant || 0) > 0 ? 1 : 0, commentaires: `Contrat - ${contract.statut}`, client_nom: contract.client_nom || getClientName(contract.client_id), _pending: true };
     }
     function getClientName(clientId) { return State.clients.find(client => client.client_id === clientId)?.nom_entreprise || 'Client'; }
-    function contractStatusClass(status) { const v = String(status || '').toLowerCase(); if (v.includes('signe')) return 'status-signe'; if (v.includes('termine')) return 'status-termine'; if (v.includes('annule')) return 'status-annule'; return 'status-negociation'; }
+    function formatContractStatus(status) {
+      const labels = {
+        'En negociation': 'En négociation',
+        'Signe': 'Signé',
+        'Termine': 'Terminé',
+        'Annule': 'Annulé',
+        'Paye': 'Payé',
+      };
+      return labels[status] || status;
+    }
+    function isPaidContractStatus(status) {
+      const value = String(status || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      return value === 'paye' || value === 'paid';
+    }
+    function renderContractStatusOptions(selectedStatus) {
+      const select = $('contract_status');
+      if (!select) return;
+      const selected = selectedStatus || select.value || 'En negociation';
+      const options = [
+        { value: 'En negociation', label: 'En négociation', adminOnly: false },
+        { value: 'Signe', label: 'Signé', adminOnly: false },
+        { value: 'Termine', label: 'Terminé', adminOnly: false },
+        { value: 'Annule', label: 'Annulé', adminOnly: false },
+        { value: 'Paye', label: 'Payé', adminOnly: true },
+      ];
+      const isAdmin = isAdminUser();
+      select.innerHTML = options
+        .filter(option => isAdmin || !option.adminOnly || isPaidContractStatus(selected) && option.value === 'Paye')
+        .map(option => `<option value="${escapeAttr(option.value)}">${escapeHtml(option.label)}</option>`)
+        .join('');
+      if ([...select.options].some(option => option.value === selected)) select.value = selected;
+      else select.value = 'En negociation';
+    }
+    function contractStatusClass(status) {
+      const v = String(status || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (v.includes('paye') || v.includes('paid')) return 'status-paye';
+      if (v.includes('signe')) return 'status-signe';
+      if (v.includes('termine')) return 'status-termine';
+      if (v.includes('annule')) return 'status-annule';
+      return 'status-negociation';
+    }
     function getAssignableUsers() { if (State.user?.role !== 'admin') return [State.user].filter(Boolean); return State.users.filter(user => user.role === 'apporteur' || user.role === 'admin'); }
     function getObjectiveFor(ownerId) { return State.objectives.find(item => String(item.owner_id).toLowerCase() === String(ownerId || '').toLowerCase()) || null; }
     function fillObjectiveForm() {
@@ -3617,8 +3981,10 @@ async function refreshCatalogue() {
     async function startApp() {
       if (!State.token) { showLogin(); return; }
       if (State.user) {
-        $('bootScreen').style.display = 'none'; $('loginScreen').style.display = 'none'; $('app').style.display = 'block';
-        renderAll(); silentRefresh({ onAuthFail: true }); return;
+        showAppShell();
+        beginDashboardSync();
+        silentRefresh({ onAuthFail: true });
+        return;
       }
       $('bootScreen').style.display = 'grid'; $('loginScreen').style.display = 'none'; $('app').style.display = 'none';
       try { await bootstrapApp(); }
@@ -3666,11 +4032,17 @@ async function refreshCatalogue() {
     $('clearFiltersBtn').addEventListener('click', () => { ['filter_start','filter_end','filter_client','filter_owner'].forEach(id => $(id).value = ''); renderAll(); });
     // CATALOGUE / DEVIS
     $('savePrestationBtn').addEventListener('click', savePrestationAction);
-    $('cancelPrestationBtn').addEventListener('click', () => { ['prs_nom','prs_categorie','prs_description','prs_conseille','prs_minimum','prs_vente','prs_commission_valeur'].forEach(id => $(id).value = ''); delete $('savePrestationBtn').dataset.editing; });
+    $('cancelPrestationBtn').addEventListener('click', () => { clearCatalogueForm('prs'); delete $('savePrestationBtn').dataset.editing; });
     $('deletePrestationBtn').addEventListener('click', () => { const id = $('savePrestationBtn').dataset.editing; if (id) deletePrestationAction(id); });
     $('saveSupplementBtn').addEventListener('click', saveSupplementAction);
-    $('cancelSupplementBtn').addEventListener('click', () => { ['sup_nom','sup_description','sup_min','sup_max','sup_precision'].forEach(id => $(id).value = ''); delete $('saveSupplementBtn').dataset.editing; });
+    $('cancelSupplementBtn').addEventListener('click', () => { clearCatalogueForm('sup'); delete $('saveSupplementBtn').dataset.editing; });
     $('deleteSupplementBtn').addEventListener('click', () => { const id = $('saveSupplementBtn').dataset.editing; if (id) deleteSupplementAction(id); });
+    ['prs_nom','prs_categorie','prs_description','prs_conseille','prs_minimum','prs_vente','prs_commission_type','prs_commission_valeur','prs_tva'].forEach(id => {
+      $(id)?.addEventListener('input', () => updateCataloguePreview('prs'));
+    });
+    ['sup_nom','sup_categorie','sup_description','sup_conseille','sup_minimum','sup_vente','sup_commission_type','sup_commission_valeur','sup_tva'].forEach(id => {
+      $(id)?.addEventListener('input', () => updateCataloguePreview('sup'));
+    });
     $('saveDevisBtn').addEventListener('click', saveDevisFromDraft);
     $('cancelDevisBtn').addEventListener('click', () => setView('dashboard'));
     $('transformDevisBtn').addEventListener('click', () => transformDevisToContract($('devis_id').value));
@@ -3678,11 +4050,15 @@ async function refreshCatalogue() {
     $('refreshCatalogueBtn').addEventListener('click', refreshCatalogue);
 $('togglePrestationFormBtn')?.addEventListener('click', () => {
   const p = $('adminPrestationPanel');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  const opening = p.style.display === 'none';
+  p.style.display = opening ? 'block' : 'none';
+  if (opening) updateCataloguePreview('prs');
 });
 $('toggleSupplementFormBtn')?.addEventListener('click', () => {
   const p = $('adminSupplementPanel');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  const opening = p.style.display === 'none';
+  p.style.display = opening ? 'block' : 'none';
+  if (opening) updateCataloguePreview('sup');
 });
 
     $('refreshDevisBtn').addEventListener('click', () => silentBusinessRefresh());
@@ -3711,6 +4087,7 @@ $('toggleSupplementFormBtn')?.addEventListener('click', () => {
       const ep = t.closest('[data-edit-prestation]'); if (ep) openEditPrestation(ep.dataset.editPrestation);
       const dp = t.closest('[data-delete-prestation]'); if (dp) deletePrestationAction(dp.dataset.deletePrestation);
       const tp = t.closest('[data-toggle-prestation]'); if (tp) togglePrestationAction(tp.dataset.togglePrestation);
+      const ts = t.closest('[data-toggle-supplement]'); if (ts) toggleSupplementAction(ts.dataset.toggleSupplement);
       const es = t.closest('[data-edit-supplement]'); if (es) openEditSupplement(es.dataset.editSupplement);
       const ds = t.closest('[data-delete-supplement]'); if (ds) deleteSupplementAction(ds.dataset.deleteSupplement);
       const ed = t.closest('[data-edit-devis]'); if (ed) openEditDevis(ed.dataset.editDevis);
