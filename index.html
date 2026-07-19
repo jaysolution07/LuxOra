@@ -818,7 +818,8 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;   /* ← ici */
   gap: 14px !important;
-  max-width: 1120px !important;                                    /* et là */
+    max-width: 760px !important;
+
   align-items: stretch !important;
   width: auto !important;
 }
@@ -910,7 +911,8 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
 #dashboard .dashboard-stats > .stat:nth-child(3) .stat-head svg { background: #def4e9 !important; }
 #dashboard .dashboard-stats .stat-group {
   display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)) !important;
+
 
   gap: 12px 22px !important;
   width: 100% !important;
