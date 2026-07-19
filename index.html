@@ -1902,9 +1902,8 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
       const rentabilite = ca > 0 ? Math.round(marge / ca * 100) : 0;
       $('statCatalogueCa').textContent = formatMoney(ca);
       $('statCatalogueCommission').textContent = formatMoney(commissions);
-      const sCommission = $('statCatalogueCommission');
-      const sDashboard = $('statCommissions');
-      if (sCommission && sDashboard) sDashboard.textContent = sCommission.textContent;
+            // La commission du dashboard est calculée par renderStats() selon le filtre actif.
+
 
       $('statCatalogueMarge').textContent = formatMoney(marge);
       $('statCatalogueRentabilite').textContent = rentabilite + ' %';
@@ -2445,9 +2444,23 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
       $('statClients').textContent = State.clients.length || 0;
       $('statAppointments').textContent = State.appointments.length || 0;
       $('statPendingReports').textContent = State.appointments.filter(item => item.statut === 'En attente de compte rendu').length || 0;
-      $('statRevenue').textContent = formatMoney(sumField(filteredRevenue, 'montant'));
+                        $('statRevenue').textContent = formatMoney(sumField(filteredRevenue, 'montant'));
+      // Commission : on filtre directement State.devis sur les mêmes critères que filterRevenue
+      const start = $('filter_start')?.value || '';
+      const end = $('filter_end')?.value || '';
+      const clientId = $('filter_client')?.value || '';
+      const ownerId = $('filter_owner')?.value || '';
+      const filteredDevis = State.devis.filter(d => {
+        if (start && d.date < start) return false;
+        if (end && d.date > end) return false;
+        if (clientId && d.client_id !== clientId) return false;
+        if (ownerId && d.owner_id !== ownerId) return false;
+        return d.statut === 'Accepte' || d.statut === 'Transforme';
+      });
+      $('statCommissions').textContent = formatMoney(sumField(filteredDevis, 'commission_apporteur'));
+
       $('statContracts').textContent = sumField(filteredRevenue, 'nombre_contrats');
-    }
+}
 
     function renderAll() {
       const isAdmin = State.user?.role === 'admin';
