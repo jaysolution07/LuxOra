@@ -1549,14 +1549,20 @@ body .catalogue-stats .stat-item {
 
 
           <div class="tabs">
-            <button class="btn btn-secondary tab-btn active" data-tab="cataloguePrestations">Prestations</button>
+                        <button class="btn btn-secondary tab-btn" data-tab="cataloguePrestations">Prestations</button>
+
             <button class="btn btn-secondary tab-btn" data-tab="catalogueSupplements">Suppléments</button>
             <button class="btn btn-secondary tab-btn" data-tab="catalogueAnalytics">Rentabilité</button>
           </div>
 
-          <div id="cataloguePrestations" class="tab-panel">
-            <div class="panel admin-only" id="adminPrestationPanel" style="margin-top:14px">
+                    <div id="cataloguePrestations" class="tab-panel" style="display:none">
+
+                        <div class="panel admin-only" style="margin-top:14px">
+              <button id="togglePrestationFormBtn" class="btn btn-primary" type="button">+ Nouvelle prestation</button>
+            </div>
+            <div class="panel admin-only" id="adminPrestationPanel" style="margin-top:14px; display:none;">
               <h3>Nouvelle prestation</h3>
+
               <div class="form-grid">
                 <div><label>Nom</label><input id="prs_nom"></div>
                 <div><label>Catégorie</label><input id="prs_categorie" placeholder="Publication, Pack, Option..."></div>
@@ -1587,8 +1593,12 @@ body .catalogue-stats .stat-item {
           </div>
 
           <div id="catalogueSupplements" class="tab-panel" style="display:none">
-            <div class="panel admin-only" id="adminSupplementPanel" style="margin-top:14px">
+                        <div class="panel admin-only" style="margin-top:14px">
+              <button id="toggleSupplementFormBtn" class="btn btn-primary" type="button">+ Nouveau supplément</button>
+            </div>
+            <div class="panel admin-only" id="adminSupplementPanel" style="margin-top:14px; display:none;">
               <h3>Nouveau supplément</h3>
+
               <div class="form-grid">
                 <div><label>Nom</label><input id="sup_nom"></div>
                 <div><label>Description</label><input id="sup_description"></div>
@@ -1868,6 +1878,23 @@ body .catalogue-stats .stat-item {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display = (p.id === tabId) ? 'block' : 'none');
     }
+function toggleCatalogueTab(tabId) {
+  const panel = $(tabId);
+  const btn = document.querySelector(`[data-tab="${tabId}"]`);
+  if (!panel || !btn) return;
+  const isOpen = panel.style.display !== 'none';
+  if (isOpen) {
+    // Le panneau est ouvert : on le referme
+    panel.style.display = 'none';
+    btn.classList.remove('active');
+  } else {
+    // Fermer tous les autres puis ouvrir celui-ci
+    document.querySelectorAll('#catalogue .tab-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('#catalogue .tab-btn').forEach(b => b.classList.remove('active'));
+    panel.style.display = 'block';
+    btn.classList.add('active');
+  }
+}
 
     function pendingKey(collection, id) { return `${collection}:${id}`; }
     function prunePendingOps() {
@@ -3647,12 +3674,27 @@ async function refreshCatalogue() {
     $('transformDevisBtn').addEventListener('click', () => transformDevisToContract($('devis_id').value));
     $('addDevisLigneBtn').addEventListener('click', () => { const d = getDevisDraft(); d.lignes.push(makeEmptyLigneDraft(d.lignes.length + 1)); renderDevisLignes(); computeDevisTotalsUI(); });
     $('refreshCatalogueBtn').addEventListener('click', refreshCatalogue);
+$('togglePrestationFormBtn')?.addEventListener('click', () => {
+  const p = $('adminPrestationPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+});
+$('toggleSupplementFormBtn')?.addEventListener('click', () => {
+  const p = $('adminSupplementPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+});
+
     $('refreshDevisBtn').addEventListener('click', () => silentBusinessRefresh());
 
     document.addEventListener('click', event => {
       const t = event.target;
-      const tabBtn = t.closest('.tab-btn');
-      if (tabBtn) { switchTab(tabBtn.dataset.tab); return; }
+            const tabBtn = t.closest('.tab-btn');
+      if (tabBtn) {
+        // Catalogue : toggle (clic referme), Devis : switch classique
+        if (tabBtn.closest('#catalogue')) toggleCatalogueTab(tabBtn.dataset.tab);
+        else switchTab(tabBtn.dataset.tab);
+        return;
+      }
+
       const reportBtn = t.closest('[data-report]'); if (reportBtn) openReport(reportBtn.dataset.report);
       const deleteBtn = t.closest('[data-delete-rdv]'); if (deleteBtn) deleteAppointment(deleteBtn.dataset.deleteRdv);
       const editUserBtn = t.closest('[data-edit-user]'); if (editUserBtn) openEditUser(editUserBtn.dataset.editUser);
