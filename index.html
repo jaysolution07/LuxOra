@@ -2128,8 +2128,13 @@ body .catalogue-stats .stat-item {
         </section>
 
         <section id="contracts" class="view">
-          <div class="toolbar"><div><div class="eyebrow">Contrats</div><h2>Contrats et planning partagé</h2><p class="muted">Le planning est commun a toute l'entreprise. Les changements s'affichent immediatement puis se synchronisent.</p></div></div>
-          <div class="panel">
+          <div class="toolbar">
+            <div><div class="eyebrow">Contrats</div><h2>Contrats et planning partagé</h2><p class="muted">Le planning est commun a toute l'entreprise. Les changements s'affichent immediatement puis se synchronisent.</p></div>
+            <div class="toolbar-actions">
+              <button id="toggleContractFormBtn" class="btn btn-primary" type="button">+ Nouveau contrat</button>
+            </div>
+          </div>
+          <div id="contractFormPanel" class="panel" style="display:none">
             <h3 id="contractFormTitle">Nouveau contrat</h3>
             <input id="contract_id" type="hidden">
             <div class="form-grid">
@@ -4133,9 +4138,8 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
           </tr>`;
       }).join('') || `<tr><td colspan="7" class="muted">Aucun contrat pour le moment.</td></tr>`;
       renderContractsCalendar();
-      if ($('contractLignesRows')) {
-        if (State.currentContractDraft) renderContractForm();
-        else if (!$('contractLignesRows').childElementCount) resetContractDraft();
+      if ($('contractLignesRows') && isContractFormVisible() && State.currentContractDraft) {
+        renderContractForm();
       }
     }
 
@@ -4965,6 +4969,37 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
       } finally { setButtonLoading('saveContractBtn', false); }
     }
 
+    function isContractFormVisible() {
+      const panel = $('contractFormPanel');
+      return Boolean(panel && panel.style.display !== 'none');
+    }
+
+    function showContractFormPanel(scroll) {
+      const panel = $('contractFormPanel');
+      const btn = $('toggleContractFormBtn');
+      if (panel) panel.style.display = 'block';
+      if (btn) btn.textContent = '− Fermer le formulaire';
+      if (scroll) panel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function hideContractFormPanel() {
+      const panel = $('contractFormPanel');
+      const btn = $('toggleContractFormBtn');
+      if (panel) panel.style.display = 'none';
+      if (btn) btn.textContent = '+ Nouveau contrat';
+    }
+
+    function openNewContractForm() {
+      State.currentContractDraft = null;
+      resetContractDraft();
+      showContractFormPanel(true);
+    }
+
+    function toggleContractFormPanel() {
+      if (isContractFormVisible()) resetContractForm();
+      else openNewContractForm();
+    }
+
     function openEditContract(contractId) {
       if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const contract = State.contracts.find(item => item.contract_id === contractId);
@@ -4977,23 +5012,13 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
         lignes: lignes.length ? lignes.map(l => ({ ...l })) : buildEmptyCatalogueDraft(),
       }));
       setView('contracts');
-      $('contractFormTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showContractFormPanel(true);
     }
 
     function resetContractForm() {
       State.currentContractDraft = null;
-      const today = new Date().toISOString().slice(0, 10);
-      resetContractDraft({
-        contract_id: '',
-        client_id: State.clients[0]?.client_id || '',
-        date_debut: today,
-        date_fin: addOneYear(today) || today,
-        statut: 'En negociation',
-        notes: '',
-        remise_pct: 0,
-        remise_montant: 0,
-        lignes: buildEmptyCatalogueDraft(),
-      });
+      hideContractFormPanel();
+      if ($('contractLignesRows')) $('contractLignesRows').innerHTML = '';
     }
 
     async function deleteContract(contractId) {
@@ -5616,6 +5641,7 @@ async function refreshCatalogue() {
     $('cancelObjectiveFormBtn').addEventListener('click', closeObjectiveForm);
 
    $('openSelectedPersonBtn').addEventListener('click', () => openPersonStats($('filter_owner').value || State.user.ID));
+    $('toggleContractFormBtn')?.addEventListener('click', toggleContractFormPanel);
     $('saveContractBtn').addEventListener('click', saveContract);
     $('cancelContractEditBtn').addEventListener('click', resetContractForm);
     $('addContractLigneBtn')?.addEventListener('click', () => {
