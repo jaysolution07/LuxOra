@@ -460,36 +460,299 @@
       border-radius: inherit;
     }
 
-    .planner {
+    .contract-calendar {
       display: grid;
-      gap: 10px;
-      min-width: 720px;
+      gap: 14px;
+      min-width: 0;
     }
 
-    .planner-row {
-      display: grid;
-      grid-template-columns: 180px minmax(360px, 1fr) 110px;
-      gap: 12px;
+    .contract-calendar-toolbar {
+      display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--line);
+      justify-content: space-between;
+      gap: 10px;
     }
 
-    .planner-track {
+    .contract-calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .contract-calendar-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      min-width: 160px;
+      text-align: center;
+    }
+
+    .contract-calendar-modes {
+      display: flex;
+      gap: 6px;
+    }
+
+    .contract-calendar-modes .btn.active {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand-dark);
+    }
+
+    .contract-calendar-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .contract-calendar-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cal-legend-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .cal-legend-swatch.is-period { background: linear-gradient(90deg, #175cd3, #027a48); border-radius: 999px; }
+    .cal-legend-swatch.is-end { background: #b42318; border-radius: 50%; }
+    .cal-legend-swatch.is-deadline { background: #b54708; transform: rotate(45deg); border-radius: 2px; }
+    .cal-legend-swatch.is-event { background: #6941c6; border-radius: 3px; }
+
+    .contract-calendar-timeline {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbf9f5;
+      padding: 10px 12px;
+      overflow-x: auto;
+    }
+
+    .contract-calendar-timeline-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .contract-calendar-timeline-head h4 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .contract-calendar-timeline-range {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .cal-period-list {
+      display: grid;
+      gap: 8px;
+      min-width: min(100%, 520px);
+    }
+
+    .cal-period-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 180px) minmax(180px, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .cal-period-label {
+      min-width: 0;
+    }
+
+    .cal-period-label strong {
+      display: block;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cal-period-label span {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .cal-period-track {
       position: relative;
-      height: 20px;
+      height: 18px;
       border-radius: 999px;
-      background: #f1ede4;
+      background: #ece7dc;
       overflow: hidden;
     }
 
-    .planner-bar {
+    .cal-period-bar {
       position: absolute;
       top: 0;
       bottom: 0;
-      min-width: 8px;
+      min-width: 10px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #027a48, #175cd3);
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    .cal-period-bar:hover { transform: scaleY(1.08); }
+    .cal-period-bar.is-pending { opacity: .62; outline: 2px dashed rgba(27, 26, 36, .28); outline-offset: 1px; }
+
+    .cal-period-bar.is-negociation { background: linear-gradient(90deg, #175cd3, #53b1fd); }
+    .cal-period-bar.is-signe { background: linear-gradient(90deg, #027a48, #12b76a); }
+    .cal-period-bar.is-paye { background: linear-gradient(90deg, #05603a, #039855); }
+    .cal-period-bar.is-termine { background: linear-gradient(90deg, #b54708, #fdb022); }
+    .cal-period-bar.is-annule { background: linear-gradient(90deg, #b42318, #f97066); }
+
+    .contract-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .contract-calendar-weekday {
+      padding: 8px 6px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      background: #fbf9f5;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .contract-calendar-day {
+      min-height: 92px;
+      padding: 6px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+
+    .contract-calendar-day:nth-child(7n) { border-right: none; }
+    .contract-calendar-day.is-outside { background: #fafafa; opacity: .72; }
+    .contract-calendar-day.is-today { background: #fffaeb; box-shadow: inset 0 0 0 2px rgba(201, 162, 75, .45); }
+    .contract-calendar-day.is-selected { background: #f3ecff; box-shadow: inset 0 0 0 2px rgba(105, 65, 198, .35); }
+    .contract-calendar-day:hover { background: #fbf9f5; }
+
+    .contract-calendar-day-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .contract-calendar-day.is-outside .contract-calendar-day-num { color: var(--muted); }
+
+    .contract-calendar-markers {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .cal-marker {
+      display: block;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      padding: 3px 5px;
+      font-size: 10px;
+      line-height: 1.2;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .cal-marker.is-end { background: #b42318; }
+    .cal-marker.is-deadline { background: #b54708; }
+    .cal-marker.is-event { background: #6941c6; }
+    .cal-marker.is-pending { opacity: .65; box-shadow: inset 0 0 0 1px rgba(255,255,255,.45); }
+
+    .cal-marker-more {
+      font-size: 10px;
+      color: var(--muted);
+      padding-left: 2px;
+    }
+
+    .contract-calendar-detail {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .contract-calendar-detail-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .contract-calendar-detail-head h4 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .contract-calendar-detail-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .contract-calendar-detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fbf9f5;
+    }
+
+    .contract-calendar-detail-item strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .contract-calendar-detail-item span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .contract-calendar-empty {
+      padding: 28px 16px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      background: #fbf9f5;
+    }
+
+    .contract-calendar-week .contract-calendar-day {
+      min-height: 140px;
     }
 
     .status-signe { color: var(--ok); background: #ecfdf3; }
@@ -601,10 +864,98 @@
       padding: 14px 12px;
     }
 
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sync-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 7px 12px;
+      border-radius: 999px;
+      opacity: 1;
+      transition: opacity 0.35s ease;
+    }
+
+    .sync-indicator::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 0 currentColor;
+    }
+
+    .sync-indicator.sync-syncing {
+      color: #b54708;
+      background: #fffaeb;
+    }
+
+    .sync-indicator.sync-syncing::before {
+      animation: syncPulseOrange 1.2s ease-in-out infinite;
+    }
+
+    .sync-indicator.sync-done {
+      color: #027a48;
+      background: #ecfdf3;
+    }
+
+    .sync-indicator.sync-done::before {
+      box-shadow: 0 0 0 4px rgba(2, 122, 72, 0.15);
+    }
+
+    @keyframes syncPulseOrange {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(0.92); }
+    }
+
     .inline-actions {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+    }
+
+    .doc-links {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 120px;
+    }
+
+    .doc-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--primary);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .doc-link:hover { text-decoration: underline; }
+
+    .doc-link.signed {
+      color: var(--ok);
+      font-weight: 600;
+    }
+
+    .signature-panel canvas {
+      display: block;
+      width: 100%;
+      max-width: 480px;
+      height: 160px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      touch-action: none;
+      cursor: crosshair;
     }
 
     .mobile-nav {
@@ -789,7 +1140,9 @@ main, .view, .panel, .grid, .form-grid, .table-wrap,
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { min-width: 100%; font-size: 12px; }
   th, td { padding: 8px 10px; white-space: nowrap; }
-  .planner { min-width: 560px; }
+  .contract-calendar-day { min-height: 78px; }
+  .cal-period-row { grid-template-columns: 1fr; gap: 6px; }
+  .contract-calendar-title { min-width: 0; font-size: 16px; }
 
     /* Mobile-nav : 1 SEULE rangée avec 8 emojis */
   .mobile-nav {
@@ -1216,7 +1569,10 @@ body .catalogue-stats .stat-item {
               <h2 id="dashboardTitle">Tableau de bord</h2>
               <p class="muted" id="userLine"></p>
             </div>
-            <button class="btn btn-secondary" id="refreshBtn">Actualiser</button>
+            <div class="toolbar-actions">
+              <span id="syncIndicator" class="sync-indicator" style="display:none" aria-live="polite">Sync</span>
+              <button class="btn btn-secondary" id="refreshBtn">Actualiser</button>
+            </div>
           </div>
           <div class="grid dashboard-stats">
             <div class="stat admin-stat">
@@ -1717,7 +2073,7 @@ body .catalogue-stats .stat-item {
               <h3>Devis enregistrés</h3>
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>Date</th><th>Client</th><th>Statut</th><th>Total HT</th><th>TVA</th><th>Total TTC</th><th>Commission</th><th>Marge</th><th>Contrat</th><th>Actions</th></tr></thead>
+                  <thead><tr><th>Date</th><th>Client</th><th>Statut</th><th>Total HT</th><th>TVA</th><th>Total TTC</th><th>Commission</th><th>Marge</th><th>Contrat</th><th>Documents</th><th>Actions</th></tr></thead>
                   <tbody id="devisRows"></tbody>
                 </table>
               </div>
@@ -1730,7 +2086,9 @@ body .catalogue-stats .stat-item {
               <input type="hidden" id="devis_id">
               <div class="form-grid">
                 <div><label>Client</label><select id="devis_client"></select></div>
-                <div><label>Date</label><input id="devis_date" type="date"></div>
+                <div><label>Date du devis</label><input id="devis_date" type="date"></div>
+                <div><label>Date de début</label><input id="devis_start" type="date"></div>
+                <div><label>Date de fin</label><input id="devis_end" type="date"></div>
                 <div><label>Statut</label><select id="devis_statut"><option value="Brouillon">Brouillon</option><option value="Envoye">Envoyé</option><option value="Accepte">Accepté</option><option value="Refuse">Refusé</option></select></div>
                 <div><label>Notes</label><input id="devis_notes"></div>
               </div>
@@ -1777,11 +2135,36 @@ body .catalogue-stats .stat-item {
             <div class="form-grid">
               <div><label for="contract_client">Marque / client</label><select id="contract_client"></select></div>
               <div><label for="contract_status">Statut</label><select id="contract_status"><option value="En negociation">En négociation</option><option value="Signe">Signé</option><option value="Termine">Terminé</option><option value="Annule">Annulé</option><option value="Paye" class="admin-only-option">Payé</option></select></div>
-              <div><label for="contract_start">Date de debut</label><input id="contract_start" type="date"></div>
+              <div><label for="contract_start">Date de début</label><input id="contract_start" type="date"></div>
               <div><label for="contract_end">Date de fin</label><input id="contract_end" type="date"></div>
-              <div><label for="contract_amount">Montant</label><input id="contract_amount" type="number" min="0" step="0.01"></div>
               <div><label for="contract_notes">Notes</label><input id="contract_notes"></div>
             </div>
+
+            <h4 style="margin-top:14px">Lignes du contrat</h4>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Type</th><th>Référence</th><th>Qté</th><th>PU (€)</th><th>Remise %</th><th>TVA %</th><th>Total HT</th><th>Commission</th><th></th></tr></thead>
+                <tbody id="contractLignesRows"></tbody>
+              </table>
+            </div>
+            <div class="inline-actions"><button id="addContractLigneBtn" class="btn btn-secondary" type="button">+ Ajouter une ligne</button></div>
+
+            <div class="admin-only" style="margin-top:14px">
+              <div class="form-grid">
+                <div><label>Remise globale (%)</label><input id="contract_remise_pct" type="number" step="0.1" value="0"></div>
+                <div><label>Remise fixe (€)</label><input id="contract_remise_montant" type="number" step="0.01" value="0"></div>
+              </div>
+              <p class="muted">Les apporteurs ne voient pas cette zone.</p>
+            </div>
+
+            <div class="totaux" style="margin-top:14px">
+              <div><span>Sous-total HT</span><strong id="contract_total_ht">0 €</strong></div>
+              <div><span>TVA</span><strong id="contract_total_tva">0 €</strong></div>
+              <div><span>Total TTC</span><strong id="contract_total_ttc">0 €</strong></div>
+              <div><span>Commission apporteur</span><strong id="contract_commission">0 €</strong></div>
+              <div><span>Marge entreprise</span><strong id="contract_marge">0 €</strong></div>
+            </div>
+
             <div class="actions">
               <button id="cancelContractEditBtn" class="btn btn-secondary" type="button">Annuler</button>
               <button id="saveContractBtn" class="btn btn-primary" type="button">Enregistrer le contrat</button>
@@ -1790,27 +2173,60 @@ body .catalogue-stats .stat-item {
           <div class="panel" style="margin-top:14px">
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Client</th><th>Vendeur</th><th>Période</th><th>Statut</th><th>Montant</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Client</th><th>Vendeur</th><th>Période</th><th>Statut</th><th>Montant</th><th>Documents</th><th>Actions</th></tr></thead>
                 <tbody id="contractsRows"></tbody>
               </table>
             </div>
           </div>
-          <div class="panel" style="margin-top:14px">
-            <h3>Planning partagé</h3>
-            <div class="table-wrap">
-              <div id="contractsPlanner" class="planner"></div>
+          <div class="panel contract-calendar-panel" style="margin-top:14px">
+            <div class="contract-calendar-head">
+              <h3 style="margin-bottom:4px">Planning partagé</h3>
+              <p class="muted" style="margin:0">Calendrier des périodes, échéances, fins de contrat et événements liés.</p>
             </div>
+            <div id="contractsPlanner" class="contract-calendar" aria-live="polite"></div>
           </div>
         </section>
 
+        <div class="panel signature-panel" id="signaturePanel" style="display:none;margin:14px 0">
+          <h3 id="signaturePanelTitle">Signature électronique</h3>
+          <p class="muted" id="signaturePanelSubtitle"></p>
+          <input type="hidden" id="signature_entity_type">
+          <input type="hidden" id="signature_entity_id">
+          <div class="form-grid">
+            <div><label for="signature_signer_name">Nom du signataire</label><input id="signature_signer_name" placeholder="Nom et prénom"></div>
+          </div>
+          <p class="muted" style="margin:10px 0 6px">Signez dans le cadre ci-dessous :</p>
+          <canvas id="signatureCanvas" width="360" height="120"></canvas>
+          <div class="inline-actions" style="margin-top:10px">
+            <button type="button" id="clearSignatureBtn" class="btn btn-secondary">Effacer</button>
+            <button type="button" id="cancelSignatureBtn" class="btn btn-secondary">Annuler</button>
+            <button type="button" id="submitSignatureBtn" class="btn btn-primary">Valider la signature</button>
+          </div>
+        </div>
+
+        <input type="file" id="entityDocumentInput" style="display:none" multiple>
+
                 <section id="settings" class="view">
-          <div class="toolbar"><div><div class="eyebrow">Compte</div><h2>Paramètres Google</h2><p class="muted">Associez votre propre compte Google pour Gmail, Google Agenda et Google Drive.</p></div></div>
+          <div class="toolbar"><div><div class="eyebrow">Compte</div><h2>Paramètres Google</h2><p class="muted">Associez votre compte Google pour Gmail et Google Agenda. Les documents CRM sont enregistres dans le dossier Drive configure par l administrateur.</p></div></div>
           <div class="panel">
             <h3>Compte Google utilisateur</h3>
             <p class="muted" id="googleAccountStatus"></p>
             <div class="actions">
               <button id="connectGoogleBtn" class="btn btn-primary" type="button">Connecter mon compte Google</button>
               <button id="disconnectGoogleBtn" class="btn btn-secondary" type="button">Déconnecter Google</button>
+            </div>
+          </div>
+          <div class="panel admin-only" style="margin-top:14px">
+            <h3>Dossier Drive documents CRM</h3>
+            <p class="muted">Le dossier est configure dans <code>business.gs</code> (<code>CRM_DRIVE_FOLDER_ID</code>).</p>
+            <ol class="muted" style="margin:8px 0;padding-left:18px;line-height:1.6">
+              <li>Apps Script → executer <code>autoriserDriveCRM()</code> → accepter l acces <strong>Google Drive</strong></li>
+              <li>Redeployer le script web (<strong>nouvelle version</strong>, Executer en tant que : <strong>Moi</strong>)</li>
+              <li>Cliquer « Tester le dossier Drive » ci-dessous</li>
+            </ol>
+            <p class="muted" id="driveFolderStatus">Test non effectue.</p>
+            <div class="actions">
+              <button id="testDriveFolderBtn" class="btn btn-secondary" type="button">Tester le dossier Drive</button>
             </div>
           </div>
         </section>
@@ -1851,15 +2267,18 @@ body .catalogue-stats .stat-item {
       objectives: StoredSession?.objectives || [],
       portfolioHistory: StoredSession?.portfolioHistory || [],
       contracts: StoredSession?.contracts || [],
+      contract_lignes: StoredSession?.contract_lignes || [],
       google: StoredSession?.google || null,
       // CATALOGUE / DEVIS
       devis: StoredSession?.devis || [],
       devis_lignes: StoredSession?.devis_lignes || [],
+      documents: StoredSession?.documents || [],
       prestations: StoredSession?.prestations || [],
       supplements: StoredSession?.supplements || [],
       pendingOps: StoredSession?.pendingOps || {},
       catalogueAnalytics: null,
       currentDevisDraft: null,
+      currentContractDraft: null,
       loading: {
         clients: false, appointments: false, revenue: false,
         contracts: false, catalogue: false, devis: false,
@@ -1867,6 +2286,15 @@ body .catalogue-stats .stat-item {
       syncingRefresh: false,
       syncingBusiness: false,
       dashboardSynced: false,
+      syncIndicator: { visible: false, status: 'idle' },
+      contractsCalendar: {
+        mode: window.matchMedia('(max-width: 779px)').matches ? 'week' : 'month',
+        anchor: (() => {
+          const today = new Date();
+          return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        })(),
+        selectedDay: '',
+      },
     };
 
     document.body.classList.toggle('is-admin', State.user?.role === 'admin');
@@ -1876,15 +2304,34 @@ body .catalogue-stats .stat-item {
         this.getUrl = getUrl;
         this.getBasePayload = getBasePayload || (() => ({}));
       }
+      usesPost(action, payload) {
+        if (action === 'bootstrap' || action === 'uploadDocument' || action === 'signDevis' || action === 'signContract') return true;
+        if (action === 'registerDocument' && payload?.file_content) return true;
+        return false;
+      }
       async request(action, payload = {}) {
         const url = this.getUrl();
         if (!url) throw new Error('Service temporairement indisponible');
         const body = { action, ...this.getBasePayload(), ...payload };
+        if (isAppsScriptUrl(url) && this.usesPost(action, payload)) return this.postRequest(url, body);
         if (isAppsScriptUrl(url)) return this.jsonpRequest(url, body);
         const response = await fetch(url, {
           method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body),
         });
         const data = await response.json();
+        if (!data.ok) throw new Error(data.error || 'Erreur API');
+        return data.data;
+      }
+      async postRequest(url, payload) {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        });
+        const text = await response.text();
+        let data;
+        try { data = JSON.parse(text); }
+        catch (err) { throw new Error('Reponse serveur invalide'); }
         if (!data.ok) throw new Error(data.error || 'Erreur API');
         return data.data;
       }
@@ -2002,10 +2449,13 @@ function toggleCatalogueTab(tabId) {
       State.objectives = applyPendingOps('objectives', data.objectives || [], 'objective_id');
       State.portfolioHistory = data.portfolioHistory || [];
       State.contracts = applyPendingOps('contracts', data.contracts || [], 'contract_id');
+      State.contract_lignes = applyPendingOps('contract_lignes', data.contract_lignes || [], 'ligne_id');
+      applyExpiredContractStatuses();
       State.prestations = applyPendingOps('prestations', data.prestations || [], 'prestation_id');
       State.supplements = applyPendingOps('supplements', data.supplements || [], 'supplement_id');
       State.devis = applyPendingOps('devis', devisRows, 'devis_id');
       State.devis_lignes = applyPendingOps('devis_lignes', devisLines.filter(line => !deletedDevisIds.has(line.devis_id)), 'ligne_id');
+      State.documents = data.documents || [];
     }
 
     async function login(event) {
@@ -2017,15 +2467,21 @@ function toggleCatalogueTab(tabId) {
         State.token = data.token; State.user = data.user; State.company = data.company;
         State.businessEndpoint = data.company?.business_endpoint || '';
         State.users = data.users || [State.user]; State.stats = data.stats || null;
+        State.dashboardSynced = Boolean(data.stats);
         resetBusinessCache();
         persistSession();
         showAppShell();
-        beginDashboardSync();
-        loadBusinessBootstrap().then(() => {
-          finishDashboardSync();
+        renderDashboard();
+        scheduleSecondaryRender();
+        showSyncIndicator('syncing');
+        loadBusinessBootstrap({ background: true }).then(() => {
+          State.dashboardSynced = true;
+          renderDashboard();
           scheduleSecondaryRender();
+          persistSession();
+          showSyncIndicator('done');
         }).catch(err => {
-          finishDashboardSync();
+          hideSyncIndicator();
           showToast(err.message);
         });
       } catch (err) { $('loginError').textContent = err.message; $('loginError').style.display = 'block'; }
@@ -2034,25 +2490,34 @@ function toggleCatalogueTab(tabId) {
 
     async function bootstrapApp() {
       showAppShell();
-      beginDashboardSync();
+      showSyncIndicator('syncing');
+      const hadCache = hasCachedBusinessData();
+      if (hadCache) {
+        finishDashboardSync();
+        scheduleSecondaryRender();
+      } else {
+        beginDashboardSync();
+      }
       try {
-        const businessPromise = State.businessEndpoint ? loadBusinessBootstrap() : null;
-        const data = await masterApi.request('bootstrap');
-        State.user = data.user; State.company = data.company;
-        State.businessEndpoint = data.company?.business_endpoint || '';
-        State.stats = data.stats; State.users = data.users || [State.user];
+        const hadEndpoint = Boolean(State.businessEndpoint);
+        const tasks = [masterApi.request('bootstrap')];
+        if (hadEndpoint) tasks.push(loadBusinessBootstrap({ background: true }));
+        const [masterData] = await Promise.all(tasks);
+        State.user = masterData.user; State.company = masterData.company;
+        State.businessEndpoint = masterData.company?.business_endpoint || State.businessEndpoint || '';
+        State.stats = masterData.stats; State.users = masterData.users || [State.user];
         renderDashboard();
-        if (businessPromise) {
-          await businessPromise;
-        } else if (State.businessEndpoint) {
-          await loadBusinessBootstrap();
-        } else {
+        if (State.businessEndpoint && !hadEndpoint) {
+          await loadBusinessBootstrap({ background: true });
+        } else if (!State.businessEndpoint) {
           ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
         }
         finishDashboardSync();
         scheduleSecondaryRender();
         persistSession();
+        showSyncIndicator('done');
       } catch (err) {
+        hideSyncIndicator();
         clearStoredSession();
         State.token = '';
         showLogin();
@@ -2067,16 +2532,57 @@ function toggleCatalogueTab(tabId) {
       State.objectives = [];
       State.portfolioHistory = [];
       State.contracts = [];
+      State.contract_lignes = [];
       State.prestations = [];
       State.supplements = [];
       State.devis = [];
       State.devis_lignes = [];
+      State.documents = [];
+    }
+
+    function shouldShowDashboardSkeletons() {
+      if (State.syncIndicator?.status === 'syncing') return false;
+      if (State.dashboardSynced) return false;
+      if (State.stats || hasCachedBusinessData()) return false;
+      return State.loading.clients || State.loading.appointments || State.loading.revenue || State.loading.devis;
+    }
+
+    function updateSyncIndicatorUI() {
+      const el = $('syncIndicator');
+      if (!el) return;
+      const indicator = State.syncIndicator || { visible: false, status: 'idle' };
+      if (!indicator.visible) {
+        el.style.display = 'none';
+        el.className = 'sync-indicator';
+        return;
+      }
+      el.style.display = 'inline-flex';
+      el.className = `sync-indicator sync-${indicator.status}`;
+      el.textContent = 'Sync';
+    }
+
+    function showSyncIndicator(status) {
+      State.syncIndicator = { visible: true, status };
+      updateSyncIndicatorUI();
+      clearTimeout(showSyncIndicator.hideTimer);
+      if (status === 'done') {
+        showSyncIndicator.hideTimer = setTimeout(() => {
+          State.syncIndicator = { visible: false, status: 'idle' };
+          updateSyncIndicatorUI();
+        }, 1600);
+      }
+    }
+
+    function hideSyncIndicator() {
+      clearTimeout(showSyncIndicator.hideTimer);
+      State.syncIndicator = { visible: false, status: 'idle' };
+      updateSyncIndicatorUI();
     }
 
     function beginDashboardSync() {
       State.dashboardSynced = false;
       setDashboardLoading(true);
-      renderDashboard();
+      if (!State.stats && !hasCachedBusinessData()) renderDashboard();
     }
 
     function finishDashboardSync() {
@@ -2090,6 +2596,7 @@ function toggleCatalogueTab(tabId) {
       $('bootScreen').style.display = 'none';
       $('app').style.display = 'block';
       if (State.user) applyAdminVisibility();
+      preloadJsPdfLibrary();
     }
 
     function setDashboardLoading(loading) {
@@ -2117,7 +2624,7 @@ function toggleCatalogueTab(tabId) {
     }
 
     function isDashboardLoading() {
-      return !State.dashboardSynced || State.loading.clients || State.loading.appointments || State.loading.revenue || State.loading.devis;
+      return shouldShowDashboardSkeletons();
     }
 
     function applyAdminVisibility() {
@@ -2177,24 +2684,35 @@ function toggleCatalogueTab(tabId) {
       renderContractStatusOptions($('contract_status')?.value || 'En negociation');
     }
 
-    async function loadBusinessBootstrap() {
+    function hasCachedBusinessData() {
+      return Boolean(State.clients?.length || State.devis?.length || State.contracts?.length);
+    }
+
+    async function loadBusinessBootstrap(options = {}) {
       if (!State.businessEndpoint) {
         State.clients = []; State.appointments = []; State.revenue = [];
         State.objectives = []; State.portfolioHistory = []; State.contracts = [];
-        State.prestations = []; State.supplements = []; State.devis = []; State.devis_lignes = [];
+        State.prestations = []; State.supplements = []; State.devis = []; State.devis_lignes = []; State.contract_lignes = [];
         ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
         return;
       }
-      State.loading.clients = true;
-      State.loading.appointments = true;
-      State.loading.revenue = true;
-      State.loading.devis = true;
-      State.loading.contracts = true;
-      State.loading.catalogue = true;
+      const background = options.background === true;
+      if (!background) {
+        State.loading.clients = true;
+        State.loading.appointments = true;
+        State.loading.revenue = true;
+        State.loading.devis = true;
+        State.loading.contracts = true;
+        State.loading.catalogue = true;
+      }
       try {
         const data = await businessApi.request('bootstrap');
         applyBusinessBootstrapData(data);
         if (data.stats) State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
+        if (background) {
+          renderDashboard();
+          scheduleSecondaryRender();
+        }
       } finally {
         ['clients','appointments','revenue','contracts','catalogue','devis'].forEach(k => State.loading[k] = false);
       }
@@ -2422,6 +2940,358 @@ function toggleCatalogueTab(tabId) {
 
     function isAdminUser() { return State.user?.role === 'admin'; }
 
+    function getDocumentsForEntity(entityType, entityId) {
+      return (State.documents || []).filter(doc => doc.entity_type === entityType && doc.entity_id === entityId);
+    }
+
+    function renderDocumentLinks(entityType, entityId) {
+      const docs = getDocumentsForEntity(entityType, entityId);
+      if (!docs.length) return '<span class="muted">—</span>';
+      return `<div class="doc-links">${docs.map(doc => {
+        const isSigned = doc.doc_type === 'signed_pdf';
+        const label = isSigned ? `PDF signé${doc.signed_by ? ' (' + doc.signed_by + ')' : ''}` : (doc.file_name || 'Document');
+        return `<a class="doc-link${isSigned ? ' signed' : ''}" href="${escapeAttr(doc.url)}" target="_blank" rel="noopener noreferrer" title="Ouvrir ${escapeAttr(doc.file_name || 'document')}">${escapeHtml(label)}</a>`;
+      }).join('')}</div>`;
+    }
+
+    function openEntityDocuments(entityType, entityId) {
+      State.pendingDocumentUpload = { entity_type: entityType, entity_id: entityId };
+      const input = $('entityDocumentInput');
+      if (!input) return;
+      input.value = '';
+      input.click();
+    }
+
+    async function fileToBase64(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      const chunkSize = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+      }
+      return btoa(binary);
+    }
+
+    function pdfFmtMoney(value) {
+      return Number(value || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac';
+    }
+
+    function pdfFmtDate(value) {
+      if (!value) return '';
+      const d = new Date(String(value).slice(0, 10) + 'T12:00:00');
+      return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleDateString('fr-FR');
+    }
+
+    function getSignPackage(entityType, entityId) {
+      if (entityType === 'devis') {
+        const entity = State.devis.find(d => d.devis_id === entityId);
+        const lignes = State.devis_lignes.filter(l => l.devis_id === entityId);
+        return entity ? { entity, lignes, title: 'Devis signe', refLabel: 'Reference ' + entityId } : null;
+      }
+      const entity = State.contracts.find(c => c.contract_id === entityId);
+      const lignes = State.contract_lignes.filter(l => l.contract_id === entityId);
+      return entity ? { entity, lignes, title: 'Contrat signe', refLabel: 'Reference ' + entityId } : null;
+    }
+
+    function getJsPdfClass() {
+      return window.jspdf?.jsPDF || window.jsPDF || null;
+    }
+
+    let jsPdfLoadPromise = null;
+    const JS_PDF_CDN_URLS = [
+      'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js',
+      'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js',
+    ];
+
+    function loadJsPdfLibrary() {
+      const existing = getJsPdfClass();
+      if (existing) return Promise.resolve(existing);
+      if (jsPdfLoadPromise) return jsPdfLoadPromise;
+      jsPdfLoadPromise = new Promise((resolve, reject) => {
+        let index = 0;
+        const tryNext = () => {
+          if (getJsPdfClass()) {
+            resolve(getJsPdfClass());
+            return;
+          }
+          if (index >= JS_PDF_CDN_URLS.length) {
+            jsPdfLoadPromise = null;
+            reject(new Error('Bibliotheque PDF indisponible. Verifiez votre connexion internet.'));
+            return;
+          }
+          const url = JS_PDF_CDN_URLS[index++];
+          const script = document.createElement('script');
+          script.src = url;
+          script.async = true;
+          script.onload = () => {
+            const cls = getJsPdfClass();
+            if (cls) resolve(cls);
+            else tryNext();
+          };
+          script.onerror = tryNext;
+          document.head.appendChild(script);
+        };
+        tryNext();
+      });
+      return jsPdfLoadPromise;
+    }
+
+    function preloadJsPdfLibrary() {
+      loadJsPdfLibrary().catch(() => {});
+    }
+
+    async function buildSignedPdfBase64(entityType, entityId, signatureDataUrl, signerName) {
+      const JsPDF = await loadJsPdfLibrary();
+      const pack = getSignPackage(entityType, entityId);
+      if (!pack) throw new Error('Element introuvable');
+      const { entity, lignes, title, refLabel } = pack;
+      const doc = new JsPDF({ unit: 'mm', format: 'a4' });
+      let y = 18;
+      doc.setFontSize(18);
+      doc.text(title, 14, y);
+      y += 8;
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text(refLabel, 14, y);
+      y += 10;
+      doc.setTextColor(30);
+      doc.text('Client : ' + (entity.client_nom || getClientName(entity.client_id) || ''), 14, y);
+      y += 6;
+      if (entityType === 'devis') {
+        doc.text('Date du devis : ' + pdfFmtDate(entity.date), 14, y);
+        y += 6;
+      }
+      doc.text('Periode : ' + pdfFmtDate(entity.date_debut || entity.date) + ' - ' + pdfFmtDate(entity.date_fin), 14, y);
+      y += 10;
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text('Prestation', 14, y);
+      doc.text('Qte', 110, y);
+      doc.text('Total HT', 140, y);
+      doc.text('Total TTC', 170, y);
+      y += 2;
+      doc.line(14, y, 196, y);
+      y += 5;
+      doc.setFont(undefined, 'normal');
+      (lignes || []).forEach(ligne => {
+        if (y > 250) { doc.addPage(); y = 20; }
+        const name = String(ligne.nom || '').slice(0, 48);
+        doc.text(name, 14, y);
+        doc.text(String(ligne.quantite || 0), 110, y);
+        doc.text(pdfFmtMoney(ligne.total_ht), 140, y);
+        doc.text(pdfFmtMoney(ligne.total_ttc), 170, y);
+        y += 6;
+      });
+      y += 4;
+      doc.text('Total HT : ' + pdfFmtMoney(entity.total_ht || entity.montant), 140, y);
+      y += 6;
+      doc.text('TVA : ' + pdfFmtMoney(entity.total_tva), 140, y);
+      y += 6;
+      doc.setFont(undefined, 'bold');
+      doc.text('Total TTC : ' + pdfFmtMoney(entity.total_ttc || entity.montant), 140, y);
+      y += 12;
+      doc.setFont(undefined, 'normal');
+      doc.text('Signe par : ' + signerName, 14, y);
+      y += 6;
+      doc.text('Date : ' + new Date().toLocaleString('fr-FR'), 14, y);
+      y += 4;
+      doc.addImage(signatureDataUrl, 'JPEG', 14, y, 70, 24);
+      const dataUri = doc.output('datauristring');
+      return dataUri.split(',')[1];
+    }
+
+    async function handleEntityDocumentSelected(event) {
+      const files = Array.from(event.target.files || []);
+      const pending = State.pendingDocumentUpload;
+      event.target.value = '';
+      if (!files.length || !pending) return;
+
+      let uploaded = 0;
+      for (const file of files) {
+        if (file.size > 8 * 1024 * 1024) {
+          showToast(`${file.name} : max 8 Mo`);
+          continue;
+        }
+        const tempDocId = tempId('doc');
+        const optimisticDoc = {
+          doc_id: tempDocId,
+          entity_type: pending.entity_type,
+          entity_id: pending.entity_id,
+          file_name: file.name,
+          url: '#',
+          doc_type: 'attachment',
+          _pending: true,
+        };
+        State.documents = [...(State.documents || []), optimisticDoc];
+        renderDevisListe();
+        renderContracts();
+        try {
+          const fileContent = await fileToBase64(file);
+          const doc = await businessApi.request('uploadDocument', {
+            entity_type: pending.entity_type,
+            entity_id: pending.entity_id,
+            file_name: file.name,
+            mime_type: file.type || 'application/octet-stream',
+            file_content: fileContent,
+            doc_type: 'attachment',
+          });
+          State.documents = [...(State.documents || []).filter(d => d.doc_id !== tempDocId), doc];
+          uploaded += 1;
+        } catch (err) {
+          State.documents = (State.documents || []).filter(d => d.doc_id !== tempDocId);
+          showToast(err.message || 'Erreur upload document');
+        }
+      }
+      State.pendingDocumentUpload = null;
+      if (uploaded) {
+        persistSession();
+        renderDevisListe();
+        renderContracts();
+        showToast(uploaded > 1 ? `${uploaded} documents enregistres` : 'Document enregistre');
+      }
+    }
+
+    let signaturePad = null;
+
+    function initSignaturePad() {
+      const canvas = $('signatureCanvas');
+      if (!canvas || signaturePad) return;
+      const ctx = canvas.getContext('2d');
+      ctx.strokeStyle = '#111827';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      let drawing = false;
+
+      function getPoint(event) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const source = event.touches ? event.touches[0] : event;
+        return {
+          x: (source.clientX - rect.left) * scaleX,
+          y: (source.clientY - rect.top) * scaleY,
+        };
+      }
+
+      function startDraw(event) {
+        drawing = true;
+        const p = getPoint(event);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        event.preventDefault();
+      }
+
+      function draw(event) {
+        if (!drawing) return;
+        const p = getPoint(event);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        event.preventDefault();
+      }
+
+      function stopDraw() { drawing = false; }
+
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDraw);
+      canvas.addEventListener('mouseleave', stopDraw);
+      canvas.addEventListener('touchstart', startDraw, { passive: false });
+      canvas.addEventListener('touchmove', draw, { passive: false });
+      canvas.addEventListener('touchend', stopDraw);
+
+      signaturePad = {
+        clear() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        },
+        isEmpty() {
+          const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          for (let i = 3; i < data.length; i += 4) {
+            if (data[i] !== 0) return false;
+          }
+          return true;
+        },
+        toDataUrl() {
+          return canvas.toDataURL('image/jpeg', 0.65);
+        },
+      };
+    }
+
+    function clearSignatureCanvas() {
+      initSignaturePad();
+      signaturePad?.clear();
+    }
+
+    function openSignaturePanel(entityType, entityId, label) {
+      preloadJsPdfLibrary();
+      initSignaturePad();
+      clearSignatureCanvas();
+      $('signature_entity_type').value = entityType;
+      $('signature_entity_id').value = entityId;
+      $('signaturePanelTitle').textContent = entityType === 'devis' ? 'Signature du devis' : 'Signature du contrat';
+      $('signaturePanelSubtitle').textContent = label || '';
+      $('signature_signer_name').value = State.user?.Nom || '';
+      $('signaturePanel').style.display = 'block';
+      $('signaturePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeSignaturePanel() {
+      if ($('signaturePanel')) $('signaturePanel').style.display = 'none';
+    }
+
+    async function submitSignature() {
+      initSignaturePad();
+      const entityType = $('signature_entity_type').value;
+      const entityId = $('signature_entity_id').value;
+      const signerName = $('signature_signer_name').value.trim();
+      if (!entityType || !entityId) return;
+      if (!signerName) { showToast('Nom du signataire requis'); return; }
+      if (!signaturePad || signaturePad.isEmpty()) { showToast('Veuillez signer dans le cadre'); return; }
+
+      const signatureDataUrl = signaturePad.toDataUrl();
+      setButtonLoading('submitSignatureBtn', true);
+      closeSignaturePanel();
+      showToast('Generation du PDF...');
+      try {
+        let payload;
+        const action = entityType === 'devis' ? 'signDevis' : 'signContract';
+        try {
+          const pdfContent = await buildSignedPdfBase64(entityType, entityId, signatureDataUrl, signerName);
+          payload = entityType === 'devis'
+            ? { devis_id: entityId, signer_name: signerName, pdf_content: pdfContent }
+            : { contract_id: entityId, signer_name: signerName, pdf_content: pdfContent };
+        } catch (pdfErr) {
+          showToast('PDF local indisponible, generation serveur...');
+          const signatureData = signatureDataUrl.split(',')[1];
+          payload = entityType === 'devis'
+            ? { devis_id: entityId, signer_name: signerName, signature_data: signatureData }
+            : { contract_id: entityId, signer_name: signerName, signature_data: signatureData };
+        }
+        const result = await businessApi.request(action, payload);
+        if (result.document) {
+          State.documents = [...(State.documents || []).filter(d => d.doc_id !== result.document.doc_id), result.document];
+        }
+        if (result.devis) {
+          const idx = State.devis.findIndex(d => d.devis_id === result.devis.devis_id);
+          if (idx >= 0) State.devis[idx] = result.devis;
+          else State.devis.unshift(result.devis);
+        }
+        if (result.contrat) {
+          const idx = State.contracts.findIndex(c => c.contract_id === result.contrat.contract_id);
+          if (idx >= 0) State.contracts[idx] = result.contrat;
+          else State.contracts.unshift(result.contrat);
+        }
+        persistSession();
+        renderAll();
+        showToast('Document signe enregistre');
+      } catch (err) {
+        showToast(err.message || 'Erreur signature');
+      } finally {
+        setButtonLoading('submitSignatureBtn', false);
+      }
+    }
+
     function renderDevisListe() {
       if (!$('devisRows')) return;
       if (State.loading.devis) {
@@ -2440,15 +3310,18 @@ function toggleCatalogueTab(tabId) {
           <td>${formatMoney(d.commission_apporteur)}</td>
           <td>${formatMoney(d.montant_entreprise)}</td>
           <td>${d.contrat_id ? `<a href="#" data-open-contract="${escapeAttr(d.contrat_id)}">Contrat</a>` : ''}</td>
+          <td>${renderDocumentLinks('devis', d.devis_id)}</td>
           <td>
             <div class="inline-actions">
+              <button class="btn btn-secondary" data-entity-docs="devis" data-entity-id="${escapeAttr(d.devis_id)}">Documents</button>
+              ${d.statut !== 'Transforme' && d.statut !== 'Refuse' && !getDocumentsForEntity('devis', d.devis_id).some(doc => doc.doc_type === 'signed_pdf') ? `<button class="btn btn-secondary" data-sign-entity="devis" data-entity-id="${escapeAttr(d.devis_id)}" data-entity-label="${escapeAttr(d.client_nom || getClientName(d.client_id))}">Faire signer</button>` : ''}
               ${isAdmin ? `<button class="btn btn-secondary" data-edit-devis="${escapeAttr(d.devis_id)}">Modifier</button>` : ''}
               ${d.statut !== 'Transforme' ? `<button class="btn btn-secondary" data-transform-devis="${escapeAttr(d.devis_id)}">Transformer</button>` : ''}
               ${isAdmin ? `<button class="btn btn-secondary" data-delete-devis="${escapeAttr(d.devis_id)}">Supprimer</button>` : ''}
 
             </div>
           </td>
-        </tr>`).join('') || '<tr><td colspan="10" class="muted">Aucun devis.</td></tr>';
+        </tr>`).join('') || '<tr><td colspan="11" class="muted">Aucun devis.</td></tr>';
     }
 
     function devisStatusClass(s) {
@@ -2458,20 +3331,63 @@ function toggleCatalogueTab(tabId) {
       return 'pending';
     }
 
-    // ============ Simulateur de devis ============
+    // ============ Simulateur devis / contrat (lignes partagées) ============
     function makeEmptyLigneDraft(position) {
       return { ligne_id: tempId('lig'), type: 'prestation', ref_id: '', nom: '', quantite: 1, prix_unitaire: 0, remise_pct: 0, tva_pct: 20, total_ht: 0, commission_valeur: 0, position, _persisted: false };
     }
-    function buildEmptyDevisDraft() { return [makeEmptyLigneDraft(1)]; }
+    function buildEmptyCatalogueDraft() { return [makeEmptyLigneDraft(1)]; }
+    function buildEmptyDevisDraft() { return buildEmptyCatalogueDraft(); }
+
     function getDevisDraft() {
-      if (!State.currentDevisDraft) State.currentDevisDraft = { devis_id: '', client_id: State.clients[0]?.client_id || '', date: new Date().toISOString().slice(0,10), statut: 'Brouillon', notes: '', remise_pct: 0, remise_montant: 0, lignes: buildEmptyDevisDraft() };
+      if (!State.currentDevisDraft) {
+        const today = new Date().toISOString().slice(0, 10);
+        State.currentDevisDraft = {
+          devis_id: '', client_id: State.clients[0]?.client_id || '', date: today,
+          date_debut: today, date_fin: addOneYear(today) || today,
+          statut: 'Brouillon', notes: '', remise_pct: 0, remise_montant: 0, lignes: buildEmptyCatalogueDraft(),
+        };
+      }
       return State.currentDevisDraft;
     }
     function resetDevisDraft(existing) {
-      State.currentDevisDraft = existing ? JSON.parse(JSON.stringify(existing)) : { devis_id: '', client_id: State.clients[0]?.client_id || '', date: new Date().toISOString().slice(0,10), statut: 'Brouillon', notes: '', remise_pct: 0, remise_montant: 0, lignes: buildEmptyDevisDraft() };
-      if (!State.currentDevisDraft.lignes || !State.currentDevisDraft.lignes.length) State.currentDevisDraft.lignes = buildEmptyDevisDraft();
-      switchTab('devisForm'); renderDevisForm(); computeDevisTotalsUI();
+      const today = new Date().toISOString().slice(0, 10);
+      State.currentDevisDraft = existing ? JSON.parse(JSON.stringify(existing)) : {
+        devis_id: '', client_id: State.clients[0]?.client_id || '', date: today,
+        date_debut: today, date_fin: addOneYear(today) || today,
+        statut: 'Brouillon', notes: '', remise_pct: 0, remise_montant: 0, lignes: buildEmptyCatalogueDraft(),
+      };
+      if (!State.currentDevisDraft.lignes?.length) State.currentDevisDraft.lignes = buildEmptyCatalogueDraft();
+      if (!State.currentDevisDraft.date_debut) State.currentDevisDraft.date_debut = State.currentDevisDraft.date || today;
+      if (!State.currentDevisDraft.date_fin) State.currentDevisDraft.date_fin = addOneYear(State.currentDevisDraft.date_debut) || State.currentDevisDraft.date_debut;
+      switchTab('devisForm'); renderDevisForm(); computeCatalogueTotalsUI('devis');
     }
+
+    function getContractDraft() {
+      if (!State.currentContractDraft) {
+        const today = new Date().toISOString().slice(0, 10);
+        State.currentContractDraft = {
+          contract_id: '', client_id: State.clients[0]?.client_id || '',
+          date_debut: today, date_fin: addOneYear(today) || today,
+          statut: 'En negociation', notes: '', remise_pct: 0, remise_montant: 0, lignes: buildEmptyCatalogueDraft(),
+        };
+      }
+      return State.currentContractDraft;
+    }
+    function resetContractDraft(existing) {
+      const today = new Date().toISOString().slice(0, 10);
+      State.currentContractDraft = existing ? JSON.parse(JSON.stringify(existing)) : {
+        contract_id: '', client_id: State.clients[0]?.client_id || '',
+        date_debut: today, date_fin: addOneYear(today) || today,
+        statut: 'En negociation', notes: '', remise_pct: 0, remise_montant: 0, lignes: buildEmptyCatalogueDraft(),
+      };
+      if (!State.currentContractDraft.lignes?.length) State.currentContractDraft.lignes = buildEmptyCatalogueDraft();
+      renderContractForm(); computeCatalogueTotalsUI('contract');
+    }
+
+    function getCatalogueDraft(formKey) {
+      return formKey === 'contract' ? getContractDraft() : getDevisDraft();
+    }
+
     function renderDevisForm() {
       const d = getDevisDraft();
       const isAdmin = isAdminUser();
@@ -2480,60 +3396,83 @@ function toggleCatalogueTab(tabId) {
       $('devis_id').value = d.devis_id || '';
       $('devis_client').value = d.client_id || '';
       $('devis_date').value = d.date || '';
+      $('devis_start').value = d.date_debut || d.date || '';
+      $('devis_end').value = d.date_fin || addOneYear(d.date_debut || d.date) || '';
       $('devis_statut').value = d.statut || 'Brouillon';
       $('devis_notes').value = d.notes || '';
       $('devis_remise_pct').value = d.remise_pct || 0;
       $('devis_remise_montant').value = d.remise_montant || 0;
       $('transformDevisBtn').style.display = isEdit && isAdmin ? 'inline-flex' : 'none';
       const readOnlyEdit = isEdit && !isAdmin;
-      ['devis_client', 'devis_date', 'devis_statut', 'devis_notes'].forEach(id => {
-        const el = $(id);
-        if (el) el.disabled = readOnlyEdit;
+      ['devis_client', 'devis_date', 'devis_start', 'devis_end', 'devis_statut', 'devis_notes'].forEach(id => {
+        const el = $(id); if (el) el.disabled = readOnlyEdit;
       });
       if ($('addDevisLigneBtn')) $('addDevisLigneBtn').style.display = readOnlyEdit ? 'none' : 'inline-flex';
-      if ($('saveDevisBtn')) {
-        $('saveDevisBtn').style.display = readOnlyEdit ? 'none' : 'inline-flex';
-        $('saveDevisBtn').textContent = isEdit ? 'Enregistrer le devis' : 'Enregistrer le devis';
-      }
-      renderDevisLignes();
+      if ($('saveDevisBtn')) $('saveDevisBtn').style.display = readOnlyEdit ? 'none' : 'inline-flex';
+      renderCatalogueLignes('devis');
     }
-    function renderDevisLignes() {
-      const d = getDevisDraft();
+
+    function renderContractForm() {
+      const d = getContractDraft();
+      const isEdit = Boolean(d.contract_id);
+      const canManage = isAdminUser();
+      $('contractFormTitle').textContent = isEdit ? 'Modifier contrat' : 'Nouveau contrat';
+      $('contract_id').value = d.contract_id || '';
+      renderContractOptions();
+      $('contract_client').value = d.client_id || '';
+      renderContractStatusOptions(d.statut || 'En negociation');
+      $('contract_start').value = d.date_debut || '';
+      $('contract_end').value = d.date_fin || '';
+      $('contract_notes').value = d.notes || '';
+      $('contract_remise_pct').value = d.remise_pct || 0;
+      $('contract_remise_montant').value = d.remise_montant || 0;
+      const readOnly = isEdit && !canManage;
+      ['contract_client', 'contract_status', 'contract_start', 'contract_end', 'contract_notes'].forEach(id => {
+        const el = $(id); if (el) el.disabled = readOnly;
+      });
+      if ($('addContractLigneBtn')) $('addContractLigneBtn').style.display = readOnly ? 'none' : 'inline-flex';
+      if ($('saveContractBtn')) $('saveContractBtn').style.display = readOnly ? 'none' : 'inline-flex';
+      renderCatalogueLignes('contract');
+    }
+
+    function renderCatalogueLignes(formKey) {
+      const d = getCatalogueDraft(formKey);
+      const tbodyId = formKey === 'contract' ? 'contractLignesRows' : 'devisLignesRows';
+      const tbody = $(tbodyId);
+      if (!tbody) return;
       const refOptions = (selectedType) => {
         if (selectedType === 'prestation') {
           return '<option value=""></option>' + State.prestations.filter(p => p.statut === 'Actif').map(p => `<option value="${escapeAttr(p.prestation_id)}">${escapeHtml(p.nom)} - ${formatMoney(p.tarif_vente)}</option>`).join('');
         }
         return '<option value=""></option>' + State.supplements.filter(s => (s.statut || 'Actif') === 'Actif').map(s => `<option value="${escapeAttr(s.supplement_id)}">${escapeHtml(s.nom)} - ${formatMoney(normalizeCatalogueItem(s).tarif_vente)}</option>`).join('');
       };
-      $('devisLignesRows').innerHTML = d.lignes.map((l) => `
+      tbody.innerHTML = d.lignes.map(l => `
         <tr class="devis-ligne-row">
-          <td><select data-ligne-field="type" data-ligne-id="${l.ligne_id}">
+          <td><select data-form="${escapeAttr(formKey)}" data-ligne-field="type" data-ligne-id="${l.ligne_id}">
             <option value="prestation" ${l.type === 'prestation' ? 'selected' : ''}>Prestation</option>
             <option value="supplement" ${l.type === 'supplement' ? 'selected' : ''}>Supplément</option>
           </select></td>
-          <td><select data-ligne-field="ref_id" data-ligne-id="${l.ligne_id}">${refOptions(l.type)}</select></td>
-          <td><input type="number" min="1" step="1" value="${l.quantite}" data-ligne-field="quantite" data-ligne-id="${l.ligne_id}"></td>
-          <td><input type="number" min="0" step="0.01" value="${l.prix_unitaire}" data-ligne-field="prix_unitaire" data-ligne-id="${l.ligne_id}"></td>
-          <td><input type="number" min="0" max="100" step="0.1" value="${l.remise_pct}" data-ligne-field="remise_pct" data-ligne-id="${l.ligne_id}"></td>
-          <td><input type="number" min="0" max="100" step="0.1" value="${l.tva_pct}" data-ligne-field="tva_pct" data-ligne-id="${l.ligne_id}"></td>
-          <td><strong data-ligne-total="${l.ligne_id}">${formatMoney(l.total_ht)}</strong></td>
-          <td><strong data-ligne-commission="${l.ligne_id}">${formatMoney(l.commission_valeur)}</strong></td>
-          <td><button class="btn btn-secondary" data-remove-ligne="${l.ligne_id}">×</button></td>
+          <td><select data-form="${escapeAttr(formKey)}" data-ligne-field="ref_id" data-ligne-id="${l.ligne_id}">${refOptions(l.type)}</select></td>
+          <td><input type="number" min="1" step="1" value="${l.quantite}" data-form="${escapeAttr(formKey)}" data-ligne-field="quantite" data-ligne-id="${l.ligne_id}"></td>
+          <td><input type="number" min="0" step="0.01" value="${l.prix_unitaire}" data-form="${escapeAttr(formKey)}" data-ligne-field="prix_unitaire" data-ligne-id="${l.ligne_id}"></td>
+          <td><input type="number" min="0" max="100" step="0.1" value="${l.remise_pct}" data-form="${escapeAttr(formKey)}" data-ligne-field="remise_pct" data-ligne-id="${l.ligne_id}"></td>
+          <td><input type="number" min="0" max="100" step="0.1" value="${l.tva_pct}" data-form="${escapeAttr(formKey)}" data-ligne-field="tva_pct" data-ligne-id="${l.ligne_id}"></td>
+          <td><strong data-ligne-total="${formKey}-${l.ligne_id}">${formatMoney(l.total_ht)}</strong></td>
+          <td><strong data-ligne-commission="${formKey}-${l.ligne_id}">${formatMoney(l.commission_valeur)}</strong></td>
+          <td><button type="button" class="btn btn-secondary" data-form="${escapeAttr(formKey)}" data-remove-ligne="${l.ligne_id}">×</button></td>
         </tr>`).join('');
       d.lignes.forEach(l => {
-        const sel = document.querySelector(`select[data-ligne-field="ref_id"][data-ligne-id="${l.ligne_id}"]`);
+        const sel = document.querySelector(`select[data-form="${formKey}"][data-ligne-field="ref_id"][data-ligne-id="${l.ligne_id}"]`);
         if (sel && l.ref_id) sel.value = l.ref_id;
       });
     }
-    function onDevisLigneChange(ligneId, field, value) {
-      const d = getDevisDraft();
+
+    function onCatalogueLigneChange(formKey, ligneId, field, value) {
+      const d = getCatalogueDraft(formKey);
       const l = d.lignes.find(x => x.ligne_id === ligneId);
       if (!l) return;
-      if (['quantite','prix_unitaire','remise_pct','tva_pct'].includes(field)) {
-        l[field] = Number(value);
-      } else {
-        l[field] = value;
-      }
+      if (['quantite', 'prix_unitaire', 'remise_pct', 'tva_pct'].includes(field)) l[field] = Number(value);
+      else l[field] = value;
       if (field === 'ref_id' && value) {
         if (l.type === 'prestation') {
           const p = State.prestations.find(x => x.prestation_id === value);
@@ -2547,16 +3486,18 @@ function toggleCatalogueTab(tabId) {
             l.tva_pct = Number(normalized.tva || 20);
           }
         }
-        renderDevisLignes();
+        renderCatalogueLignes(formKey);
       }
       if (field === 'type') {
         l.ref_id = ''; l.nom = ''; l.prix_unitaire = 0;
-        renderDevisLignes();
+        renderCatalogueLignes(formKey);
       }
-      computeDevisTotalsUI();
+      computeCatalogueTotalsUI(formKey);
     }
-    function computeDevisTotalsUI() {
-      const d = getDevisDraft();
+
+    function computeCatalogueTotalsUI(formKey) {
+      const d = getCatalogueDraft(formKey);
+      const prefix = formKey === 'contract' ? 'contract' : 'devis';
       let total_ht = 0, total_tva = 0, total_ttc = 0, commission = 0;
       d.lignes.forEach(l => {
         const ht = Number(l.quantite || 0) * Number(l.prix_unitaire || 0) * (1 - Number(l.remise_pct || 0) / 100);
@@ -2567,7 +3508,7 @@ function toggleCatalogueTab(tabId) {
             l.commission_valeur = p.commission_type === 'pourcentage'
               ? Math.round(ht * (Number(p.commission_valeur || 0) / 100) * 100) / 100
               : Math.round(Number(l.quantite || 0) * Number(p.commission_valeur || 0) * 100) / 100;
-          } else { l.commission_valeur = 0; }
+          } else l.commission_valeur = 0;
         } else {
           const s = State.supplements.find(x => x.supplement_id === l.ref_id);
           if (s) {
@@ -2575,29 +3516,31 @@ function toggleCatalogueTab(tabId) {
             l.commission_valeur = normalized.commission_type === 'pourcentage'
               ? Math.round(ht * (Number(normalized.commission_valeur || 0) / 100) * 100) / 100
               : Math.round(Number(l.quantite || 0) * Number(normalized.commission_valeur || 0) * 100) / 100;
-          } else { l.commission_valeur = 0; }
+          } else l.commission_valeur = 0;
         }
         const tvaL = ht * (Number(l.tva_pct || 0) / 100);
         total_ht += ht; total_tva += tvaL; total_ttc += ht + tvaL;
         commission += Number(l.commission_valeur || 0);
-        const tEl = document.querySelector(`[data-ligne-total="${l.ligne_id}"]`);
-        const cEl = document.querySelector(`[data-ligne-commission="${l.ligne_id}"]`);
+        const tEl = document.querySelector(`[data-ligne-total="${formKey}-${l.ligne_id}"]`);
+        const cEl = document.querySelector(`[data-ligne-commission="${formKey}-${l.ligne_id}"]`);
         if (tEl) tEl.textContent = formatMoney(l.total_ht);
         if (cEl) cEl.textContent = formatMoney(l.commission_valeur);
       });
-      const remisePct = State.user.role === 'admin' ? Number($('devis_remise_pct')?.value || 0) : 0;
-      const remiseMontant = State.user.role === 'admin' ? Number($('devis_remise_montant')?.value || 0) : 0;
+      const remisePct = State.user.role === 'admin' ? Number($(`${prefix}_remise_pct`)?.value || 0) : 0;
+      const remiseMontant = State.user.role === 'admin' ? Number($(`${prefix}_remise_montant`)?.value || 0) : 0;
       d.remise_pct = remisePct; d.remise_montant = remiseMontant;
       const factor = Math.max(0, 1 - remisePct / 100);
       total_ht *= factor; total_tva *= factor; total_ttc *= factor; commission *= factor;
       total_ttc = Math.max(0, total_ttc - remiseMontant);
       const marge = Math.max(0, total_ht - commission);
-      $('devis_total_ht').textContent = formatMoney(total_ht);
-      $('devis_total_tva').textContent = formatMoney(total_tva);
-      $('devis_total_ttc').textContent = formatMoney(total_ttc);
-      $('devis_commission').textContent = formatMoney(commission);
-      $('devis_marge').textContent = formatMoney(marge);
+      $(`${prefix}_total_ht`).textContent = formatMoney(total_ht);
+      $(`${prefix}_total_tva`).textContent = formatMoney(total_tva);
+      $(`${prefix}_total_ttc`).textContent = formatMoney(total_ttc);
+      $(`${prefix}_commission`).textContent = formatMoney(commission);
+      $(`${prefix}_marge`).textContent = formatMoney(marge);
     }
+    function computeDevisTotalsUI() { computeCatalogueTotalsUI('devis'); }
+    function computeContractTotalsUI() { computeCatalogueTotalsUI('contract'); }
 
     function calculateDevisTotals(d) {
       let total_ht = 0, total_tva = 0, total_ttc = 0, commission = 0;
@@ -2630,12 +3573,15 @@ function toggleCatalogueTab(tabId) {
       if (d.devis_id && !isAdminUser()) return showToast('Action reservee aux administrateurs');
       d.client_id = $('devis_client').value;
       d.date = $('devis_date').value;
+      d.date_debut = $('devis_start').value;
+      d.date_fin = $('devis_end').value;
       d.statut = $('devis_statut').value;
       d.notes = $('devis_notes').value;
       d.lignes = d.lignes.filter(l => l.ref_id && l.quantite > 0);
       if (!d.client_id) return showToast('Client requis');
+      if (!d.date_debut || !d.date_fin) return showToast('Dates de début et de fin requises');
       if (!d.lignes.length) return showToast('Au moins une ligne requise');
-      const payload = { client_id: d.client_id, date: d.date, statut: d.statut, notes: d.notes,
+      const payload = { client_id: d.client_id, date: d.date, date_debut: d.date_debut, date_fin: d.date_fin, statut: d.statut, notes: d.notes,
         remise_pct: d.remise_pct, remise_montant: d.remise_montant,
         lignes: d.lignes.map(l => ({ type: l.type, ref_id: l.ref_id, nom: l.nom, quantite: l.quantite,
           prix_unitaire: l.prix_unitaire, remise_pct: l.remise_pct, tva_pct: l.tva_pct })) };
@@ -2649,6 +3595,8 @@ function toggleCatalogueTab(tabId) {
         client_id: d.client_id,
         client_nom: getClientName(d.client_id),
         date: d.date,
+        date_debut: d.date_debut,
+        date_fin: d.date_fin,
         statut: d.statut,
         notes: d.notes,
         remise_pct: d.remise_pct,
@@ -2701,17 +3649,16 @@ function toggleCatalogueTab(tabId) {
     async function transformDevisToContract(devisId) {
       const d = State.devis.find(x => x.devis_id === devisId);
       if (!d) return showToast('Devis introuvable');
-      const dateDebut = (function (s) {
-        const m = String(s || '').match(/(\d{4})-(\d{2})-(\d{2})/);
-        return m ? (m[1] + '-' + m[2] + '-' + m[3]) : null;
-      })(d.date);
-      if (!dateDebut) return showToast('Date du devis invalide : ' + d.date);
-      const dateFin = addOneYear(dateDebut);
+      const dateDebut = d.date_debut || d.date;
+      const dateFin = d.date_fin || addOneYear(dateDebut);
+      if (!dateDebut) return showToast('Date de début du devis invalide');
       if (!dateFin) return showToast('Impossible de calculer la date de fin');
       if (!confirm('Transformer ce devis en contrat signé ? Cette action est définitive.')) return;
       const previousDevis = State.devis.slice();
       const previousContracts = State.contracts.slice();
       const target = State.devis.find(x => x.devis_id === devisId);
+      const totals = calculateDevisTotals(d);
+      const devisLines = State.devis_lignes.filter(l => l.devis_id === devisId);
       const optimisticContract = {
         contract_id: tempId('ctr'),
         owner_id: d.owner_id || State.user?.ID || '',
@@ -2720,12 +3667,26 @@ function toggleCatalogueTab(tabId) {
         date_debut: dateDebut,
         date_fin: dateFin,
         statut: 'Signe',
-        montant: Number(d.total_ht || 0),
+        montant: totals.total_ttc,
+        total_ht: totals.total_ht,
+        total_tva: totals.total_tva,
+        total_ttc: totals.total_ttc,
+        remise_pct: d.remise_pct || 0,
+        remise_montant: d.remise_montant || 0,
+        commission_apporteur: totals.commission_apporteur,
+        montant_entreprise: totals.montant_entreprise,
         notes: `Transforme depuis devis ${d.devis_id}`,
         _pending: true,
       };
+      const optimisticContractLines = devisLines.map((line, index) => Object.assign({}, line, {
+        contract_id: optimisticContract.contract_id,
+        ligne_id: tempId('lig'),
+        position: index + 1,
+        _pending: true,
+      }));
       if (target) { target.statut = 'Transforme'; target.contrat_id = optimisticContract.contract_id; target._pending = true; }
       State.contracts.unshift(optimisticContract);
+      State.contract_lignes = State.contract_lignes.concat(optimisticContractLines);
       renderAll(); persistSession();
       try {
         const res = await businessApi.request('transformerEnContrat', {
@@ -2761,6 +3722,7 @@ function toggleCatalogueTab(tabId) {
         await businessApi.request('deleteDevis', { devis_id: devisId });
         State.devis = State.devis.filter(x => x.devis_id !== devisId);
         State.devis_lignes = State.devis_lignes.filter(l => l.devis_id !== devisId);
+        State.documents = (State.documents || []).filter(doc => !(doc.entity_type === 'devis' && doc.entity_id === devisId));
         showToast(isTransformed ? 'Devis supprime (contrat preserve)' : 'Devis supprime');
         renderDevisListe(); renderCatalogueAnalytics(); persistSession();
       } catch (err) {
@@ -2786,7 +3748,11 @@ function toggleCatalogueTab(tabId) {
       if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const d = State.devis.find(x => x.devis_id === id); if (!d) return;
       const lignes = State.devis_lignes.filter(l => l.devis_id === id).sort((a,b) => Number(a.position) - Number(b.position));
-      State.currentDevisDraft = Object.assign({}, d, { lignes: lignes.length ? lignes : buildEmptyDevisDraft() });
+      State.currentDevisDraft = Object.assign({}, d, {
+        date_debut: d.date_debut || d.date,
+        date_fin: d.date_fin || addOneYear(d.date_debut || d.date),
+        lignes: lignes.length ? lignes.map(l => ({ ...l })) : buildEmptyCatalogueDraft(),
+      });
       switchTab('devisForm'); setView('devis'); renderDevisForm(); computeDevisTotalsUI();
     }
     function openEditPrestation(id) {
@@ -2804,7 +3770,7 @@ function toggleCatalogueTab(tabId) {
       if (editing) State.prestations = State.prestations.map(p => p.prestation_id === editing ? optimistic : p);
       else State.prestations.unshift(optimistic);
       markPendingUpsert('prestations', optimistic.prestation_id, optimistic);
-      renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes(); persistSession();
+      renderPrestations(); renderCatalogueAnalytics(); renderCatalogueLignes('devis'); persistSession();
       setButtonLoading('savePrestationBtn', true);
       try {
         const saved = editing
@@ -2817,11 +3783,11 @@ function toggleCatalogueTab(tabId) {
         showToast('Prestation enregistrée');
         clearCatalogueForm('prs');
         delete $('savePrestationBtn').dataset.editing;
-        renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes(); persistSession();
+        renderPrestations(); renderCatalogueAnalytics(); renderCatalogueLignes('devis'); persistSession();
       } catch (err) {
         clearPendingOp('prestations', optimistic.prestation_id);
         State.prestations = previous;
-        renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes();
+        renderPrestations(); renderCatalogueAnalytics(); renderCatalogueLignes('devis');
         showToast(err.message);
       } finally { setButtonLoading('savePrestationBtn', false); }
     }
@@ -2847,7 +3813,7 @@ function toggleCatalogueTab(tabId) {
       const previous = State.prestations.slice();
       markPendingDelete('prestations', id);
       State.prestations = State.prestations.filter(p => p.prestation_id !== id);
-      renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes(); persistSession();
+      renderPrestations(); renderCatalogueAnalytics(); renderCatalogueLignes('devis'); persistSession();
       try {
         await businessApi.request('deletePrestation', { prestation_id: id });
         confirmPendingDelete('prestations', id);
@@ -2856,7 +3822,7 @@ function toggleCatalogueTab(tabId) {
       } catch (err) {
         clearPendingOp('prestations', id);
         State.prestations = previous;
-        renderPrestations(); renderCatalogueAnalytics(); renderDevisLignes();
+        renderPrestations(); renderCatalogueAnalytics(); renderCatalogueLignes('devis');
         showToast(err.message);
       }
     }
@@ -2875,7 +3841,7 @@ function toggleCatalogueTab(tabId) {
       if (editing) State.supplements = State.supplements.map(s => s.supplement_id === editing ? optimistic : s);
       else State.supplements.unshift(optimistic);
       markPendingUpsert('supplements', optimistic.supplement_id, optimistic);
-      renderSupplements(); renderDevisLignes(); persistSession();
+      renderSupplements(); renderCatalogueLignes('devis'); persistSession();
       setButtonLoading('saveSupplementBtn', true);
       try {
         const saved = editing
@@ -2892,7 +3858,7 @@ function toggleCatalogueTab(tabId) {
       } catch (err) {
         clearPendingOp('supplements', optimistic.supplement_id);
         State.supplements = previous;
-        renderSupplements(); renderDevisLignes();
+        renderSupplements(); renderCatalogueLignes('devis');
         showToast(err.message);
       } finally { setButtonLoading('saveSupplementBtn', false); }
     }
@@ -2901,7 +3867,7 @@ function toggleCatalogueTab(tabId) {
       const previous = State.supplements.slice();
       markPendingDelete('supplements', id);
       State.supplements = State.supplements.filter(s => s.supplement_id !== id);
-      renderSupplements(); renderDevisLignes(); persistSession();
+      renderSupplements(); renderCatalogueLignes('devis'); persistSession();
       try {
         await businessApi.request('deleteSupplement', { supplement_id: id });
         confirmPendingDelete('supplements', id);
@@ -2909,7 +3875,7 @@ function toggleCatalogueTab(tabId) {
       } catch (err) {
         clearPendingOp('supplements', id);
         State.supplements = previous;
-        renderSupplements(); renderDevisLignes();
+        renderSupplements(); renderCatalogueLignes('devis');
         showToast(err.message);
       }
     }
@@ -2918,16 +3884,16 @@ function toggleCatalogueTab(tabId) {
       const previous = State.supplements.slice();
       State.supplements = State.supplements.map(s => s.supplement_id === id ? Object.assign({}, s, { statut: (s.statut || 'Actif') === 'Actif' ? 'Inactif' : 'Actif', _pending: true }) : s);
       markPendingUpsert('supplements', id, State.supplements.find(s => s.supplement_id === id));
-      renderSupplements(); renderDevisLignes(); persistSession();
+      renderSupplements(); renderCatalogueLignes('devis'); persistSession();
       try {
         const saved = await businessApi.request('toggleSupplement', { supplement_id: id });
         State.supplements = State.supplements.map(s => s.supplement_id === id ? saved : s);
         confirmPendingUpsert('supplements', id, saved);
-        renderSupplements(); renderDevisLignes(); persistSession();
+        renderSupplements(); renderCatalogueLignes('devis'); persistSession();
       } catch (err) {
         clearPendingOp('supplements', id);
         State.supplements = previous;
-        renderSupplements(); renderDevisLignes();
+        renderSupplements(); renderCatalogueLignes('devis');
         showToast(err.message);
       }
     }
@@ -2938,7 +3904,8 @@ function toggleCatalogueTab(tabId) {
         setDashboardSkeletons();
         return;
       }
-      const filteredRevenue = filterRevenue(State.revenue);
+      applyExpiredContractStatuses();
+      const filteredRevenue = filterKpiRevenue(State.revenue);
       const isAdmin = State.user?.role === 'admin';
       if (isAdmin) {
         $('statUsers').textContent = State.stats?.users || State.users.length || 0;
@@ -2961,7 +3928,7 @@ function toggleCatalogueTab(tabId) {
         return d.statut === 'Accepte' || d.statut === 'Transforme';
       });
       $('statCommissions').textContent = formatMoney(sumField(filteredDevis, 'commission_apporteur'));
-      $('statContracts').textContent = sumField(filteredRevenue, 'nombre_contrats');
+      $('statContracts').textContent = filterKpiContracts(State.contracts).length;
     }
 
     function renderAll() {
@@ -3134,9 +4101,10 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
 
     function renderContracts() {
       if (!$('contractsRows')) return;
+      applyExpiredContractStatuses();
       if (State.loading.contracts) {
         $('contractsRows').innerHTML = skeletonRows(6, 4);
-        $('contractsPlanner').innerHTML = '<div class="skeleton" style="height:140px"></div>';
+        $('contractsPlanner').innerHTML = '<div class="skeleton" style="height:360px;border-radius:12px"></div>';
         return;
       }
       const userMap = new Map(State.users.map(user => [user.ID, user.Nom || user.ID]));
@@ -3151,49 +4119,507 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
             <td>${escapeHtml(userMap.get(contract.owner_id) || contract.owner_id || '')}</td>
             <td>${escapeHtml(formatDate(contract.date_debut))} - ${escapeHtml(formatDate(contract.date_fin))}</td>
             <td><span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(contract._pending ? 'Synchronisation' : formatContractStatus(contract.statut))}</span></td>
-            <td>${escapeHtml(formatMoney(contract.montant))}</td>
+            <td>${escapeHtml(formatMoney(contract.total_ttc || contract.montant))}</td>
+            <td>${renderDocumentLinks('contrat', contract.contract_id)}</td>
             <td>
               <div class="inline-actions">
+                <button class="btn btn-secondary" data-entity-docs="contrat" data-entity-id="${escapeAttr(contract.contract_id)}">Documents</button>
+                ${contract.statut !== 'Annule' && contract.statut !== 'Termine' && !getDocumentsForEntity('contrat', contract.contract_id).some(doc => doc.doc_type === 'signed_pdf') ? `<button class="btn btn-secondary" data-sign-entity="contrat" data-entity-id="${escapeAttr(contract.contract_id)}" data-entity-label="${escapeAttr(contract.client_nom || getClientName(contract.client_id))}">Faire signer</button>` : ''}
                 ${canManageContract ? `<button class="btn btn-secondary" data-edit-contract="${escapeAttr(contract.contract_id)}">Modifier</button>` : ''}
                 ${canCreateDevis ? `<button class="btn btn-secondary" data-new-devis-from-contract="${escapeAttr(contract.contract_id)}">Devis</button>` : ''}
                 ${canManageContract ? `<button class="btn btn-secondary" data-delete-contract="${escapeAttr(contract.contract_id)}">Supprimer</button>` : ''}
               </div>
             </td>
           </tr>`;
-      }).join('') || `<tr><td colspan="6" class="muted">Aucun contrat pour le moment.</td></tr>`;
-      renderContractsPlanner(rows);
+      }).join('') || `<tr><td colspan="7" class="muted">Aucun contrat pour le moment.</td></tr>`;
+      renderContractsCalendar();
+      if ($('contractLignesRows')) {
+        if (State.currentContractDraft) renderContractForm();
+        else if (!$('contractLignesRows').childElementCount) resetContractDraft();
+      }
     }
 
-    function renderContractsPlanner(rows) {
-      const planner = $('contractsPlanner'); if (!planner) return;
-      if (!rows.length) { planner.innerHTML = '<p class="muted">Aucun contrat a afficher dans le planning.</p>'; return; }
-      const dates = rows.flatMap(item => [new Date(item.date_debut + 'T00:00:00'), new Date(item.date_fin + 'T00:00:00')]).filter(date => !isNaN(date.getTime()));
-      const min = Math.min(...dates.map(date => date.getTime()));
-      const max = Math.max(...dates.map(date => date.getTime()));
-      const range = Math.max(max - min, 24 * 60 * 60 * 1000);
-      planner.innerHTML = rows.map((contract, index) => {
-        const start = new Date(contract.date_debut + 'T00:00:00').getTime();
-        const end = new Date(contract.date_fin + 'T00:00:00').getTime();
-        const left = Math.max(0, Math.min(100, Math.round((start - min) / range * 100)));
-        const width = Math.max(3, Math.min(100 - left, Math.round((end - start) / range * 100)));
-        const hue = [145, 215, 32, 270, 12, 190][index % 6];
+    const CALENDAR_WEEKDAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+    function parseCalendarDate(value) {
+      if (!value) return null;
+      const iso = String(value).slice(0, 10);
+      const date = new Date(`${iso}T12:00:00`);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function calendarIso(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function addCalendarDays(date, amount) {
+      const next = new Date(date);
+      next.setDate(next.getDate() + amount);
+      return next;
+    }
+
+    function startOfMonth(date) {
+      return new Date(date.getFullYear(), date.getMonth(), 1, 12, 0, 0, 0);
+    }
+
+    function endOfMonth(date) {
+      return new Date(date.getFullYear(), date.getMonth() + 1, 0, 12, 0, 0, 0);
+    }
+
+    function startOfWeek(date) {
+      const next = new Date(date);
+      const day = (next.getDay() + 6) % 7;
+      next.setDate(next.getDate() - day);
+      next.setHours(12, 0, 0, 0);
+      return next;
+    }
+
+    function endOfWeek(date) {
+      return addCalendarDays(startOfWeek(date), 6);
+    }
+
+    function isSameCalendarDay(a, b) {
+      return a && b && calendarIso(a) === calendarIso(b);
+    }
+
+    function normalizeContractStatusKey(status) {
+      const value = String(status || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (value.includes('negoc')) return 'negociation';
+      if (value.includes('sign')) return 'signe';
+      if (value.includes('term')) return 'termine';
+      if (value.includes('annul')) return 'annule';
+      if (value === 'paye' || value === 'paid') return 'paye';
+      return 'negociation';
+    }
+
+    function getContractsCalendarAnchor() {
+      return parseCalendarDate(State.contractsCalendar.anchor) || new Date();
+    }
+
+    function getContractsCalendarRange() {
+      const anchor = getContractsCalendarAnchor();
+      if (State.contractsCalendar.mode === 'week') {
+        return { start: startOfWeek(anchor), end: endOfWeek(anchor) };
+      }
+      return { start: startOfMonth(anchor), end: endOfMonth(anchor) };
+    }
+
+    function getContractsCalendarGridDays() {
+      const anchor = getContractsCalendarAnchor();
+      if (State.contractsCalendar.mode === 'week') {
+        const start = startOfWeek(anchor);
+        return Array.from({ length: 7 }, (_, index) => addCalendarDays(start, index));
+      }
+      const first = startOfMonth(anchor);
+      const last = endOfMonth(anchor);
+      const gridStart = startOfWeek(first);
+      const gridEnd = endOfWeek(last);
+      const days = [];
+      for (let day = new Date(gridStart); day <= gridEnd; day = addCalendarDays(day, 1)) {
+        days.push(new Date(day));
+      }
+      return days;
+    }
+
+    function calendarItemOnDay(item, dayIso) {
+      if (item.kind === 'period') {
+        const startIso = calendarIso(item.start);
+        const endIso = calendarIso(item.end);
+        return dayIso >= startIso && dayIso <= endIso;
+      }
+      return calendarIso(item.date) === dayIso;
+    }
+
+    function buildContractCalendarItems() {
+      const items = [];
+      const contracts = State.contracts.slice();
+      const revenueByContract = new Map(
+        State.revenue
+          .filter(row => String(row.revenue_id || '').startsWith('ca_'))
+          .map(row => [String(row.revenue_id).replace(/^ca_/, ''), row])
+      );
+      const contractByClient = new Map(contracts.map(contract => [contract.client_id, contract]));
+
+      contracts.forEach(contract => {
+        const start = parseCalendarDate(contract.date_debut);
+        const end = parseCalendarDate(contract.date_fin);
+        const clientLabel = contract.client_nom || getClientName(contract.client_id);
+        const pending = !!contract._pending;
+        const statusKey = normalizeContractStatusKey(contract.statut);
+
+        if (start && end && start <= end) {
+          items.push({
+            kind: 'period',
+            contractId: contract.contract_id,
+            clientId: contract.client_id,
+            title: clientLabel,
+            start,
+            end,
+            statut: contract.statut,
+            statusKey,
+            pending,
+          });
+        }
+
+        if (end) {
+          items.push({
+            kind: 'end',
+            contractId: contract.contract_id,
+            clientId: contract.client_id,
+            title: `Fin · ${clientLabel}`,
+            date: end,
+            statut: contract.statut,
+            pending,
+          });
+        }
+
+        const revenue = revenueByContract.get(contract.contract_id);
+        const revenueDate = parseCalendarDate(revenue?.date);
+        if (revenueDate && Number(revenue?.montant || 0) > 0) {
+          items.push({
+            kind: 'deadline',
+            contractId: contract.contract_id,
+            clientId: contract.client_id,
+            title: `Échéance CA · ${clientLabel}`,
+            date: revenueDate,
+            meta: formatMoney(revenue.montant),
+            pending: pending || !!revenue._pending,
+          });
+        } else if (start && statusKey === 'negociation') {
+          items.push({
+            kind: 'deadline',
+            contractId: contract.contract_id,
+            clientId: contract.client_id,
+            title: `Relance · ${clientLabel}`,
+            date: addCalendarDays(start, 14),
+            pending,
+          });
+        }
+
+        if (end && (statusKey === 'signe' || statusKey === 'paye')) {
+          const renewal = addCalendarDays(end, -30);
+          if (!start || renewal >= start) {
+            items.push({
+              kind: 'deadline',
+              contractId: contract.contract_id,
+              clientId: contract.client_id,
+              title: `Renouvellement · ${clientLabel}`,
+              date: renewal,
+              pending,
+            });
+          }
+        }
+
+        const created = parseCalendarDate(String(contract.created_at || '').slice(0, 10));
+        if (created) {
+          items.push({
+            kind: 'event',
+            contractId: contract.contract_id,
+            clientId: contract.client_id,
+            title: `Création · ${clientLabel}`,
+            date: created,
+            pending,
+          });
+        }
+      });
+
+      State.appointments.forEach(appointment => {
+        const contract = contractByClient.get(appointment.client_id);
+        if (!contract) return;
+        const date = parseCalendarDate(appointment.date);
+        if (!date) return;
+        items.push({
+          kind: 'event',
+          appointmentId: appointment.appointment_id,
+          contractId: contract.contract_id,
+          clientId: appointment.client_id,
+          title: appointment.objet || 'Rendez-vous',
+          date,
+          meta: [getClientName(appointment.client_id), appointment.heure].filter(Boolean).join(' · '),
+          pending: !!appointment._pending,
+        });
+      });
+
+      State.devis.forEach(devis => {
+        const contract = devis.contrat_id
+          ? contracts.find(item => item.contract_id === devis.contrat_id)
+          : contractByClient.get(devis.client_id);
+        if (!contract) return;
+        const date = parseCalendarDate(devis.date);
+        if (!date) return;
+        items.push({
+          kind: 'event',
+          devisId: devis.devis_id,
+          contractId: contract.contract_id,
+          clientId: devis.client_id,
+          title: `Devis · ${devis.client_nom || getClientName(devis.client_id)}`,
+          date,
+          meta: formatContractStatus(devis.statut) || devis.statut,
+          pending: !!devis._pending,
+        });
+      });
+
+      return items;
+    }
+
+    function periodBarStyle(period, rangeStart, rangeEnd) {
+      const rangeStartMs = rangeStart.getTime();
+      const rangeEndMs = rangeEnd.getTime();
+      if (rangeEndMs <= rangeStartMs) return null;
+      const visibleStart = Math.max(period.start.getTime(), rangeStartMs);
+      const visibleEnd = Math.min(period.end.getTime(), rangeEndMs);
+      if (visibleStart > visibleEnd) return null;
+      const left = ((visibleStart - rangeStartMs) / (rangeEndMs - rangeStartMs)) * 100;
+      const width = ((visibleEnd - visibleStart) / (rangeEndMs - rangeStartMs)) * 100;
+      return {
+        left: `${Math.max(0, left)}%`,
+        width: `${Math.max(1.8, width)}%`,
+      };
+    }
+
+    function renderCalendarMarker(item) {
+      const pendingClass = item.pending ? ' is-pending' : '';
+      const attrs = [];
+      if (item.contractId) attrs.push(`data-cal-open-contract="${escapeAttr(item.contractId)}"`);
+      if (item.appointmentId) attrs.push(`data-cal-open-appointment="${escapeAttr(item.appointmentId)}"`);
+      if (item.devisId) attrs.push(`data-cal-open-devis="${escapeAttr(item.devisId)}"`);
+      if (item.kind !== 'period') attrs.push(`data-cal-item-kind="${escapeAttr(item.kind)}"`);
+      return `<button type="button" class="cal-marker is-${escapeAttr(item.kind)}${pendingClass}" ${attrs.join(' ')} title="${escapeAttr(item.title)}">${escapeHtml(item.title)}</button>`;
+    }
+
+    function renderContractsCalendarDetail(dayIso, dayItems) {
+      if (!dayIso) return '';
+      const grouped = ['end', 'deadline', 'event'].map(kind => ({
+        kind,
+        rows: dayItems.filter(item => item.kind === kind),
+      })).filter(group => group.rows.length);
+      if (!grouped.length) {
         return `
-          <div class="planner-row">
-            <div><strong>${escapeHtml(contract.client_nom || getClientName(contract.client_id))}</strong><div class="muted">${escapeHtml(formatDate(contract.date_debut))} -> ${escapeHtml(formatDate(contract.date_fin))}</div></div>
-            <div class="planner-track"><div class="planner-bar" style="left:${left}%;width:${width}%;background:linear-gradient(90deg,hsl(${hue} 62% 42%),hsl(${hue + 28} 64% 48%))"></div></div>
-            <span class="badge ${contractStatusClass(contract.statut)}">${escapeHtml(formatContractStatus(contract.statut))}</span>
+          <div class="contract-calendar-detail">
+            <div class="contract-calendar-detail-head">
+              <div><h4>${escapeHtml(formatDate(dayIso))}</h4><p class="muted" style="margin:4px 0 0">Aucun marqueur ce jour.</p></div>
+              <button type="button" class="btn btn-secondary" data-cal-close-detail>Fermer</button>
+            </div>
+          </div>`;
+      }
+      const kindLabels = { end: 'Fins de contrat', deadline: 'Échéances', event: 'Événements liés' };
+      return `
+        <div class="contract-calendar-detail">
+          <div class="contract-calendar-detail-head">
+            <div><h4>${escapeHtml(formatDate(dayIso))}</h4><p class="muted" style="margin:4px 0 0">${dayItems.length} élément(s)</p></div>
+            <button type="button" class="btn btn-secondary" data-cal-close-detail>Fermer</button>
+          </div>
+          <div class="contract-calendar-detail-list">
+            ${grouped.map(group => group.rows.map(item => `
+              <div class="contract-calendar-detail-item">
+                <div>
+                  <strong>${escapeHtml(item.title)}</strong>
+                  <span>${escapeHtml(kindLabels[group.kind])}${item.meta ? ` · ${escapeHtml(item.meta)}` : ''}${item.pending ? ' · Synchronisation' : ''}</span>
+                </div>
+                <div class="inline-actions">
+                  ${item.contractId ? `<button type="button" class="btn btn-secondary" data-cal-open-contract="${escapeAttr(item.contractId)}">Contrat</button>` : ''}
+                  ${item.appointmentId ? `<button type="button" class="btn btn-secondary" data-cal-open-appointment="${escapeAttr(item.appointmentId)}">RDV</button>` : ''}
+                  ${item.devisId ? `<button type="button" class="btn btn-secondary" data-cal-open-devis="${escapeAttr(item.devisId)}">Devis</button>` : ''}
+                </div>
+              </div>`).join('')).join('')}
+          </div>
+        </div>`;
+    }
+
+    function renderContractsCalendar() {
+      const planner = $('contractsPlanner');
+      if (!planner) return;
+
+      const items = buildContractCalendarItems();
+      const periods = items.filter(item => item.kind === 'period');
+      const pointItems = items.filter(item => item.kind !== 'period');
+      const anchor = getContractsCalendarAnchor();
+      const range = getContractsCalendarRange();
+      const gridDays = getContractsCalendarGridDays();
+      const todayIso = calendarIso(new Date());
+      const selectedDay = State.contractsCalendar.selectedDay || '';
+      const mode = State.contractsCalendar.mode;
+      const title = mode === 'week'
+        ? `Semaine du ${formatDate(calendarIso(range.start))}`
+        : anchor.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^./, char => char.toUpperCase());
+
+      const visiblePeriods = periods.filter(period => periodBarStyle(period, range.start, range.end));
+      const timelineHtml = visiblePeriods.length
+        ? visiblePeriods.map(period => {
+            const style = periodBarStyle(period, range.start, range.end);
+            return `
+              <div class="cal-period-row">
+                <div class="cal-period-label">
+                  <strong>${escapeHtml(period.title)}</strong>
+                  <span>${escapeHtml(formatDate(calendarIso(period.start)))} → ${escapeHtml(formatDate(calendarIso(period.end)))}</span>
+                </div>
+                <div class="cal-period-track">
+                  <button type="button" class="cal-period-bar is-${escapeAttr(period.statusKey)}${period.pending ? ' is-pending' : ''}" style="left:${style.left};width:${style.width}" data-cal-open-contract="${escapeAttr(period.contractId)}" title="${escapeAttr(period.title)}"></button>
+                </div>
+                <span class="badge ${contractStatusClass(period.statut)}">${escapeHtml(formatContractStatus(period.statut))}</span>
+              </div>`;
+          }).join('')
+        : '<p class="muted" style="margin:0">Aucune période de contrat sur cette plage.</p>';
+
+      const monthAnchor = mode === 'month' ? anchor : null;
+      const dayCells = gridDays.map(day => {
+        const dayIso = calendarIso(day);
+        const dayItems = pointItems.filter(item => calendarItemOnDay(item, dayIso));
+        const markers = dayItems.slice(0, 3).map(renderCalendarMarker).join('');
+        const extra = dayItems.length > 3 ? `<div class="cal-marker-more">+${dayItems.length - 3} autre(s)</div>` : '';
+        const classes = [
+          'contract-calendar-day',
+          monthAnchor && day.getMonth() !== monthAnchor.getMonth() ? 'is-outside' : '',
+          dayIso === todayIso ? 'is-today' : '',
+          selectedDay === dayIso ? 'is-selected' : '',
+        ].filter(Boolean).join(' ');
+        return `
+          <div class="${classes}" data-cal-day="${escapeAttr(dayIso)}" role="button" tabindex="0">
+            <span class="contract-calendar-day-num">${day.getDate()}</span>
+            <div class="contract-calendar-markers">${markers}${extra}</div>
           </div>`;
       }).join('');
+
+      const selectedItems = selectedDay ? pointItems.filter(item => calendarItemOnDay(item, selectedDay)) : [];
+      const detailHtml = selectedDay ? renderContractsCalendarDetail(selectedDay, selectedItems) : '';
+
+      planner.innerHTML = `
+        <div class="contract-calendar-toolbar">
+          <div class="contract-calendar-nav">
+            <button type="button" class="btn btn-secondary" data-cal-nav="-1" aria-label="Période précédente">◀</button>
+            <div class="contract-calendar-title">${escapeHtml(title)}</div>
+            <button type="button" class="btn btn-secondary" data-cal-nav="1" aria-label="Période suivante">▶</button>
+            <button type="button" class="btn btn-secondary" data-cal-today>Aujourd'hui</button>
+          </div>
+          <div class="contract-calendar-modes">
+            <button type="button" class="btn btn-secondary${mode === 'month' ? ' active' : ''}" data-cal-mode="month">Mois</button>
+            <button type="button" class="btn btn-secondary${mode === 'week' ? ' active' : ''}" data-cal-mode="week">Semaine</button>
+          </div>
+        </div>
+        <div class="contract-calendar-legend">
+          <span><i class="cal-legend-swatch is-period"></i>Période</span>
+          <span><i class="cal-legend-swatch is-end"></i>Fin de contrat</span>
+          <span><i class="cal-legend-swatch is-deadline"></i>Échéance</span>
+          <span><i class="cal-legend-swatch is-event"></i>Événement lié</span>
+        </div>
+        <div class="contract-calendar-timeline">
+          <div class="contract-calendar-timeline-head">
+            <h4>Périodes des contrats</h4>
+            <span class="contract-calendar-timeline-range">${escapeHtml(formatDate(calendarIso(range.start)))} → ${escapeHtml(formatDate(calendarIso(range.end)))}</span>
+          </div>
+          <div class="cal-period-list">${timelineHtml}</div>
+        </div>
+        <div class="contract-calendar-grid contract-calendar-${mode}">
+          ${CALENDAR_WEEKDAYS.map(label => `<div class="contract-calendar-weekday">${label}</div>`).join('')}
+          ${dayCells}
+        </div>
+        ${detailHtml}
+        ${!items.length ? '<div class="contract-calendar-empty">Ajoutez un contrat pour alimenter le planning partagé.</div>' : ''}`;
+    }
+
+    function shiftContractsCalendar(step) {
+      const anchor = getContractsCalendarAnchor();
+      const delta = State.contractsCalendar.mode === 'week' ? step * 7 : 0;
+      if (State.contractsCalendar.mode === 'month') {
+        anchor.setMonth(anchor.getMonth() + step);
+      } else {
+        anchor.setDate(anchor.getDate() + delta);
+      }
+      State.contractsCalendar.anchor = calendarIso(anchor);
+      renderContractsCalendar();
+    }
+
+    function openCalendarAppointment(appointmentId) {
+      const appointment = State.appointments.find(item => item.appointment_id === appointmentId);
+      if (!appointment) return showToast('Rendez-vous introuvable');
+      setView('appointments');
+      openReport(appointmentId);
+    }
+
+    function openCalendarDevis(devisId) {
+      const devis = State.devis.find(item => item.devis_id === devisId);
+      if (!devis) return showToast('Devis introuvable');
+      setView('devis');
+      openEditDevis(devisId);
+    }
+
+    function handleContractsCalendarClick(event) {
+      const markerTarget = event.target.closest('[data-cal-open-contract],[data-cal-open-appointment],[data-cal-open-devis]');
+      if (markerTarget && markerTarget.closest('#contractsPlanner')) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (markerTarget.dataset.calOpenContract) {
+          openEditContract(markerTarget.dataset.calOpenContract);
+          return;
+        }
+        if (markerTarget.dataset.calOpenAppointment) {
+          openCalendarAppointment(markerTarget.dataset.calOpenAppointment);
+          return;
+        }
+        if (markerTarget.dataset.calOpenDevis) {
+          openCalendarDevis(markerTarget.dataset.calOpenDevis);
+        }
+        return;
+      }
+
+      const target = event.target.closest('[data-cal-nav],[data-cal-today],[data-cal-mode],[data-cal-day],[data-cal-close-detail]');
+      if (!target || !target.closest('#contractsPlanner')) return;
+      event.preventDefault();
+
+      if (target.dataset.calNav) {
+        shiftContractsCalendar(Number(target.dataset.calNav));
+        return;
+      }
+      if (target.dataset.calToday !== undefined) {
+        State.contractsCalendar.anchor = calendarIso(new Date());
+        State.contractsCalendar.selectedDay = calendarIso(new Date());
+        renderContractsCalendar();
+        return;
+      }
+      if (target.dataset.calMode) {
+        State.contractsCalendar.mode = target.dataset.calMode;
+        renderContractsCalendar();
+        return;
+      }
+      if (target.dataset.calDay) {
+        State.contractsCalendar.selectedDay = target.dataset.calDay;
+        renderContractsCalendar();
+        return;
+      }
+      if (target.dataset.calCloseDetail !== undefined) {
+        State.contractsCalendar.selectedDay = '';
+        renderContractsCalendar();
+        return;
+      }
     }
 
     function renderGoogleStatus() {
       if (!$('googleAccountStatus')) return;
       const connected = hasGoogleToken();
       $('googleAccountStatus').textContent = connected
-        ? `Compte Google associe${State.google?.email ? ` - ${State.google.email}` : ''}. Calendrier, Gmail et Drive utilisent ce compte.`
-        : 'Aucun compte Google associe.';
+        ? `Compte Google associe${State.google?.email ? ` - ${State.google.email}` : ''}. Utilise pour Agenda et Gmail.`
+        : 'Aucun compte Google associe (Agenda / Gmail). Les documents CRM utilisent le dossier Drive du script.';
       $('connectGoogleBtn').textContent = connected ? 'Reconnecter mon compte Google' : 'Connecter mon compte Google';
       $('disconnectGoogleBtn').style.display = connected ? 'inline-flex' : 'none';
+    }
+
+    async function testDriveFolderAccess() {
+      if (!$('driveFolderStatus')) return;
+      setButtonLoading('testDriveFolderBtn', true);
+      $('driveFolderStatus').textContent = 'Test en cours...';
+      try {
+        const data = await businessApi.request('testDriveFolder');
+        $('driveFolderStatus').textContent = `${data.message} Dossier : « ${data.folder_name} » (${data.folder_id}). Compte script : ${data.script_account || '?'}.`;
+        showToast('Dossier Drive accessible');
+      } catch (err) {
+        $('driveFolderStatus').textContent = err.message || 'Dossier inaccessible';
+        showToast(err.message || 'Dossier inaccessible');
+      } finally {
+        setButtonLoading('testDriveFolderBtn', false);
+      }
     }
 
     function renderDashboardAnalytics() {
@@ -3206,11 +4632,11 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
         }
         return;
       }
-      const rows = filterRevenue(State.revenue);
+      const rows = filterKpiRevenue(State.revenue);
       const ownerId = State.user.role === 'admin' ? $('filter_owner').value || State.user.ID : State.user.ID;
       const objective = getObjectiveFor(ownerId);
       const ca = sumField(rows.filter(item => State.user.role === 'admin' ? item.owner_id === ownerId : true), 'montant');
-      const contracts = sumField(rows.filter(item => State.user.role === 'admin' ? item.owner_id === ownerId : true), 'nombre_contrats');
+      const contracts = filterKpiContracts(State.contracts).filter(contract => State.user.role === 'admin' ? contract.owner_id === ownerId : true).length;
       const caTarget = Number(objective?.objectif_ca || 0);
       const contractTarget = Number(objective?.objectif_contrats || 0);
       $('objectiveProgress').innerHTML = `
@@ -3288,23 +4714,19 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
         const clients = isGlobal
           ? State.clients.slice()
           : State.clients.filter(c => matchesOwner(c.owner_id));
-        const revenueRows = State.revenue
-          .filter(r => matchesOwner(r.owner_id))
-          .filter(r => {
-            if (start && r.date < start) return false;
-            if (end && r.date > end) return false;
-            if (clientId && r.client_id !== clientId) return false;
-            return true;
-          })
-          .slice()
-          .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+        const revenueRows = filterKpiRevenue(
+          State.revenue.filter(r => matchesOwner(r.owner_id))
+        );
         const appointments = isGlobal
           ? State.appointments.slice()
           : State.appointments.filter(a => matchesOwner(a.owner_id));
         const objective = isGlobal ? null : getObjectiveFor(filterVal);
 
         const totalCa = sumField(revenueRows, 'montant');
-        const totalContracts = sumField(revenueRows, 'nombre_contrats');
+        const totalContracts = isGlobal
+          ? filterKpiContracts(State.contracts).length
+          : filterKpiContracts(State.contracts).filter(contract => matchesOwner(contract.owner_id)).length;
+        revenueRows.sort((a, b) => String(b.date).localeCompare(String(a.date)));
         const clientMap = new Map(State.clients.map(c => [c.client_id, c.nom_entreprise]));
 
         $('personStatsHelp').textContent = isGlobal
@@ -3445,69 +4867,162 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
       finally { setButtonLoading('saveObjectiveBtn', false); }
     }
 
+    function buildCatalogueLinesPayload(lignes) {
+      return lignes.map(l => ({
+        type: l.type, ref_id: l.ref_id, nom: l.nom, quantite: l.quantite,
+        prix_unitaire: l.prix_unitaire, remise_pct: l.remise_pct, tva_pct: l.tva_pct,
+      }));
+    }
+
     async function saveContract() {
-      const contract = buildContractFromForm();
-      if (!contract.client_id || !contract.date_debut || !contract.date_fin) return showToast('Client, date de debut et date de fin requis');
-      const existing = State.contracts.find(item => item.contract_id === contract.contract_id);
+      const d = getContractDraft();
+      d.client_id = $('contract_client').value;
+      d.date_debut = $('contract_start').value;
+      d.date_fin = $('contract_end').value;
+      d.statut = $('contract_status').value;
+      d.notes = $('contract_notes').value;
+      d.remise_pct = Number($('contract_remise_pct')?.value || 0);
+      d.remise_montant = Number($('contract_remise_montant')?.value || 0);
+      d.lignes = d.lignes.filter(l => l.ref_id && l.quantite > 0);
+      computeCatalogueTotalsUI('contract');
+      if (!d.client_id || !d.date_debut || !d.date_fin) return showToast('Client, date de début et date de fin requis');
+      if (!d.lignes.length) return showToast('Au moins une ligne requise');
+      const existing = State.contracts.find(item => item.contract_id === d.contract_id);
       if (existing && !isAdminUser()) return showToast('Action reservee aux administrateurs');
-      if (!isAdminUser() && isPaidContractStatus(contract.statut)) return showToast('Seul un administrateur peut definir le statut Paye');
+      if (!isAdminUser() && isPaidContractStatus(d.statut)) return showToast('Seul un administrateur peut definir le statut Paye');
       if (existing && isPaidContractStatus(existing.statut) && !isAdminUser()) return showToast('Seul un administrateur peut modifier le statut Paye');
+
+      const contractId = d.contract_id || tempId('ctr');
+      const totals = calculateDevisTotals(d);
+      const payload = {
+        contract_id: contractId,
+        client_id: d.client_id,
+        date_debut: d.date_debut,
+        date_fin: d.date_fin,
+        statut: d.statut,
+        notes: d.notes,
+        remise_pct: d.remise_pct,
+        remise_montant: d.remise_montant,
+        lignes: buildCatalogueLinesPayload(d.lignes),
+      };
+      const optimisticContract = Object.assign({
+        contract_id: contractId,
+        owner_id: existing?.owner_id || State.user?.ID || '',
+        client_id: d.client_id,
+        client_nom: getClientName(d.client_id),
+        date_debut: d.date_debut,
+        date_fin: d.date_fin,
+        statut: d.statut,
+        notes: d.notes,
+        remise_pct: d.remise_pct,
+        remise_montant: d.remise_montant,
+        revenue_id: `ca_${contractId}`,
+        montant: totals.total_ttc,
+        _pending: true,
+      }, totals);
+      const optimisticLines = d.lignes.map((l, index) => Object.assign({}, l, {
+        contract_id: contractId,
+        ligne_id: l.ligne_id || tempId('lig'),
+        position: index + 1,
+        _pending: true,
+      }));
       const previousContracts = State.contracts.slice();
+      const previousLines = State.contract_lignes.slice();
       const previousRevenue = State.revenue.slice();
-      const optimisticRevenue = buildRevenueFromContract(contract);
-      if (existing) Object.assign(existing, contract, { _pending: true }); else State.contracts.unshift(contract);
+      const optimisticRevenue = buildRevenueFromContract(optimisticContract);
+      if (existing) Object.assign(existing, optimisticContract);
+      else State.contracts.unshift(optimisticContract);
+      State.contract_lignes = State.contract_lignes.filter(l => l.contract_id !== contractId).concat(optimisticLines);
+      const countsForKpi = isKpiContractStatus(optimisticContract.statut);
       State.revenue = State.revenue.filter(item => item.revenue_id !== optimisticRevenue.revenue_id);
-      if (Number(contract.montant) > 0) State.revenue.unshift(optimisticRevenue);
-      markPendingUpsert('contracts', contract.contract_id, contract);
-      if (Number(contract.montant) > 0) markPendingUpsert('revenue', optimisticRevenue.revenue_id, optimisticRevenue);
+      if (Number(optimisticContract.montant) > 0 && countsForKpi) State.revenue.unshift(optimisticRevenue);
+      markPendingUpsert('contracts', contractId, optimisticContract);
+      optimisticLines.forEach(line => markPendingUpsert('contract_lignes', line.ligne_id, line));
+      if (Number(optimisticContract.montant) > 0 && countsForKpi) markPendingUpsert('revenue', optimisticRevenue.revenue_id, optimisticRevenue);
       else markPendingDelete('revenue', optimisticRevenue.revenue_id);
       renderAll(); persistSession();
       setButtonLoading('saveContractBtn', true);
       try {
-        const saved = await businessApi.request(existing ? 'updateContract' : 'createContract', contract);
-        const target = State.contracts.find(item => item.contract_id === contract.contract_id);
+        const saved = await businessApi.request(existing ? 'updateContract' : 'createContract', payload);
+        const target = State.contracts.find(item => item.contract_id === contractId);
         if (target) Object.assign(target, saved, { _pending: false });
-        confirmPendingUpsert('contracts', contract.contract_id, saved);
-        if (Number(saved.montant || 0) > 0) confirmPendingUpsert('revenue', `ca_${saved.contract_id}`, buildRevenueFromContract(saved));
+        State.contract_lignes = State.contract_lignes.filter(l => l.contract_id !== contractId).concat(saved.lignes || []);
+        confirmPendingUpsert('contracts', contractId, saved);
+        optimisticLines.forEach(line => clearPendingOp('contract_lignes', line.ligne_id));
+        (saved.lignes || []).forEach(line => confirmPendingUpsert('contract_lignes', line.ligne_id, line));
+        if (Number(saved.montant || 0) > 0 && isKpiContractStatus(saved.statut)) confirmPendingUpsert('revenue', `ca_${saved.contract_id}`, buildRevenueFromContract(saved));
         else confirmPendingDelete('revenue', `ca_${saved.contract_id}`);
-        resetContractForm(); renderAll(); silentBusinessRefresh(); showToast(existing ? 'Contrat modifie' : 'Contrat cree');
-      } catch (err) { clearPendingOp('contracts', contract.contract_id); clearPendingOp('revenue', optimisticRevenue.revenue_id); State.contracts = previousContracts; State.revenue = previousRevenue; renderAll(); showToast(err.message); }
-      finally { setButtonLoading('saveContractBtn', false); }
+        resetContractForm(); renderAll(); showToast(existing ? 'Contrat modifié' : 'Contrat créé');
+      } catch (err) {
+        clearPendingOp('contracts', contractId);
+        optimisticLines.forEach(line => clearPendingOp('contract_lignes', line.ligne_id));
+        clearPendingOp('revenue', optimisticRevenue.revenue_id);
+        State.contracts = previousContracts;
+        State.contract_lignes = previousLines;
+        State.revenue = previousRevenue;
+        renderAll();
+        showToast(err.message);
+      } finally { setButtonLoading('saveContractBtn', false); }
     }
 
     function openEditContract(contractId) {
       if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
-      const contract = State.contracts.find(item => item.contract_id === contractId); if (!contract) return;
-      $('contractFormTitle').textContent = 'Modifier contrat';
-      $('contract_id').value = contract.contract_id; $('contract_client').value = contract.client_id;
-      renderContractStatusOptions(contract.statut || 'En negociation');
-      $('contract_start').value = contract.date_debut || ''; $('contract_end').value = contract.date_fin || '';
-      $('contract_amount').value = contract.montant || ''; $('contract_notes').value = contract.notes || '';
-      setView('contracts'); $('contractFormTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const contract = State.contracts.find(item => item.contract_id === contractId);
+      if (!contract) return;
+      const lignes = State.contract_lignes.filter(l => l.contract_id === contractId).sort((a, b) => Number(a.position) - Number(b.position));
+      State.currentContractDraft = null;
+      resetContractDraft(Object.assign({}, contract, {
+        remise_pct: contract.remise_pct || 0,
+        remise_montant: contract.remise_montant || 0,
+        lignes: lignes.length ? lignes.map(l => ({ ...l })) : buildEmptyCatalogueDraft(),
+      }));
+      setView('contracts');
+      $('contractFormTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function resetContractForm() {
-      $('contractFormTitle').textContent = 'Nouveau contrat';
-      ['contract_id','contract_start','contract_end','contract_amount','contract_notes'].forEach(id => $(id).value = '');
-      renderContractStatusOptions('En negociation');
+      State.currentContractDraft = null;
+      const today = new Date().toISOString().slice(0, 10);
+      resetContractDraft({
+        contract_id: '',
+        client_id: State.clients[0]?.client_id || '',
+        date_debut: today,
+        date_fin: addOneYear(today) || today,
+        statut: 'En negociation',
+        notes: '',
+        remise_pct: 0,
+        remise_montant: 0,
+        lignes: buildEmptyCatalogueDraft(),
+      });
     }
 
     async function deleteContract(contractId) {
       if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const removed = State.contracts.find(item => item.contract_id === contractId); if (!removed) return;
       const previousContracts = State.contracts.slice();
+      const previousLines = State.contract_lignes.slice();
       const previousRevenue = State.revenue.slice();
       markPendingDelete('contracts', contractId);
       markPendingDelete('revenue', `ca_${contractId}`);
       State.contracts = State.contracts.filter(item => item.contract_id !== contractId);
+      State.contract_lignes = State.contract_lignes.filter(l => l.contract_id !== contractId);
       State.revenue = State.revenue.filter(item => item.revenue_id !== `ca_${contractId}`);
+      State.documents = (State.documents || []).filter(doc => !(doc.entity_type === 'contrat' && doc.entity_id === contractId));
       renderAll(); persistSession();
       try {
         await businessApi.request('deleteContract', { contract_id: contractId });
         confirmPendingDelete('contracts', contractId);
         confirmPendingDelete('revenue', `ca_${contractId}`);
-        silentBusinessRefresh(); showToast('Contrat supprime');
-      } catch (err) { clearPendingOp('contracts', contractId); clearPendingOp('revenue', `ca_${contractId}`); State.contracts = previousContracts; State.revenue = previousRevenue; renderAll(); showToast(err.message); }
+        silentBusinessRefresh(); showToast('Contrat supprimé');
+      } catch (err) {
+        clearPendingOp('contracts', contractId);
+        clearPendingOp('revenue', `ca_${contractId}`);
+        State.contracts = previousContracts;
+        State.contract_lignes = previousLines;
+        State.revenue = previousRevenue;
+        renderAll();
+        showToast(err.message);
+      }
     }
 
     async function createClient() {
@@ -3756,34 +5271,54 @@ showToast('Client cree');
     }
 
     async function refresh() {
-      setButtonLoading('refreshBtn', true);
+      if (State.syncingRefresh) return;
+      State.syncingRefresh = true;
+      showSyncIndicator('syncing');
       try {
-        beginDashboardSync();
-        const data = await masterApi.request('bootstrap');
-        State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
-        State.stats = data.stats; State.users = data.users || [State.user];
-        await loadBusinessBootstrap();
-        finishDashboardSync();
+        const hadEndpoint = Boolean(State.businessEndpoint);
+        const tasks = [masterApi.request('bootstrap')];
+        if (hadEndpoint) tasks.push(loadBusinessBootstrap({ background: true }));
+        const [masterData] = await Promise.all(tasks);
+        State.user = masterData.user;
+        State.company = masterData.company;
+        State.businessEndpoint = masterData.company?.business_endpoint || State.businessEndpoint || '';
+        State.stats = masterData.stats;
+        State.users = masterData.users || [State.user];
+        renderDashboard();
+        if (State.businessEndpoint && !hadEndpoint) {
+          await loadBusinessBootstrap({ background: true });
+        }
         renderAll();
         persistSession();
-      } finally { setButtonLoading('refreshBtn', false); }
+        showSyncIndicator('done');
+      } catch (err) {
+        hideSyncIndicator();
+        showToast(err.message);
+        throw err;
+      } finally {
+        State.syncingRefresh = false;
+      }
     }
 
     function silentRefresh(options = {}) {
       if (State.syncingRefresh) return;
       State.syncingRefresh = true;
-      beginDashboardSync();
+      if (options.showIndicator) showSyncIndicator('syncing');
       (async () => {
         try {
           const data = await masterApi.request('bootstrap');
           State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
           State.stats = data.stats; State.users = data.users || [State.user];
-          await loadBusinessBootstrap();
-          finishDashboardSync();
+          if (State.businessEndpoint) {
+            await loadBusinessBootstrap({ background: true });
+          }
+          State.dashboardSynced = true;
+          setDashboardLoading(false);
           renderAll();
           persistSession();
+          if (options.showIndicator) showSyncIndicator('done');
         } catch (err) {
-          finishDashboardSync();
+          if (options.showIndicator) hideSyncIndicator();
           if (options.onAuthFail) {
             clearStoredSession();
             State.token = '';
@@ -3821,13 +5356,10 @@ showToast('Client cree');
     function buildAppointmentFromForm() {
       return { appointment_id: tempId('rdv'), owner_id: State.user?.ID || '', client_id: $('rdv_client').value, referent_id: $('rdv_referent').value, date: $('rdv_date').value, heure: $('rdv_time').value, adresse: $('rdv_address').value, objet: $('rdv_subject').value, notes: $('rdv_notes').value, statut: 'En attente de compte rendu', _pending: true };
     }
-        function buildContractFromForm() {
-      const client = State.clients.find(item => item.client_id === $('contract_client').value);
-      const contractId = $('contract_id').value || tempId('ctr');
-      return { contract_id: contractId, owner_id: State.user?.ID || '', client_id: $('contract_client').value, client_nom: client?.nom_entreprise || '', date_debut: $('contract_start').value, date_fin: $('contract_end').value, statut: $('contract_status').value, montant: Number($('contract_amount').value || 0), notes: $('contract_notes').value, revenue_id: `ca_${contractId}`, _pending: true };
-    }
     function buildRevenueFromContract(contract) {
-      return { revenue_id: `ca_${contract.contract_id}`, client_id: contract.client_id, owner_id: contract.owner_id, date: contract.date_debut, montant: Number(contract.montant || 0), nombre_contrats: Number(contract.montant || 0) > 0 ? 1 : 0, commentaires: `Contrat - ${contract.statut}`, client_nom: contract.client_nom || getClientName(contract.client_id), _pending: true };
+      const countsForKpi = isKpiContractStatus(contract.statut);
+      const amount = countsForKpi ? Number(contract.total_ttc || contract.montant || 0) : 0;
+      return { revenue_id: `ca_${contract.contract_id}`, client_id: contract.client_id, owner_id: contract.owner_id, date: contract.date_debut, montant: amount, nombre_contrats: amount > 0 ? 1 : 0, commentaires: `Contrat - ${contract.statut}`, client_nom: contract.client_nom || getClientName(contract.client_id), _pending: true };
     }
     function getClientName(clientId) { return State.clients.find(client => client.client_id === clientId)?.nom_entreprise || 'Client'; }
     function formatContractStatus(status) {
@@ -3843,6 +5375,64 @@ showToast('Client cree');
     function isPaidContractStatus(status) {
       const value = String(status || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       return value === 'paye' || value === 'paid';
+    }
+    function isKpiContractStatus(status) {
+      const value = String(status || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      return value === 'signe' || value === 'signed' || value === 'paye' || value === 'paid';
+    }
+    function getTodayIso() {
+      const today = new Date();
+      return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    }
+    function shouldAutoTerminateContract(contract, todayIso) {
+      if (!contract) return false;
+      const status = String(contract.statut || '').trim();
+      if (status === 'Termine' || status === 'Annule') return false;
+      const dateFin = String(contract.date_fin || '').slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateFin)) return false;
+      return dateFin < (todayIso || getTodayIso());
+    }
+    function applyExpiredContractStatuses() {
+      const today = getTodayIso();
+      let changed = false;
+      State.contracts = State.contracts.map(contract => {
+        if (!shouldAutoTerminateContract(contract, today)) return contract;
+        changed = true;
+        return Object.assign({}, contract, { statut: 'Termine' });
+      });
+      if (changed) {
+        State.revenue = State.revenue.filter(item => {
+          const contract = getContractForRevenueItem(item);
+          return !contract || isKpiContractStatus(contract.statut);
+        });
+      }
+    }
+    function getContractForRevenueItem(item) {
+      const revenueId = String(item?.revenue_id || '');
+      if (!revenueId.startsWith('ca_')) return null;
+      const contractId = revenueId.replace(/^ca_/, '');
+      return State.contracts.find(contract => contract.contract_id === contractId) || null;
+    }
+    function filterKpiRevenue(rows) {
+      return filterRevenue(rows).filter(item => {
+        const contract = getContractForRevenueItem(item);
+        if (!contract) return true;
+        return isKpiContractStatus(contract.statut);
+      });
+    }
+    function filterKpiContracts(contracts) {
+      const start = $('filter_start')?.value || '';
+      const end = $('filter_end')?.value || '';
+      const clientId = $('filter_client')?.value || '';
+      const ownerId = $('filter_owner')?.value || '';
+      return contracts.filter(contract => {
+        if (!isKpiContractStatus(contract.statut)) return false;
+        if (start && contract.date_debut < start) return false;
+        if (end && contract.date_debut > end) return false;
+        if (clientId && contract.client_id !== clientId) return false;
+        if (ownerId && contract.owner_id !== ownerId) return false;
+        return true;
+      });
     }
     function renderContractStatusOptions(selectedStatus) {
       const select = $('contract_status');
@@ -3931,7 +5521,7 @@ async function refreshCatalogue() {
 }
     function startRealtimeSync() {
       clearInterval(startRealtimeSync.timer);
-      startRealtimeSync.timer = setInterval(() => { if (State.token && State.user && document.visibilityState === 'visible') silentBusinessRefresh(); }, 15000);
+      startRealtimeSync.timer = setInterval(() => { if (State.token && State.user && document.visibilityState === 'visible') silentBusinessRefresh(); }, 60000);
     }
 
     function filterRevenue(rows) {
@@ -3967,9 +5557,11 @@ async function refreshCatalogue() {
         users: State.users, clients: State.clients, appointments: State.appointments,
         revenue: State.revenue, objectives: State.objectives, portfolioHistory: State.portfolioHistory,
         contracts: State.contracts,
+        contract_lignes: State.contract_lignes,
         // CATALOGUE / DEVIS
         prestations: State.prestations, supplements: State.supplements,
         devis: State.devis, devis_lignes: State.devis_lignes,
+        documents: State.documents,
         pendingOps: State.pendingOps,
         google: State.google, savedAt: Date.now(),
       }));
@@ -3982,8 +5574,10 @@ async function refreshCatalogue() {
       if (!State.token) { showLogin(); return; }
       if (State.user) {
         showAppShell();
-        beginDashboardSync();
-        silentRefresh({ onAuthFail: true });
+        State.dashboardSynced = hasCachedBusinessData();
+        renderDashboard();
+        scheduleSecondaryRender();
+        silentRefresh({ onAuthFail: true, showIndicator: true });
         return;
       }
       $('bootScreen').style.display = 'grid'; $('loginScreen').style.display = 'none'; $('app').style.display = 'none';
@@ -3994,7 +5588,7 @@ async function refreshCatalogue() {
     // ===== Event listeners =====
     $('loginForm').addEventListener('submit', login);
     $('logoutBtn').addEventListener('click', logout);
-    $('refreshBtn').addEventListener('click', () => refresh().then(() => showToast('Donnees actualisees')).catch(err => showToast(err.message)));
+    $('refreshBtn').addEventListener('click', () => refresh().catch(() => {}));
     $('createUserBtn').addEventListener('click', createUser);
     $('toggleUserFormBtn').addEventListener('click', toggleUserForm);
     $('cancelUserFormBtn').addEventListener('click', closeUserForm);
@@ -4024,8 +5618,15 @@ async function refreshCatalogue() {
    $('openSelectedPersonBtn').addEventListener('click', () => openPersonStats($('filter_owner').value || State.user.ID));
     $('saveContractBtn').addEventListener('click', saveContract);
     $('cancelContractEditBtn').addEventListener('click', resetContractForm);
+    $('addContractLigneBtn')?.addEventListener('click', () => {
+      const d = getContractDraft();
+      d.lignes.push(makeEmptyLigneDraft(d.lignes.length + 1));
+      renderCatalogueLignes('contract');
+      computeCatalogueTotalsUI('contract');
+    });
     $('connectGoogleBtn').addEventListener('click', connectGoogle);
     $('disconnectGoogleBtn').addEventListener('click', disconnectGoogle);
+    $('testDriveFolderBtn')?.addEventListener('click', testDriveFolderAccess);
     $('rdv_client').addEventListener('change', renderReferentOptions);
         $('objective_owner').addEventListener('change', () => { fillObjectiveForm(); renderDashboardAnalytics(); });
     ['filter_start','filter_end','filter_client','filter_owner'].forEach(id => { $(id).addEventListener('change', () => { renderStats(); renderRevenue(); renderDashboardAnalytics(); renderPortfolioHistory(); renderPersonStats(); }); });
@@ -4046,7 +5647,7 @@ async function refreshCatalogue() {
     $('saveDevisBtn').addEventListener('click', saveDevisFromDraft);
     $('cancelDevisBtn').addEventListener('click', () => setView('dashboard'));
     $('transformDevisBtn').addEventListener('click', () => transformDevisToContract($('devis_id').value));
-    $('addDevisLigneBtn').addEventListener('click', () => { const d = getDevisDraft(); d.lignes.push(makeEmptyLigneDraft(d.lignes.length + 1)); renderDevisLignes(); computeDevisTotalsUI(); });
+    $('addDevisLigneBtn').addEventListener('click', () => { const d = getDevisDraft(); d.lignes.push(makeEmptyLigneDraft(d.lignes.length + 1)); renderCatalogueLignes('devis'); computeCatalogueTotalsUI('devis'); });
     $('refreshCatalogueBtn').addEventListener('click', refreshCatalogue);
 $('togglePrestationFormBtn')?.addEventListener('click', () => {
   const p = $('adminPrestationPanel');
@@ -4062,6 +5663,11 @@ $('toggleSupplementFormBtn')?.addEventListener('click', () => {
 });
 
     $('refreshDevisBtn').addEventListener('click', () => silentBusinessRefresh());
+    $('contractsPlanner')?.addEventListener('click', handleContractsCalendarClick);
+    $('entityDocumentInput')?.addEventListener('change', handleEntityDocumentSelected);
+    $('clearSignatureBtn')?.addEventListener('click', clearSignatureCanvas);
+    $('cancelSignatureBtn')?.addEventListener('click', closeSignaturePanel);
+    $('submitSignatureBtn')?.addEventListener('click', submitSignature);
 
     document.addEventListener('click', event => {
       const t = event.target;
@@ -4093,20 +5699,33 @@ $('toggleSupplementFormBtn')?.addEventListener('click', () => {
       const ed = t.closest('[data-edit-devis]'); if (ed) openEditDevis(ed.dataset.editDevis);
       const cd = t.closest('[data-transform-devis]'); if (cd) transformDevisToContract(cd.dataset.transformDevis);
       const xd = t.closest('[data-delete-devis]'); if (xd) deleteDevisAction(xd.dataset.deleteDevis);
+      const docBtn = t.closest('[data-entity-docs]');
+      if (docBtn) openEntityDocuments(docBtn.dataset.entityDocs, docBtn.dataset.entityId);
+      const signBtn = t.closest('[data-sign-entity]');
+      if (signBtn) openSignaturePanel(signBtn.dataset.signEntity, signBtn.dataset.entityId, signBtn.dataset.entityLabel);
       const oc = t.closest('[data-open-contract]'); if (oc) { setView('contracts'); openEditContract(oc.dataset.openContract); }
-      const rl = t.closest('[data-remove-ligne]'); if (rl) { const d = getDevisDraft(); d.lignes = d.lignes.filter(l => l.ligne_id !== rl.dataset.removeLigne); renderDevisLignes(); computeDevisTotalsUI(); }
+      const rl = t.closest('[data-remove-ligne]');
+      if (rl) {
+        const formKey = rl.dataset.form || 'devis';
+        const draft = getCatalogueDraft(formKey);
+        draft.lignes = draft.lignes.filter(l => l.ligne_id !== rl.dataset.removeLigne);
+        if (!draft.lignes.length) draft.lignes = buildEmptyCatalogueDraft();
+        renderCatalogueLignes(formKey);
+        computeCatalogueTotalsUI(formKey);
+      }
       const ndc = t.closest('[data-new-devis-from-client]'); if (ndc) { setView('devis'); resetDevisDraft({ client_id: ndc.dataset.newDevisFromClient }); }
-      const ndct = t.closest('[data-new-devis-from-contract]'); if (ndct) { const c = State.contracts.find(x => x.contract_id === ndct.dataset.newDevisFromContract); if (c) { setView('devis'); resetDevisDraft({ client_id: c.client_id, date: c.date_debut }); } }
+      const ndct = t.closest('[data-new-devis-from-contract]'); if (ndct) { const c = State.contracts.find(x => x.contract_id === ndct.dataset.newDevisFromContract); if (c) { setView('devis'); resetDevisDraft({ client_id: c.client_id, date: c.date_debut, date_debut: c.date_debut, date_fin: c.date_fin }); } }
     });
 
     document.addEventListener('input', event => {
       const t = event.target;
-      if (t.dataset && t.dataset.ligneId) onDevisLigneChange(t.dataset.ligneId, t.dataset.ligneField, t.value);
-      if (t.id === 'devis_remise_pct' || t.id === 'devis_remise_montant') computeDevisTotalsUI();
+      if (t.dataset && t.dataset.ligneId) onCatalogueLigneChange(t.dataset.form || 'devis', t.dataset.ligneId, t.dataset.ligneField, t.value);
+      if (t.id === 'devis_remise_pct' || t.id === 'devis_remise_montant') computeCatalogueTotalsUI('devis');
+      if (t.id === 'contract_remise_pct' || t.id === 'contract_remise_montant') computeCatalogueTotalsUI('contract');
     });
     document.addEventListener('change', event => {
       const t = event.target;
-      if (t.dataset && t.dataset.ligneId) onDevisLigneChange(t.dataset.ligneId, t.dataset.ligneField, t.value);
+      if (t.dataset && t.dataset.ligneId) onCatalogueLigneChange(t.dataset.form || 'devis', t.dataset.ligneId, t.dataset.ligneField, t.value);
     });
 
     document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
