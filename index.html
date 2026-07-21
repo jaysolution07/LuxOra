@@ -1503,7 +1503,7 @@ body .catalogue-stats .stat-item {
       <form id="loginForm" class="card">
         <div class="eyebrow">Connexion</div>
         <h2>Accéder à LabOra</h2>
-        <p class="muted">Renseignez votre identifiant et mot de passe.</p>
+        <p class="muted">Identifiant et mot de passe depuis le sheet master.</p>
         <label for="login">Identifiant</label>
         <input id="login" autocomplete="username" required>
         <label for="password">Mot de passe</label>
@@ -1812,7 +1812,7 @@ body .catalogue-stats .stat-item {
         </section>
 
         <section id="appointments" class="view">
-          <div class="toolbar"><div><div class="eyebrow">Activite</div><h2>Rendez-vous</h2><p class="muted">Vos RDV synchronisés avec Google Agenda.</p></div></div>
+          <div class="toolbar"><div><div class="eyebrow">Activite</div><h2>Rendez-vous</h2><p class="muted">Les ajouts s'affichent immediatement puis se synchronisent avec le back-end et Google Agenda.</p></div></div>
                     <div class="actions" style="justify-content:flex-start;margin-top:14px">
             <button id="toggleAppointmentFormBtn" class="btn btn-primary" type="button">+ Ajouter un rendez-vous</button>
           </div>
@@ -2140,7 +2140,7 @@ body .catalogue-stats .stat-item {
 
         <section id="contracts" class="view">
           <div class="toolbar">
-            <div><div class="eyebrow">Contrats</div><h2>Contrats et planning partagé</h2><p class="muted">Le planning est commun a toute l'entreprise.</p></div>
+            <div><div class="eyebrow">Contrats</div><h2>Contrats et planning partagé</h2><p class="muted">Le planning est commun a toute l'entreprise. Les changements s'affichent immediatement puis se synchronisent.</p></div>
             <div class="toolbar-actions">
               <button id="toggleContractFormBtn" class="btn btn-primary" type="button">+ Nouveau contrat</button>
             </div>
@@ -2674,11 +2674,11 @@ function toggleCatalogueTab(tabId) {
 
     function renderSecondaryViews() {
       $('usersHelp').textContent = State.user?.role === 'admin'
-        ? `Creation limitée a l'entreprise ${State.company?.entreprise || ''}.`
+        ? `Creation limitee a l'entreprise ${State.company?.entreprise || ''}.`
         : 'Votre compte apporteur.';
       if (State.user?.role !== 'admin') $('adminEditPanel').style.display = 'none';
       $('clientsHelp').textContent = State.user?.role === 'admin'
-        ? 'Vue globale des clients de l'entreprise.'
+        ? 'Vue globale des clients de l entreprise.'
         : 'Votre portefeuille client.';
       $('catalogueHelp').textContent = State.user?.role === 'admin'
         ? 'Gérez vos prestations, suppléments et la rentabilité.'
