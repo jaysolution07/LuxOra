@@ -1621,7 +1621,8 @@ body .catalogue-stats .stat-item {
                 Performance
               </div>
               <div class="stat-group">
-                <div class="stat-item"><span class="stat-label">CA</span><span id="statRevenue" class="stat-value">0 €</span></div>
+                <div class="stat-item"><span class="stat-label">CA HT</span><span id="statRevenueHt" class="stat-value">0 €</span></div>
+                <div class="stat-item"><span class="stat-label">CA TTC</span><span id="statRevenueTtc" class="stat-value">0 €</span></div>
                 <div class="stat-item"><span class="stat-label">Commissions</span><span id="statCommissions" class="stat-value">0 €</span></div>
                 <div class="stat-item"><span class="stat-label">Contrats</span><span id="statContracts" class="stat-value">0</span></div>
               </div>
@@ -1899,7 +1900,8 @@ body .catalogue-stats .stat-item {
       CA catalogue
     </div>
     <div class="stat-group">
-      <div class="stat-item"><span class="stat-label">Total HT</span><span id="statCatalogueCa" class="stat-value">0 €</span></div>
+      <div class="stat-item"><span class="stat-label">Total HT</span><span id="statCatalogueCaHt" class="stat-value">0 €</span></div>
+      <div class="stat-item"><span class="stat-label">Total TTC</span><span id="statCatalogueCaTtc" class="stat-value">0 €</span></div>
     </div>
   </div>
   <div class="stat">
@@ -2052,7 +2054,8 @@ body .catalogue-stats .stat-item {
             </div>
             <div class="panel" style="margin-top:14px">
               <h3>Marge brute & rentabilité</h3>
-              <p>CA vendu : <strong id="analyticsCa">0 €</strong></p>
+              <p>CA HT : <strong id="analyticsCaHt">0 €</strong></p>
+              <p>CA TTC : <strong id="analyticsCaTtc">0 €</strong></p>
               <p>Commissions : <strong id="analyticsCommissions">0 €</strong></p>
               <p>Marge brute : <strong id="analyticsMarge">0 €</strong></p>
               <p>Rentabilité moyenne : <strong id="analyticsRentabilite">0 %</strong></p>
@@ -2616,7 +2619,7 @@ function toggleCatalogueTab(tabId) {
       ['clients','appointments','revenue','devis'].forEach(k => { State.loading[k] = loading; });
     }
 
-    const DASHBOARD_STAT_IDS = ['statUsers','statAdmins','statApporteurs','statClients','statAppointments','statPendingReports','statRevenue','statCommissions','statContracts'];
+    const DASHBOARD_STAT_IDS = ['statUsers','statAdmins','statApporteurs','statClients','statAppointments','statPendingReports','statRevenueHt','statRevenueTtc','statCommissions','statContracts'];
 
     function setDashboardSkeletons() {
       DASHBOARD_STAT_IDS.forEach(id => {
@@ -2877,10 +2880,21 @@ function toggleCatalogueTab(tabId) {
       })).join('') || `<tr><td colspan="9" class="muted">Aucun supplément.</td></tr>`;
     }
 
+    function getKpiSalesContracts(useDashboardFilters) {
+      applyExpiredContractStatuses();
+      let contracts = useDashboardFilters
+        ? filterKpiContracts(State.contracts)
+        : State.contracts.filter(contract => isKpiContractStatus(contract.statut));
+      if (!isAdminUser()) {
+        contracts = contracts.filter(contract => contract.owner_id === State.user.ID);
+      }
+      return contracts;
+    }
+
     function renderCatalogueAnalytics() {
       if (!$('statPrestationCount')) return;
-      if (State.loading.catalogue || State.loading.devis) {
-                ['statPrestationCount','statSupplementCount','statCatalogueCa','statCatalogueCommission','statCatalogueMarge','statCatalogueRentabilite','analyticsCa','analyticsCommissions','analyticsMarge','analyticsRentabilite','statCommissions'].forEach(id => {
+      if (State.loading.catalogue || State.loading.contracts) {
+                ['statPrestationCount','statSupplementCount','statCatalogueCaHt','statCatalogueCaTtc','statCatalogueCommission','statCatalogueMarge','statCatalogueRentabilite','analyticsCaHt','analyticsCaTtc','analyticsCommissions','analyticsMarge','analyticsRentabilite'].forEach(id => {
   if ($(id)) $(id).innerHTML = '<div class="skeleton" style="height:22px"></div>';
 });
 
@@ -2891,31 +2905,32 @@ function toggleCatalogueTab(tabId) {
       }
       $('statPrestationCount').textContent = State.prestations.filter(p => p.statut === 'Actif').length;
       $('statSupplementCount').textContent = State.supplements.filter(s => (s.statut || 'Actif') === 'Actif').length;
-      const acc = State.devis.filter(d => d.statut === 'Accepte' || d.statut === 'Transforme');
-      const ca = acc.reduce((s, d) => s + Number(d.total_ht || 0), 0);
-      const commissions = State.devis.reduce((s, d) => s + Number(d.commission_apporteur || 0), 0);
-      const marge = acc.reduce((s, d) => s + Number(d.montant_entreprise || 0), 0);
-      const rentabilite = ca > 0 ? Math.round(marge / ca * 100) : 0;
-      $('statCatalogueCa').textContent = formatMoney(ca);
+      const salesContracts = getKpiSalesContracts(false);
+      const totals = sumResolvedFinancials(salesContracts, resolveContractFinancials);
+      const caHt = totals.total_ht;
+      const caTtc = totals.total_ttc;
+      const commissions = totals.commission_apporteur;
+      const marge = totals.montant_entreprise;
+      const rentabilite = caHt > 0 ? Math.round(marge / caHt * 100) : 0;
+      $('statCatalogueCaHt').textContent = formatMoney(caHt);
+      $('statCatalogueCaTtc').textContent = formatMoney(caTtc);
       $('statCatalogueCommission').textContent = formatMoney(commissions);
-            // La commission du dashboard est calculée par renderStats() selon le filtre actif.
-
-
       $('statCatalogueMarge').textContent = formatMoney(marge);
       $('statCatalogueRentabilite').textContent = rentabilite + ' %';
-      $('analyticsCa').textContent = formatMoney(ca);
+      $('analyticsCaHt').textContent = formatMoney(caHt);
+      $('analyticsCaTtc').textContent = formatMoney(caTtc);
       $('analyticsCommissions').textContent = formatMoney(commissions);
       $('analyticsMarge').textContent = formatMoney(marge);
       $('analyticsRentabilite').textContent = rentabilite + ' %';
 
       const userMap = new Map(State.users.map(u => [u.ID, u.Nom || u.ID]));
-      const mp = new Map();
-      State.devis_lignes.forEach(l => { if (!mp.has(l.devis_id)) mp.set(l.devis_id, []); mp.get(l.devis_id).push(l); });
-
       const statsP = {}, statsO = {};
-      acc.forEach(d => {
-        const ls = mp.get(d.devis_id) || [];
-        const sumHt = ls.reduce((s, l) => s + Number(l.total_ht || 0), 0) || 1;
+      salesContracts.forEach(contract => {
+        const financials = resolveContractFinancials(contract);
+        const ls = State.contract_lignes
+          .filter(l => l.contract_id === contract.contract_id)
+          .map(enrichLigneCommission);
+        const sumHt = ls.reduce((s, l) => s + Number(l.total_ht || 0), 0) || Number(financials.total_ht || 0) || 1;
         ls.forEach(l => {
           if (l.type === 'prestation' || l.type === 'supplement') {
             const ref = l.type === 'prestation'
@@ -2926,19 +2941,20 @@ function toggleCatalogueTab(tabId) {
             statsP[key].quantite += Number(l.quantite || 0);
             statsP[key].ca += Number(l.total_ht || 0);
             statsP[key].commission += Number(l.commission_valeur || 0);
-            statsP[key].marge += Number(d.montant_entreprise || 0) * (Number(l.total_ht || 0) / sumHt);
+            statsP[key].marge += Number(financials.montant_entreprise || 0) * (Number(l.total_ht || 0) / sumHt);
           }
         });
-        if (!statsO[d.owner_id]) statsO[d.owner_id] = { owner: d.owner_id, devis:0, ca:0, commission:0, marge:0 };
-        statsO[d.owner_id].devis += 1; statsO[d.owner_id].ca += Number(d.total_ht || 0);
-        statsO[d.owner_id].commission += Number(d.commission_apporteur || 0);
-        statsO[d.owner_id].marge += Number(d.montant_entreprise || 0);
+        if (!statsO[contract.owner_id]) statsO[contract.owner_id] = { owner: contract.owner_id, ventes:0, ca:0, commission:0, marge:0 };
+        statsO[contract.owner_id].ventes += 1;
+        statsO[contract.owner_id].ca += Number(financials.total_ht || 0);
+        statsO[contract.owner_id].commission += Number(financials.commission_apporteur || 0);
+        statsO[contract.owner_id].marge += Number(financials.montant_entreprise || 0);
       });
       $('analyticsPrestationsRows').innerHTML = Object.values(statsP).sort((a,b) => b.ca-a.ca).map(p =>
         `<tr><td>${escapeHtml(p.nom)}</td><td>${p.quantite}</td><td>${formatMoney(p.ca)}</td><td>${formatMoney(p.commission)}</td><td>${formatMoney(p.marge)}</td></tr>`
       ).join('') || '<tr><td colspan="5" class="muted">Aucune vente.</td></tr>';
       $('analyticsApporteursRows').innerHTML = Object.values(statsO).map(o =>
-        `<tr><td>${escapeHtml(userMap.get(o.owner) || o.owner)}</td><td>${o.devis}</td>
+        `<tr><td>${escapeHtml(userMap.get(o.owner) || o.owner)}</td><td>${o.ventes}</td>
          <td>${formatMoney(o.ca)}</td><td>${formatMoney(o.commission)}</td><td>${formatMoney(o.marge)}</td>
          <td>${o.ca > 0 ? Math.round(o.marge / o.ca * 100) : 0} %</td></tr>`
       ).join('') || '<tr><td colspan="6" class="muted">Aucun apporteur actif.</td></tr>';
@@ -3603,6 +3619,74 @@ function toggleCatalogueTab(tabId) {
       };
     }
 
+    function enrichLigneCommission(l) {
+      const ht = Number(l.quantite || 0) * Number(l.prix_unitaire || 0) * (1 - Number(l.remise_pct || 0) / 100);
+      const line = Object.assign({}, l, { total_ht: Math.round(ht * 100) / 100 });
+      if (Number(line.commission_valeur || 0) > 0) return line;
+      if (l.type === 'prestation') {
+        const p = State.prestations.find(x => x.prestation_id === l.ref_id);
+        if (p) {
+          line.commission_valeur = p.commission_type === 'pourcentage'
+            ? Math.round(ht * Number(p.commission_valeur || 0) / 100 * 100) / 100
+            : Math.round(Number(l.quantite || 0) * Number(p.commission_valeur || 0) * 100) / 100;
+        }
+      } else if (l.type === 'supplement') {
+        const s = State.supplements.find(x => x.supplement_id === l.ref_id);
+        if (s) {
+          const normalized = normalizeCatalogueItem(s);
+          line.commission_valeur = normalized.commission_type === 'pourcentage'
+            ? Math.round(ht * Number(normalized.commission_valeur || 0) / 100 * 100) / 100
+            : Math.round(Number(l.quantite || 0) * Number(normalized.commission_valeur || 0) * 100) / 100;
+        }
+      }
+      return line;
+    }
+
+    function resolveDevisFinancials(devis) {
+      const lignes = State.devis_lignes
+        .filter(l => l.devis_id === devis.devis_id)
+        .map(enrichLigneCommission);
+      if (lignes.length) {
+        return calculateDevisTotals(Object.assign({}, devis, { lignes }));
+      }
+      return {
+        total_ht: Number(devis.total_ht || 0),
+        total_ttc: Number(devis.total_ttc || devis.total_ht || 0),
+        commission_apporteur: Number(devis.commission_apporteur || 0),
+        montant_entreprise: Number(devis.montant_entreprise || Math.max(0, Number(devis.total_ht || 0) - Number(devis.commission_apporteur || 0))),
+      };
+    }
+
+    function resolveContractFinancials(contract) {
+      const lignes = State.contract_lignes
+        .filter(l => l.contract_id === contract.contract_id)
+        .map(enrichLigneCommission);
+      if (lignes.length) {
+        return calculateDevisTotals({
+          lignes,
+          remise_pct: contract.remise_pct || 0,
+          remise_montant: contract.remise_montant || 0,
+        });
+      }
+      return {
+        total_ht: Number(contract.total_ht || 0),
+        total_ttc: Number(contract.total_ttc || contract.montant || contract.total_ht || 0),
+        commission_apporteur: Number(contract.commission_apporteur || 0),
+        montant_entreprise: Number(contract.montant_entreprise || Math.max(0, Number(contract.total_ht || 0) - Number(contract.commission_apporteur || 0))),
+      };
+    }
+
+    function sumResolvedFinancials(items, resolver) {
+      return items.reduce((totals, item) => {
+        const financials = resolver(item);
+        totals.total_ht += Number(financials.total_ht || 0);
+        totals.total_ttc += Number(financials.total_ttc || 0);
+        totals.commission_apporteur += Number(financials.commission_apporteur || 0);
+        totals.montant_entreprise += Number(financials.montant_entreprise || 0);
+        return totals;
+      }, { total_ht: 0, total_ttc: 0, commission_apporteur: 0, montant_entreprise: 0 });
+    }
+
     async function saveDevisFromDraft() {
       const d = getDevisDraft();
       const existing = d.devis_id ? State.devis.find(x => x.devis_id === d.devis_id) : null;
@@ -3941,7 +4025,6 @@ function toggleCatalogueTab(tabId) {
         return;
       }
       applyExpiredContractStatuses();
-      const filteredRevenue = filterKpiRevenue(State.revenue);
       const isAdmin = State.user?.role === 'admin';
       if (isAdmin) {
         $('statUsers').textContent = State.stats?.users || State.users.length || 0;
@@ -3951,20 +4034,12 @@ function toggleCatalogueTab(tabId) {
       $('statClients').textContent = State.stats?.clients ?? State.clients.length ?? 0;
       $('statAppointments').textContent = State.stats?.appointments ?? State.appointments.length ?? 0;
       $('statPendingReports').textContent = State.stats?.pending_reports ?? State.appointments.filter(item => item.statut === 'En attente de compte rendu').length ?? 0;
-      $('statRevenue').textContent = formatMoney(sumField(filteredRevenue, 'montant'));
-      const start = $('filter_start')?.value || '';
-      const end = $('filter_end')?.value || '';
-      const clientId = $('filter_client')?.value || '';
-      const ownerId = $('filter_owner')?.value || '';
-      const filteredDevis = State.devis.filter(d => {
-        if (start && d.date < start) return false;
-        if (end && d.date > end) return false;
-        if (clientId && d.client_id !== clientId) return false;
-        if (ownerId && d.owner_id !== ownerId) return false;
-        return d.statut === 'Accepte' || d.statut === 'Transforme';
-      });
-      $('statCommissions').textContent = formatMoney(sumField(filteredDevis, 'commission_apporteur'));
-      $('statContracts').textContent = filterKpiContracts(State.contracts).length;
+      const filteredContracts = getKpiSalesContracts(true);
+      const kpiTotals = sumResolvedFinancials(filteredContracts, resolveContractFinancials);
+      $('statRevenueHt').textContent = formatMoney(kpiTotals.total_ht);
+      $('statRevenueTtc').textContent = formatMoney(kpiTotals.total_ttc);
+      $('statCommissions').textContent = formatMoney(kpiTotals.commission_apporteur);
+      $('statContracts').textContent = filteredContracts.length;
     }
 
     function renderAll() {
