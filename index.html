@@ -522,9 +522,11 @@
     }
 
     .cal-legend-swatch.is-period { background: linear-gradient(90deg, #175cd3, #027a48); border-radius: 999px; }
-    .cal-legend-swatch.is-end { background: #b42318; border-radius: 50%; }
-    .cal-legend-swatch.is-deadline { background: #b54708; transform: rotate(45deg); border-radius: 2px; }
-    .cal-legend-swatch.is-event { background: #6941c6; border-radius: 3px; }
+    .cal-legend-swatch.is-negociation { background: #175cd3; border-radius: 4px; }
+    .cal-legend-swatch.is-signe { background: #6941c6; border-radius: 4px; }
+    .cal-legend-swatch.is-paye { background: #05603a; border-radius: 4px; }
+    .cal-legend-swatch.is-termine { background: #fec84b; border-radius: 4px; }
+    .cal-legend-swatch.is-annule { background: #d92d20; border-radius: 4px; }
 
     .contract-calendar-timeline {
       border: 1px solid var(--line);
@@ -608,9 +610,9 @@
     .cal-period-bar.is-pending { opacity: .62; outline: 2px dashed rgba(27, 26, 36, .28); outline-offset: 1px; }
 
     .cal-period-bar.is-negociation { background: linear-gradient(90deg, #175cd3, #53b1fd); }
-    .cal-period-bar.is-signe { background: linear-gradient(90deg, #027a48, #12b76a); }
+    .cal-period-bar.is-signe { background: linear-gradient(90deg, #6941c6, #9e77ed); }
     .cal-period-bar.is-paye { background: linear-gradient(90deg, #05603a, #039855); }
-    .cal-period-bar.is-termine { background: linear-gradient(90deg, #b54708, #fdb022); }
+    .cal-period-bar.is-termine { background: linear-gradient(90deg, #eaaa08, #fec84b); }
     .cal-period-bar.is-annule { background: linear-gradient(90deg, #b42318, #f97066); }
 
     .contract-calendar-grid {
@@ -650,6 +652,7 @@
     .contract-calendar-day.is-outside { background: #fafafa; opacity: .72; }
     .contract-calendar-day.is-today { background: #fffaeb; box-shadow: inset 0 0 0 2px rgba(201, 162, 75, .45); }
     .contract-calendar-day.is-selected { background: #f3ecff; box-shadow: inset 0 0 0 2px rgba(105, 65, 198, .35); }
+    .contract-calendar-day.has-overlap { background: #fff7ed; }
     .contract-calendar-day:hover { background: #fbf9f5; }
 
     .contract-calendar-day-num {
@@ -669,14 +672,14 @@
       overflow: hidden;
     }
 
-    .cal-marker {
+    .cal-day-contract {
       display: block;
       width: 100%;
       border: none;
       border-radius: 6px;
       padding: 3px 5px;
       font-size: 10px;
-      line-height: 1.2;
+      line-height: 1.25;
       text-align: left;
       white-space: nowrap;
       overflow: hidden;
@@ -685,12 +688,17 @@
       color: #fff;
     }
 
-    .cal-marker.is-end { background: #b42318; }
-    .cal-marker.is-deadline { background: #b54708; }
-    .cal-marker.is-event { background: #6941c6; }
-    .cal-marker.is-pending { opacity: .65; box-shadow: inset 0 0 0 1px rgba(255,255,255,.45); }
+    .cal-day-contract.is-negociation { background: #175cd3; }
+    .cal-day-contract.is-signe { background: #6941c6; }
+    .cal-day-contract.is-paye { background: #05603a; }
+    .cal-day-contract.is-termine { background: #fec84b; color: #713b12; }
+    .cal-day-contract.is-annule { background: #d92d20; }
+    .cal-day-contract.is-pending { opacity: .65; box-shadow: inset 0 0 0 1px rgba(255,255,255,.45); }
+    .cal-day-contract.is-start { box-shadow: inset 3px 0 0 rgba(255,255,255,.85); }
+    .cal-day-contract.is-end { box-shadow: inset -3px 0 0 rgba(255,255,255,.85); }
+    .cal-day-contract.is-start.is-end { box-shadow: inset 3px 0 0 rgba(255,255,255,.85), inset -3px 0 0 rgba(255,255,255,.85); }
 
-    .cal-marker-more {
+    .cal-day-contract-more {
       font-size: 10px;
       color: var(--muted);
       padding-left: 2px;
@@ -2186,7 +2194,7 @@ body .catalogue-stats .stat-item {
           <div class="panel contract-calendar-panel" style="margin-top:14px">
             <div class="contract-calendar-head">
               <h3 style="margin-bottom:4px">Planning partagé</h3>
-              <p class="muted" style="margin:0">Calendrier des périodes, échéances, fins de contrat et événements liés.</p>
+              <p class="muted" style="margin:0">Visualisez les périodes actives des contrats, leurs chevauchements et leur statut.</p>
             </div>
             <div id="contractsPlanner" class="contract-calendar" aria-live="polite"></div>
           </div>
@@ -2945,6 +2953,23 @@ function toggleCatalogueTab(tabId) {
 
     function isAdminUser() { return State.user?.role === 'admin'; }
 
+    function ownsRecord(record) {
+      return String(record?.owner_id || '').toLowerCase() === String(State.user?.ID || '').toLowerCase();
+    }
+
+    function canEditDevis(devis) {
+      if (!devis?.devis_id) return true;
+      if (devis.statut === 'Transforme') return false;
+      return isAdminUser() || ownsRecord(devis);
+    }
+
+    function canDeleteDevis(devis) {
+      if (!devis?.devis_id) return false;
+      if (isAdminUser()) return true;
+      if (devis.statut === 'Transforme') return false;
+      return ownsRecord(devis);
+    }
+
     function getDocumentsForEntity(entityType, entityId) {
       return (State.documents || []).filter(doc => doc.entity_type === entityType && doc.entity_id === entityId);
     }
@@ -3304,7 +3329,10 @@ function toggleCatalogueTab(tabId) {
         return;
       }
       const isAdmin = isAdminUser();
-      $('devisRows').innerHTML = State.devis.slice().sort((a,b) => String(b.date).localeCompare(String(a.date))).map(d => `
+      $('devisRows').innerHTML = State.devis.slice().sort((a,b) => String(b.date).localeCompare(String(a.date))).map(d => {
+        const canEdit = canEditDevis(d);
+        const canDelete = canDeleteDevis(d);
+        return `
         <tr class="${d._pending ? 'row-pending' : ''}">
           <td>${formatDate(d.date)}</td>
           <td><strong>${escapeHtml(d.client_nom || getClientName(d.client_id))}</strong></td>
@@ -3320,13 +3348,14 @@ function toggleCatalogueTab(tabId) {
             <div class="inline-actions">
               <button class="btn btn-secondary" data-entity-docs="devis" data-entity-id="${escapeAttr(d.devis_id)}">Documents</button>
               ${d.statut !== 'Transforme' && d.statut !== 'Refuse' && !getDocumentsForEntity('devis', d.devis_id).some(doc => doc.doc_type === 'signed_pdf') ? `<button class="btn btn-secondary" data-sign-entity="devis" data-entity-id="${escapeAttr(d.devis_id)}" data-entity-label="${escapeAttr(d.client_nom || getClientName(d.client_id))}">Faire signer</button>` : ''}
-              ${isAdmin ? `<button class="btn btn-secondary" data-edit-devis="${escapeAttr(d.devis_id)}">Modifier</button>` : ''}
+              ${canEdit ? `<button class="btn btn-secondary" data-edit-devis="${escapeAttr(d.devis_id)}">Modifier</button>` : ''}
               ${d.statut !== 'Transforme' ? `<button class="btn btn-secondary" data-transform-devis="${escapeAttr(d.devis_id)}">Transformer</button>` : ''}
-              ${isAdmin ? `<button class="btn btn-secondary" data-delete-devis="${escapeAttr(d.devis_id)}">Supprimer</button>` : ''}
+              ${canDelete ? `<button class="btn btn-secondary" data-delete-devis="${escapeAttr(d.devis_id)}">Supprimer</button>` : ''}
 
             </div>
           </td>
-        </tr>`).join('') || '<tr><td colspan="11" class="muted">Aucun devis.</td></tr>';
+        </tr>`;
+      }).join('') || '<tr><td colspan="11" class="muted">Aucun devis.</td></tr>';
     }
 
     function devisStatusClass(s) {
@@ -3408,7 +3437,8 @@ function toggleCatalogueTab(tabId) {
       $('devis_remise_pct').value = d.remise_pct || 0;
       $('devis_remise_montant').value = d.remise_montant || 0;
       $('transformDevisBtn').style.display = isEdit && isAdmin ? 'inline-flex' : 'none';
-      const readOnlyEdit = isEdit && !isAdmin;
+      const persisted = d.devis_id ? State.devis.find(x => x.devis_id === d.devis_id) : null;
+      const readOnlyEdit = isEdit && !canEditDevis(persisted || d);
       ['devis_client', 'devis_date', 'devis_start', 'devis_end', 'devis_statut', 'devis_notes'].forEach(id => {
         const el = $(id); if (el) el.disabled = readOnlyEdit;
       });
@@ -3575,7 +3605,8 @@ function toggleCatalogueTab(tabId) {
 
     async function saveDevisFromDraft() {
       const d = getDevisDraft();
-      if (d.devis_id && !isAdminUser()) return showToast('Action reservee aux administrateurs');
+      const existing = d.devis_id ? State.devis.find(x => x.devis_id === d.devis_id) : null;
+      if (existing && !canEditDevis(existing)) return showToast('Modification impossible pour ce devis');
       d.client_id = $('devis_client').value;
       d.date = $('devis_date').value;
       d.date_debut = $('devis_start').value;
@@ -3715,9 +3746,9 @@ function toggleCatalogueTab(tabId) {
 
 
        async function deleteDevisAction(devisId) {
-      if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const d = State.devis.find(x => x.devis_id === devisId);
       if (!d) return;
+      if (!canDeleteDevis(d)) return showToast('Suppression impossible pour ce devis');
       const isTransformed = d.statut === 'Transforme';
       const msg = isTransformed
         ? 'Ce devis a deja ete transforme en contrat signe. Supprimer uniquement le devis (le contrat reste en place) ?'
@@ -3750,8 +3781,8 @@ function toggleCatalogueTab(tabId) {
 
 
     function openEditDevis(id) {
-      if (!isAdminUser()) return showToast('Action reservee aux administrateurs');
       const d = State.devis.find(x => x.devis_id === id); if (!d) return;
+      if (!canEditDevis(d)) return showToast('Modification impossible pour ce devis');
       const lignes = State.devis_lignes.filter(l => l.devis_id === id).sort((a,b) => Number(a.position) - Number(b.position));
       State.currentDevisDraft = Object.assign({}, d, {
         date_debut: d.date_debut || d.date,
@@ -4238,135 +4269,28 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
     }
 
     function buildContractCalendarItems() {
-      const items = [];
-      const contracts = State.contracts.slice();
-      const revenueByContract = new Map(
-        State.revenue
-          .filter(row => String(row.revenue_id || '').startsWith('ca_'))
-          .map(row => [String(row.revenue_id).replace(/^ca_/, ''), row])
-      );
-      const contractByClient = new Map(contracts.map(contract => [contract.client_id, contract]));
-
-      contracts.forEach(contract => {
-        const start = parseCalendarDate(contract.date_debut);
-        const end = parseCalendarDate(contract.date_fin);
-        const clientLabel = contract.client_nom || getClientName(contract.client_id);
-        const pending = !!contract._pending;
-        const statusKey = normalizeContractStatusKey(contract.statut);
-
-        if (start && end && start <= end) {
-          items.push({
+      return State.contracts
+        .map(contract => {
+          const start = parseCalendarDate(contract.date_debut);
+          const end = parseCalendarDate(contract.date_fin);
+          if (!start || !end || start > end) return null;
+          return {
             kind: 'period',
             contractId: contract.contract_id,
             clientId: contract.client_id,
-            title: clientLabel,
+            title: contract.client_nom || getClientName(contract.client_id),
             start,
             end,
             statut: contract.statut,
-            statusKey,
-            pending,
-          });
-        }
+            statusKey: normalizeContractStatusKey(contract.statut),
+            pending: !!contract._pending,
+          };
+        })
+        .filter(Boolean);
+    }
 
-        if (end) {
-          items.push({
-            kind: 'end',
-            contractId: contract.contract_id,
-            clientId: contract.client_id,
-            title: `Fin · ${clientLabel}`,
-            date: end,
-            statut: contract.statut,
-            pending,
-          });
-        }
-
-        const revenue = revenueByContract.get(contract.contract_id);
-        const revenueDate = parseCalendarDate(revenue?.date);
-        if (revenueDate && Number(revenue?.montant || 0) > 0) {
-          items.push({
-            kind: 'deadline',
-            contractId: contract.contract_id,
-            clientId: contract.client_id,
-            title: `Échéance CA · ${clientLabel}`,
-            date: revenueDate,
-            meta: formatMoney(revenue.montant),
-            pending: pending || !!revenue._pending,
-          });
-        } else if (start && statusKey === 'negociation') {
-          items.push({
-            kind: 'deadline',
-            contractId: contract.contract_id,
-            clientId: contract.client_id,
-            title: `Relance · ${clientLabel}`,
-            date: addCalendarDays(start, 14),
-            pending,
-          });
-        }
-
-        if (end && (statusKey === 'signe' || statusKey === 'paye')) {
-          const renewal = addCalendarDays(end, -30);
-          if (!start || renewal >= start) {
-            items.push({
-              kind: 'deadline',
-              contractId: contract.contract_id,
-              clientId: contract.client_id,
-              title: `Renouvellement · ${clientLabel}`,
-              date: renewal,
-              pending,
-            });
-          }
-        }
-
-        const created = parseCalendarDate(String(contract.created_at || '').slice(0, 10));
-        if (created) {
-          items.push({
-            kind: 'event',
-            contractId: contract.contract_id,
-            clientId: contract.client_id,
-            title: `Création · ${clientLabel}`,
-            date: created,
-            pending,
-          });
-        }
-      });
-
-      State.appointments.forEach(appointment => {
-        const contract = contractByClient.get(appointment.client_id);
-        if (!contract) return;
-        const date = parseCalendarDate(appointment.date);
-        if (!date) return;
-        items.push({
-          kind: 'event',
-          appointmentId: appointment.appointment_id,
-          contractId: contract.contract_id,
-          clientId: appointment.client_id,
-          title: appointment.objet || 'Rendez-vous',
-          date,
-          meta: [getClientName(appointment.client_id), appointment.heure].filter(Boolean).join(' · '),
-          pending: !!appointment._pending,
-        });
-      });
-
-      State.devis.forEach(devis => {
-        const contract = devis.contrat_id
-          ? contracts.find(item => item.contract_id === devis.contrat_id)
-          : contractByClient.get(devis.client_id);
-        if (!contract) return;
-        const date = parseCalendarDate(devis.date);
-        if (!date) return;
-        items.push({
-          kind: 'event',
-          devisId: devis.devis_id,
-          contractId: contract.contract_id,
-          clientId: devis.client_id,
-          title: `Devis · ${devis.client_nom || getClientName(devis.client_id)}`,
-          date,
-          meta: formatContractStatus(devis.statut) || devis.statut,
-          pending: !!devis._pending,
-        });
-      });
-
-      return items;
+    function getContractPeriodsOnDay(periods, dayIso) {
+      return periods.filter(period => calendarItemOnDay(period, dayIso));
     }
 
     function periodBarStyle(period, rangeStart, rangeEnd) {
@@ -4384,51 +4308,57 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
       };
     }
 
-    function renderCalendarMarker(item) {
-      const pendingClass = item.pending ? ' is-pending' : '';
-      const attrs = [];
-      if (item.contractId) attrs.push(`data-cal-open-contract="${escapeAttr(item.contractId)}"`);
-      if (item.appointmentId) attrs.push(`data-cal-open-appointment="${escapeAttr(item.appointmentId)}"`);
-      if (item.devisId) attrs.push(`data-cal-open-devis="${escapeAttr(item.devisId)}"`);
-      if (item.kind !== 'period') attrs.push(`data-cal-item-kind="${escapeAttr(item.kind)}"`);
-      return `<button type="button" class="cal-marker is-${escapeAttr(item.kind)}${pendingClass}" ${attrs.join(' ')} title="${escapeAttr(item.title)}">${escapeHtml(item.title)}</button>`;
+    function renderCalendarDayContract(period, dayIso) {
+      const startIso = calendarIso(period.start);
+      const endIso = calendarIso(period.end);
+      const isStart = dayIso === startIso;
+      const isEnd = dayIso === endIso;
+      const pendingClass = period.pending ? ' is-pending' : '';
+      const edgeClass = `${isStart ? ' is-start' : ''}${isEnd ? ' is-end' : ''}`;
+      const edgeLabel = isStart && isEnd ? ' (jour unique)' : isStart ? ' · début' : isEnd ? ' · fin' : '';
+      return `<button type="button" class="cal-day-contract is-${escapeAttr(period.statusKey)}${pendingClass}${edgeClass}" data-cal-open-contract="${escapeAttr(period.contractId)}" title="${escapeAttr(period.title + edgeLabel + ' · ' + formatContractStatus(period.statut))}">${escapeHtml(period.title)}${escapeHtml(edgeLabel)}</button>`;
     }
 
-    function renderContractsCalendarDetail(dayIso, dayItems) {
+    function renderContractsCalendarDetail(dayIso, dayPeriods) {
       if (!dayIso) return '';
-      const grouped = ['end', 'deadline', 'event'].map(kind => ({
-        kind,
-        rows: dayItems.filter(item => item.kind === kind),
-      })).filter(group => group.rows.length);
-      if (!grouped.length) {
+      if (!dayPeriods.length) {
         return `
           <div class="contract-calendar-detail">
             <div class="contract-calendar-detail-head">
-              <div><h4>${escapeHtml(formatDate(dayIso))}</h4><p class="muted" style="margin:4px 0 0">Aucun marqueur ce jour.</p></div>
+              <div><h4>${escapeHtml(formatDate(dayIso))}</h4><p class="muted" style="margin:4px 0 0">Aucun contrat actif ce jour.</p></div>
               <button type="button" class="btn btn-secondary" data-cal-close-detail>Fermer</button>
             </div>
           </div>`;
       }
-      const kindLabels = { end: 'Fins de contrat', deadline: 'Échéances', event: 'Événements liés' };
+      const overlapNote = dayPeriods.length > 1
+        ? `<p class="muted" style="margin:4px 0 0">${dayPeriods.length} contrats se chevauchent ce jour.</p>`
+        : `<p class="muted" style="margin:4px 0 0">1 contrat actif ce jour.</p>`;
       return `
         <div class="contract-calendar-detail">
           <div class="contract-calendar-detail-head">
-            <div><h4>${escapeHtml(formatDate(dayIso))}</h4><p class="muted" style="margin:4px 0 0">${dayItems.length} élément(s)</p></div>
+            <div><h4>${escapeHtml(formatDate(dayIso))}</h4>${overlapNote}</div>
             <button type="button" class="btn btn-secondary" data-cal-close-detail>Fermer</button>
           </div>
           <div class="contract-calendar-detail-list">
-            ${grouped.map(group => group.rows.map(item => `
+            ${dayPeriods.map(period => {
+              const startIso = calendarIso(period.start);
+              const endIso = calendarIso(period.end);
+              const edgeBits = [];
+              if (dayIso === startIso) edgeBits.push('Début');
+              if (dayIso === endIso) edgeBits.push('Fin');
+              const edgeText = edgeBits.length ? ` · ${edgeBits.join(' / ')}` : '';
+              return `
               <div class="contract-calendar-detail-item">
                 <div>
-                  <strong>${escapeHtml(item.title)}</strong>
-                  <span>${escapeHtml(kindLabels[group.kind])}${item.meta ? ` · ${escapeHtml(item.meta)}` : ''}${item.pending ? ' · Synchronisation' : ''}</span>
+                  <strong>${escapeHtml(period.title)}</strong>
+                  <span>${escapeHtml(formatDate(startIso))} → ${escapeHtml(formatDate(endIso))}${edgeText}${period.pending ? ' · Synchronisation' : ''}</span>
                 </div>
                 <div class="inline-actions">
-                  ${item.contractId ? `<button type="button" class="btn btn-secondary" data-cal-open-contract="${escapeAttr(item.contractId)}">Contrat</button>` : ''}
-                  ${item.appointmentId ? `<button type="button" class="btn btn-secondary" data-cal-open-appointment="${escapeAttr(item.appointmentId)}">RDV</button>` : ''}
-                  ${item.devisId ? `<button type="button" class="btn btn-secondary" data-cal-open-devis="${escapeAttr(item.devisId)}">Devis</button>` : ''}
+                  <span class="badge ${contractStatusClass(period.statut)}">${escapeHtml(formatContractStatus(period.statut))}</span>
+                  <button type="button" class="btn btn-secondary" data-cal-open-contract="${escapeAttr(period.contractId)}">Contrat</button>
                 </div>
-              </div>`).join('')).join('')}
+              </div>`;
+            }).join('')}
           </div>
         </div>`;
     }
@@ -4438,8 +4368,7 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
       if (!planner) return;
 
       const items = buildContractCalendarItems();
-      const periods = items.filter(item => item.kind === 'period');
-      const pointItems = items.filter(item => item.kind !== 'period');
+      const periods = items;
       const anchor = getContractsCalendarAnchor();
       const range = getContractsCalendarRange();
       const gridDays = getContractsCalendarGridDays();
@@ -4471,14 +4400,15 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
       const monthAnchor = mode === 'month' ? anchor : null;
       const dayCells = gridDays.map(day => {
         const dayIso = calendarIso(day);
-        const dayItems = pointItems.filter(item => calendarItemOnDay(item, dayIso));
-        const markers = dayItems.slice(0, 3).map(renderCalendarMarker).join('');
-        const extra = dayItems.length > 3 ? `<div class="cal-marker-more">+${dayItems.length - 3} autre(s)</div>` : '';
+        const dayPeriods = getContractPeriodsOnDay(periods, dayIso);
+        const markers = dayPeriods.slice(0, 4).map(period => renderCalendarDayContract(period, dayIso)).join('');
+        const extra = dayPeriods.length > 4 ? `<div class="cal-day-contract-more">+${dayPeriods.length - 4} autre(s)</div>` : '';
         const classes = [
           'contract-calendar-day',
           monthAnchor && day.getMonth() !== monthAnchor.getMonth() ? 'is-outside' : '',
           dayIso === todayIso ? 'is-today' : '',
           selectedDay === dayIso ? 'is-selected' : '',
+          dayPeriods.length > 1 ? 'has-overlap' : '',
         ].filter(Boolean).join(' ');
         return `
           <div class="${classes}" data-cal-day="${escapeAttr(dayIso)}" role="button" tabindex="0">
@@ -4487,8 +4417,8 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
           </div>`;
       }).join('');
 
-      const selectedItems = selectedDay ? pointItems.filter(item => calendarItemOnDay(item, selectedDay)) : [];
-      const detailHtml = selectedDay ? renderContractsCalendarDetail(selectedDay, selectedItems) : '';
+      const selectedPeriods = selectedDay ? getContractPeriodsOnDay(periods, selectedDay) : [];
+      const detailHtml = selectedDay ? renderContractsCalendarDetail(selectedDay, selectedPeriods) : '';
 
       planner.innerHTML = `
         <div class="contract-calendar-toolbar">
@@ -4504,10 +4434,12 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
           </div>
         </div>
         <div class="contract-calendar-legend">
-          <span><i class="cal-legend-swatch is-period"></i>Période</span>
-          <span><i class="cal-legend-swatch is-end"></i>Fin de contrat</span>
-          <span><i class="cal-legend-swatch is-deadline"></i>Échéance</span>
-          <span><i class="cal-legend-swatch is-event"></i>Événement lié</span>
+          <span><i class="cal-legend-swatch is-negociation"></i>En négociation</span>
+          <span><i class="cal-legend-swatch is-signe"></i>Signé</span>
+          <span><i class="cal-legend-swatch is-paye"></i>Payé</span>
+          <span><i class="cal-legend-swatch is-termine"></i>Terminé</span>
+          <span><i class="cal-legend-swatch is-annule"></i>Annulé</span>
+          <span class="muted">Barre blanche = début ou fin de contrat</span>
         </div>
         <div class="contract-calendar-timeline">
           <div class="contract-calendar-timeline-head">
@@ -4521,7 +4453,7 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
           ${dayCells}
         </div>
         ${detailHtml}
-        ${!items.length ? '<div class="contract-calendar-empty">Ajoutez un contrat pour alimenter le planning partagé.</div>' : ''}`;
+        ${!periods.length ? '<div class="contract-calendar-empty">Ajoutez un contrat pour alimenter le planning partagé.</div>' : ''}`;
     }
 
     function shiftContractsCalendar(step) {
@@ -4551,21 +4483,11 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
     }
 
     function handleContractsCalendarClick(event) {
-      const markerTarget = event.target.closest('[data-cal-open-contract],[data-cal-open-appointment],[data-cal-open-devis]');
+      const markerTarget = event.target.closest('[data-cal-open-contract]');
       if (markerTarget && markerTarget.closest('#contractsPlanner')) {
         event.preventDefault();
         event.stopPropagation();
-        if (markerTarget.dataset.calOpenContract) {
-          openEditContract(markerTarget.dataset.calOpenContract);
-          return;
-        }
-        if (markerTarget.dataset.calOpenAppointment) {
-          openCalendarAppointment(markerTarget.dataset.calOpenAppointment);
-          return;
-        }
-        if (markerTarget.dataset.calOpenDevis) {
-          openCalendarDevis(markerTarget.dataset.calOpenDevis);
-        }
+        openEditContract(markerTarget.dataset.calOpenContract);
         return;
       }
 
