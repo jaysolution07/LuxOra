@@ -1496,14 +1496,13 @@ body .catalogue-stats .stat-item {
         </div>
         <div class="eyebrow" style="color:#e9d9ab">CRM multi-entreprise</div>
         <h1>Lab<span class="o-dove"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50,54)"><path d="M-3,9 L-13,24 L-6,15 L0,22 L4,14 L9,23 L3,9 Z" fill="#1b1a24"/><ellipse cx="0" cy="-3" rx="6.6" ry="13" fill="#1b1a24"/><circle cx="2.2" cy="-16" r="5" fill="#1b1a24"/><path d="M6,-16 L12.5,-14 L6,-11.6 Z" fill="#1b1a24"/><path d="M-4,-7 C-19,-11 -32-24 -36-37 C-28-30 -17-22 -6-18 C-13-16 -19-10 -21-3 C-15,-6 -9-8 -4-7 Z" fill="#1b1a24"/><path d="M4,-7 C19-11 32-24 36-37 28-30 17-22 6-18 13-16 19-10 21-3 15-6 9-8 4-7 Z" fill="#1b1a24"/><circle cx="3.6" cy="-16.6" r="1" fill="#f5eac9"/></g></svg><span class="sr-only">O</span></span>ra</h1>
-        <p>Chaque entreprise a ses propres comptes. Un admin ne peut creer que des utilisateurs de son entreprise.</p>
+      
       </div>
     </div>
     <div class="login-panel">
       <form id="loginForm" class="card">
         <div class="eyebrow">Connexion</div>
         <h2>Accéder à LabOra</h2>
-        <p class="muted">Identifiant et mot de passe depuis le sheet master.</p>
         <label for="login">Identifiant</label>
         <input id="login" autocomplete="username" required>
         <label for="password">Mot de passe</label>
@@ -1812,7 +1811,7 @@ body .catalogue-stats .stat-item {
         </section>
 
         <section id="appointments" class="view">
-          <div class="toolbar"><div><div class="eyebrow">Activite</div><h2>Rendez-vous</h2><p class="muted">Les ajouts s'affichent immediatement puis se synchronisent avec le back-end et Google Agenda.</p></div></div>
+          <div class="toolbar"><div><div class="eyebrow">Activite</div><h2>Rendez-vous</h2><p class="muted">Vos RDV synchronisés avec Google Agenda.</p></div></div>
                     <div class="actions" style="justify-content:flex-start;margin-top:14px">
             <button id="toggleAppointmentFormBtn" class="btn btn-primary" type="button">+ Ajouter un rendez-vous</button>
           </div>
@@ -2140,7 +2139,7 @@ body .catalogue-stats .stat-item {
 
         <section id="contracts" class="view">
           <div class="toolbar">
-            <div><div class="eyebrow">Contrats</div><h2>Contrats et planning partagé</h2><p class="muted">Le planning est commun a toute l'entreprise. Les changements s'affichent immediatement puis se synchronisent.</p></div>
+            <div><div class="eyebrow">Contrats</div><h2>Contrats et planning partagé</h2><p class="muted">Le planning est commun a toute l'entreprise.</p></div>
             <div class="toolbar-actions">
               <button id="toggleContractFormBtn" class="btn btn-primary" type="button">+ Nouveau contrat</button>
             </div>
@@ -2674,11 +2673,11 @@ function toggleCatalogueTab(tabId) {
 
     function renderSecondaryViews() {
       $('usersHelp').textContent = State.user?.role === 'admin'
-        ? `Creation limitee a l'entreprise ${State.company?.entreprise || ''}.`
+        ? `Creation limitée a l'entreprise ${State.company?.entreprise || ''}.`
         : 'Votre compte apporteur.';
       if (State.user?.role !== 'admin') $('adminEditPanel').style.display = 'none';
       $('clientsHelp').textContent = State.user?.role === 'admin'
-        ? 'Vue globale des clients de l entreprise.'
+        ? 'Vue globale des clients de l'entreprise.'
         : 'Votre portefeuille client.';
       $('catalogueHelp').textContent = State.user?.role === 'admin'
         ? 'Gérez vos prestations, suppléments et la rentabilité.'
