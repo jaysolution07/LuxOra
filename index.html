@@ -3838,6 +3838,9 @@ function toggleCatalogueTab(tabId) {
         ? 'Ce devis a deja ete transforme en contrat signe. Supprimer uniquement le devis (le contrat reste en place) ?'
         : 'Supprimer ce devis ?';
       if (!confirm(msg)) return;
+      const previousDevis = State.devis.slice();
+      const previousLignes = State.devis_lignes.slice();
+      const previousDocuments = (State.documents || []).slice();
       try {
         await businessApi.request('deleteDevis', { devis_id: devisId });
         State.devis = State.devis.filter(x => x.devis_id !== devisId);
@@ -3846,6 +3849,9 @@ function toggleCatalogueTab(tabId) {
         showToast(isTransformed ? 'Devis supprime (contrat preserve)' : 'Devis supprime');
         renderDevisListe(); renderCatalogueAnalytics(); persistSession();
       } catch (err) {
+        State.devis = previousDevis;
+        State.devis_lignes = previousLignes;
+        State.documents = previousDocuments;
         showToast('Erreur: ' + (err.message || 'inconnue'));
       }
     }
@@ -5024,6 +5030,7 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
       const previousContracts = State.contracts.slice();
       const previousLines = State.contract_lignes.slice();
       const previousRevenue = State.revenue.slice();
+      const previousDocuments = (State.documents || []).slice();
       markPendingDelete('contracts', contractId);
       markPendingDelete('revenue', `ca_${contractId}`);
       State.contracts = State.contracts.filter(item => item.contract_id !== contractId);
@@ -5042,6 +5049,7 @@ if (!$('client_owner').value && State.user?.ID) $('client_owner').value = State.
         State.contracts = previousContracts;
         State.contract_lignes = previousLines;
         State.revenue = previousRevenue;
+        State.documents = previousDocuments;
         renderAll();
         showToast(err.message);
       }
@@ -5297,21 +5305,22 @@ showToast('Client cree');
       State.syncingRefresh = true;
       showSyncIndicator('syncing');
       try {
-        const hadEndpoint = Boolean(State.businessEndpoint);
-        const tasks = [masterApi.request('bootstrap')];
-        if (hadEndpoint) tasks.push(loadBusinessBootstrap({ background: true }));
-        const [masterData] = await Promise.all(tasks);
-        State.user = masterData.user;
-        State.company = masterData.company;
-        State.businessEndpoint = masterData.company?.business_endpoint || State.businessEndpoint || '';
-        State.stats = masterData.stats;
-        State.users = masterData.users || [State.user];
-        renderDashboard();
-        if (State.businessEndpoint && !hadEndpoint) {
-          await loadBusinessBootstrap({ background: true });
+        if (!State.businessEndpoint) {
+          const masterData = await masterApi.request('bootstrap');
+          State.user = masterData.user;
+          State.company = masterData.company;
+          State.businessEndpoint = masterData.company?.business_endpoint || '';
+          State.stats = masterData.stats;
+          State.users = masterData.users || [State.user];
+          renderDashboard();
+          scheduleSecondaryRender();
+          showSyncIndicator('done');
+          return;
         }
-        renderAll();
-        persistSession();
+        await loadBusinessBootstrap({ background: true });
+        finishDashboardSync();
+        renderDashboard();
+        scheduleSecondaryRender();
         showSyncIndicator('done');
       } catch (err) {
         hideSyncIndicator();
@@ -5328,16 +5337,23 @@ showToast('Client cree');
       if (options.showIndicator) showSyncIndicator('syncing');
       (async () => {
         try {
-          const data = await masterApi.request('bootstrap');
-          State.user = data.user; State.company = data.company; State.businessEndpoint = data.company?.business_endpoint || '';
-          State.stats = data.stats; State.users = data.users || [State.user];
           if (State.businessEndpoint) {
             await loadBusinessBootstrap({ background: true });
+            finishDashboardSync();
+            renderDashboard();
+            scheduleSecondaryRender();
+          } else {
+            const data = await masterApi.request('bootstrap');
+            State.user = data.user;
+            State.company = data.company;
+            State.businessEndpoint = data.company?.business_endpoint || '';
+            State.stats = data.stats;
+            State.users = data.users || [State.user];
+            renderDashboard();
+            scheduleSecondaryRender();
           }
           State.dashboardSynced = true;
           setDashboardLoading(false);
-          renderAll();
-          persistSession();
           if (options.showIndicator) showSyncIndicator('done');
         } catch (err) {
           if (options.showIndicator) hideSyncIndicator();
@@ -5524,7 +5540,10 @@ showToast('Client cree');
       State.syncingBusiness = true;
       businessApi.request('bootstrap').then(data => {
         applyBusinessBootstrapData(data);
-        renderAll(); persistSession();
+        if (data.stats) State.stats = { ...(State.stats || {}), ...(data.stats || {}) };
+        finishDashboardSync();
+        renderDashboard();
+        scheduleSecondaryRender();
       }).catch(() => {}).finally(() => State.syncingBusiness = false);
     }
 async function refreshCatalogue() {
