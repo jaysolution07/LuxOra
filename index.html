@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LabOra</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='46%25' r='62%25'%3E%3Cstop offset='0%25' stop-color='%23fffaf0'/%3E%3Cstop offset='55%25' stop-color='%23f5eac9'/%3E%3Cstop offset='100%25' stop-color='%23e6d5a3'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)' stroke='%23c9a24b' stroke-width='4'/%3E%3Cg stroke='%23c9a24b' stroke-width='2.4' stroke-linecap='round' opacity='.7'%3E%3Cline x1='50' y1='4' x2='50' y2='14'/%3E%3Cline x1='50' y1='86' x2='50' y2='96'/%3E%3Cline x1='4' y1='50' x2='14' y2='50'/%3E%3Cline x1='86' y1='50' x2='96' y2='50'/%3E%3Cline x1='17' y1='17' x2='24' y2='24'/%3E%3Cline x1='76' y1='76' x2='83' y2='83'/%3E%3Cline x1='17' y1='83' x2='24' y2='76'/%3E%3Cline x1='76' y1='24' x2='83' y2='17'/%3E%3C/g%3E%3Cg transform='translate(50 55) scale(1.05)' fill='%231b1a24'%3E%3Cpath d='M-3 9-13 24-6 15 0 22 4 14 9 23 3 9Z'/%3E%3Cellipse cx='0' cy='-3' rx='6.6' ry='13'/%3E%3Ccircle cx='2.2' cy='-16' r='5'/%3E%3Cpath d='M6-16 12.5-14 6-11.6Z'/%3E%3Cpath d='M-4-7C-19-11-32-24-36-37-28-30-17-22-6-18-13-16-19-10-21-3-15-6-9-8-4-7Z'/%3E%3Cpath d='M4-7C19-11 32-24 36-37 28-30 17-22 6-18 13-16 19-10 21-3 15-6 9-8 4-7Z'/%3E%3Ccircle cx='3.6' cy='-16.6' r='1' fill='%23f5eac9'/%3E%3C/g%3E%3C/svg%3E">
+  <!-- PWA / Installation native -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='46%25' r='62%25'%3E%3Cstop offset='0%25' stop-color='%23fffaf0'/%3E%3Cstop offset='55%25' stop-color='%23f5eac9'/%3E%3Cstop offset='100%25' stop-color='%23e6d5a3'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)' stroke='%23c9a24b' stroke-width='4'/%3E%3Cg stroke='%23c9a24b' stroke-width='2.4' stroke-linecap='round' opacity='.7'%3E%3Cline x1='50' y1='4' x2='50' y2='14'/%3E%3Cline x1='50' y1='86' x2='50' y2='96'/%3E%3Cline x1='4' y1='50' x2='14' y2='50'/%3E%3Cline x1='86' y1='50' x2='96' y2='50'/%3E%3Cline x1='17' y1='17' x2='24' y2='24'/%3E%3Cline x1='76' y1='76' x2='83' y2='83'/%3E%3Cline x1='17' y1='83' x2='24' y2='76'/%3E%3Cline x1='76' y1='24' x2='83' y2='17'/%3E%3C/g%3E%3Cg transform='translate(50 55) scale(1.05)' fill='%231b1a24'%3E%3Cpath d='M-3 9-13 24-6 15 0 22 4 14 9 23 3 9Z'/%3E%3Cellipse cx='0' cy='-3' rx='6.6' ry='13'/%3E%3Ccircle cx='2.2' cy='-16' r='5'/%3E%3Cpath d='M6-16 12.5-14 6-11.6Z'/%3E%3Cpath d='M-4-7C-19-11-32-24-36-37-28-30-17-22-6-18-13-16-19-10-21-3-15-6-9-8-4-7Z'/%3E%3Cpath d='M4-7C19-11 32-24 36-37 28-30 17-22 6-18 13-16 19-10 21-3 15-6 9-8 4-7Z'/%3E%3Ccircle cx='3.6' cy='-16.6' r='1' fill='%23f5eac9'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#1b1a24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LabOra">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1447,6 +1454,44 @@ body .catalogue-stats .stat-item {
 }
 
 
+    /* === PWA Install Banner === */
+    .install-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #2a2536, #1b1a24);
+      color: #fff;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      position: relative;
+      z-index: 9;
+    }
+    .install-banner.show { display: flex; }
+    .install-banner .btn-install {
+      background: linear-gradient(135deg, #cba758, #9b7b2e);
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      padding: 7px 16px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .install-banner .btn-install:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,162,75,.35); }
+    .install-banner .btn-dismiss {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,.45);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      line-height: 1;
+    }
+    .install-banner .btn-dismiss:hover { color: #fff; }
   </style>
 </head>
 <body>
@@ -5829,5 +5874,76 @@ $('toggleSupplementFormBtn')?.addEventListener('click', () => {
     startApp();
     startRealtimeSync();
   </script>
+<!-- PWA Install Prompt -->
+<div id="installBanner" class="install-banner">
+  <span>📲 Installez LabOra sur votre écran d'accueil</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn-install" id="installBtn">Installer</button>
+    <button class="btn-dismiss" id="dismissBtn">✕</button>
+  </div>
+</div>
+
+<script>
+// ── beforeinstallprompt ──
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'installBtn' && deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((result) => {
+      if (result.outcome === 'accepted') console.log('LabOra installée');
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+  }
+  if (e.target.id === 'dismissBtn') {
+    document.getElementById('installBanner').classList.remove('show');
+  }
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('show');
+  console.log('LabOra installée avec succès');
+});
+
+// ── Manifest dynamique (évite le double-encodage manuel) ──
+(function() {
+  const iconSrc = document.querySelector('link[rel="icon"]').href;
+  const manifest = {
+    name: 'LabOra',
+    short_name: 'LabOra',
+    start_url: './',
+    display: 'standalone',
+    background_color: '#faf8f4',
+    theme_color: '#1b1a24',
+    icons: [{ src: iconSrc, sizes: '100x100', type: 'image/svg+xml' }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = url;
+  document.head.appendChild(link);
+})();
+
+// ── Insérer la bannière après le header de #app ──
+(function() {
+  const app = document.getElementById('app');
+  const banner = document.getElementById('installBanner');
+  if (app && banner) {
+    const header = app.querySelector('header');
+    if (header) {
+      header.after(banner);
+    }
+  }
+})();
+</script>
+
 </body>
 </html>
